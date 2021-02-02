@@ -24,7 +24,7 @@ def test_admm_bga(density, M, dtype):
 @pytest.mark.parametrize('part', partition_strategy)
 class TestAdmmLbga:
     def test_admm_lbga_ray(self, density, style, M, dtype, device, part):
-        N = 32 * 5
+        N = 32 * 3
         G = rand_udg(N, density, dtype=dtype, device=device)
         bptGs, beta, partptr, perm = admm_lbga_ray(
             G, M, block_size=32, style=style, part=part)

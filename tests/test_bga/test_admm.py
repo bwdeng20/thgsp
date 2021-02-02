@@ -7,7 +7,7 @@ from thgsp.bga.admm import admm_bga, is_bipartite_fix, admm_lbga_ray
 
 @pytest.mark.parametrize('dtype', float_dtypes[1:])
 @pytest.mark.parametrize('M', [1, 2])
-@pytest.mark.parametrize('density', [0.2, 0.5])
+@pytest.mark.parametrize('density', [0.1, 0.2])
 def test_admm_bga(density, M, dtype):
     N = 32
     G = rand_udg(N, density, dtype)

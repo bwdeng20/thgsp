@@ -30,7 +30,7 @@ class TestQmfCore:
         assert qmf.coefficient_a.shape == (M, 2 ** M, 3, qmf.order + 1)
 
     def test_transform(self, device, dtype):
-        M, N = 2, 60
+        M, N = 2, 32
         K = 30
         Bs = []
         beta = []
@@ -91,7 +91,7 @@ class TestColorQmf:
 
     @pytest.mark.parametrize('Ci', [5])
     def test_transform(self, dtype, device, strategy, Ci):
-        N = 100
+        N = 60
         graph = rand_udg(N, device=device, dtype=dtype)
         qmf = ColorQmf(graph, strategy=strategy, in_channels=1)
         M = qmf.M
@@ -128,7 +128,7 @@ class TestNumQMf:
 
     @pytest.mark.parametrize('M', [1, 2])
     def test_transform(self, dtype, device, strategy, M):
-        N = 32 * 4
+        N = 32 * 3
         graph = rand_udg(N, device=device, dtype=dtype)
         qmf = NumQmf(graph, strategy=strategy, M=M)
         f = torch.rand(N, device=device, dtype=dtype)
@@ -199,7 +199,7 @@ class TestColorBiorth:
         ColorBiorth(graph, in_channels=3, strategy=strategy, zeroDC=True)
 
     def test_transform(self, dtype, device, strategy):
-        N = 600
+        N = 100
         graph = rand_udg(N, device=device, dtype=dtype)
         bio = ColorBiorth(graph, strategy=strategy)
         M = bio.M
@@ -246,7 +246,7 @@ class TestNumBiorth:
         if strategy is "admm":
             print("|admm-lbga part strategy: {}".format(part))
             kwargs["part"] = part
-        N = 32 * 4
+        N = 32 * 3
         graph = rand_udg(N, device=device, dtype=dtype)
         bio = NumBiorth(graph, strategy=strategy, M=M, **kwargs)
         f = torch.randn(N, device=device, dtype=dtype)
@@ -316,7 +316,7 @@ class TestBiorWaveletBasis:
         self.display_density(basis.operator, basis.inv_operator)
 
     def test_multi_level(self, dtype, device):
-        N = 1000
+        N = 120
         G = rand_udg(N, 0.4, dtype, device)
         bptG, beta, _, _, _ = harary(G)
 

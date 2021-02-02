@@ -63,7 +63,7 @@ def meyer_mirror_kernel(x):
 
 
 def design_p(K):
-    """
+    r"""
     Auxiliary to design the biorthgonal kernel :math:`h_0(\lambda)`
     and :math:`g_0(\lambda)` metioned in :py:func:`.design_biorth_kernel`.
 
@@ -121,7 +121,7 @@ def estimate_orthogonality(h0, g0):
 
 
 def design_biorth_kernel(k):
-    """
+    r"""
     Compute the coefficients of biorthogonal kernels :math:`h_0` and :math:`g_0`, which are nearly the most orthogonal
     and maximally balanced pair among all possible factorizations of
 

@@ -33,7 +33,7 @@ script:
   - pytest
   - cd docs && pip install -r requirements.txt && make html && cd ..
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: pages
   skip_cleanup: true

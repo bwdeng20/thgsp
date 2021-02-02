@@ -15,7 +15,7 @@ def normalize_laplace(L: SparseTensor, lam_max: float = 2.):
 
 
 def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.):
-    """ Chebyshev approximation of graph filtering
+    r""" Chebyshev approximation of graph filtering
 
     Parameters
     ----------
@@ -35,6 +35,7 @@ def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: flo
     Tensor
         The filtered signals of shape :obj:`(Co,N,Ci)`
     """
+
     Co, Ci, K = coeff.shape
     N = L.size(-1)
 

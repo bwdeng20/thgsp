@@ -161,13 +161,13 @@ def nla(x, frac=0.4, k=None, scheme='abs'):
         k_largest = int(frac * N)
 
     fuse = x.reshape(-1, Ci)
-    if scheme is 'abs':
+    if scheme == 'abs':
         _, idx = fuse.abs().topk(k_largest, dim=0)
         val = fuse.gather(0, idx)
-    elif scheme is 'naive':
+    elif scheme == 'naive':
         val, idx = fuse.topk(k_largest, dim=0)
 
-    elif scheme is "keeplow":
+    elif scheme == "keeplow":
         fuse_high = fuse[N:, ...]
         _, idx = fuse_high.abs().topk(k_largest, dim=0)
         val = fuse_high.gather(0, idx)

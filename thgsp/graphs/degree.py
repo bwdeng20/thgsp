@@ -1,3 +1,4 @@
+import torch
 from torch_sparse import SparseTensor
 
 
@@ -38,3 +39,11 @@ def binary_out_degree(adj: SparseTensor, bunch=None):
     if bunch is not None:
         deg = deg[bunch]
     return deg
+
+
+def degree_matrix(adj: SparseTensor, indeg=True):
+    N = adj.size(-1)
+    deg = adj.sum(0) if indeg else adj.sum(1)
+    row = col = torch.arange(N, device=adj.device())
+    degs = torch.as_tensor(deg, device=adj.device())
+    return SparseTensor(row=row, col=col, value=degs, sparse_sizes=(N, N), is_sorted=True)

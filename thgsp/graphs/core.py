@@ -5,13 +5,13 @@ import torch
 from scipy.sparse.linalg import eigsh
 
 from thgsp.convert import to_torch_sparse, SparseTensor
-from .degree import in_degree, out_degree
+from .degree import in_degree, out_degree, degree_matrix
 from .is_bipartite import is_bipartite
 from .laplace import laplace
 
 
 class GraphBase(SparseTensor):
-    def __init__(self, adjacency, coords: Optional[torch.Tensor] = None, cache=False, requires_grad=False):
+    def __init__(self, adjacency, coords: Optional[torch.Tensor] = None, cache=True, requires_grad=False, **kwargs):
 
         try:  # torch.Tensor, np.ndarray, scipy.spmatrix
             M, N = adjacency.shape
@@ -33,11 +33,16 @@ class GraphBase(SparseTensor):
                                         is_sorted=True)
         self.requires_grad_(requires_grad)
 
+        self.extra = kwargs
         # cached members
         self._lap_type = None
         self._L = None
         self._fs = None
         self._U = None
+
+    @property
+    def lap_type(self):
+        return self._lap_type
 
     @property
     def n_node(self) -> int:
@@ -51,6 +56,20 @@ class GraphBase(SparseTensor):
         return edge_idx, val
 
     def L(self, lap_type: str = "sym"):
+        r"""
+        Compute a specific type of Laplacian matrix. If :py:attr:`self._lap_type` equals to :obj:`lap_type` and
+        :py:attr:`self.cache` is True, then return the cached Laplacian matrix. Note that every time you compute
+        Laplacian with a different type from the last, the cached matrix will be overwritten.
+
+        Parameters
+        ----------
+        lap_type: str
+            One of ["sym", "comb", "rw"]
+
+        Returns
+        -------
+        The Laplacian matrix
+        """
         assert lap_type in ["sym", "comb", "rw"]
         if self._L is not None and lap_type is self._lap_type:
             lap = self._L
@@ -92,6 +111,12 @@ class GraphBase(SparseTensor):
         fs = self.spectrum(lap_type)
         return fs, U
 
+    def D(self, indeg=True):
+        return degree_matrix(self, indeg)
+
+    def get_extra(self, k):
+        return self.extra[k]
+
     def degree(self, bunch=None):
         raise NotImplementedError
 
@@ -131,9 +156,9 @@ class GraphBase(SparseTensor):
 class Graph(GraphBase):
     def __init__(self, adjacency,
                  coords: Optional[torch.Tensor] = None,
-                 cache=False, requires_grad=False):
+                 cache=False, requires_grad=False, **kwargs):
         adj = to_torch_sparse(adjacency).to_symmetric(reduce='mean')
-        super(Graph, self).__init__(adj, coords, cache, requires_grad)
+        super(Graph, self).__init__(adj, coords, cache, requires_grad, **kwargs)
         self._is_directed = False
 
     def degree(self, bunch=None):
@@ -154,8 +179,8 @@ class Graph(GraphBase):
 class DiGraph(GraphBase):
     def __init__(self, adjacency,
                  coords: Optional[torch.Tensor] = None,
-                 cache=False, requires_grad=False):
-        super(DiGraph, self).__init__(adjacency, coords, cache, requires_grad)
+                 cache=False, requires_grad=False, **kwargs):
+        super(DiGraph, self).__init__(adjacency, coords, cache, requires_grad, **kwargs)
         self._is_directed = True
 
     def in_degree(self, bunch=None):

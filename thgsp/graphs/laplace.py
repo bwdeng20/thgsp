@@ -9,7 +9,7 @@ def laplace(adj: SparseTensor, lap_type=None):
     val = col.new_ones(col.shape, dtype=adj.dtype()) if val is None else val
     deg = adj.sum(0)
 
-    loop_index = torch.arange(N).unsqueeze_(0)
+    loop_index = torch.arange(N, device=adj.device()).unsqueeze_(0)
     if lap_type in (None, 'sym'):
         deg05 = deg.pow(-0.5)
         deg05[deg05 == float('inf')] = 0

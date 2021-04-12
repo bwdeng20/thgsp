@@ -4,11 +4,12 @@ from torch_sparse import SparseTensor
 
 from thgsp.graphs.laplace import laplace
 
-lap_types = ["sym", "comb", "rw"]
+from ..utils4t import lap_types, devices
 
 
+@pytest.mark.parametrize("device", devices)
 @pytest.mark.parametrize("lap_type", lap_types)
-def test_laplace(lap_type):
+def test_laplace(lap_type, device):
     N = 6
     A = torch.rand(N, N)
     A = A + A.t()

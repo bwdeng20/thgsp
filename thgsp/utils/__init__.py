@@ -1,5 +1,6 @@
 from .metrics import snr, mse
-from .sparse_utils import img2graph
+from .sparse_utils import img2graph, consecutive_spmv
 __all__ = ['snr',
            'mse',
-           'img2graph']
+           'img2graph',
+           'consecutive_spmv']

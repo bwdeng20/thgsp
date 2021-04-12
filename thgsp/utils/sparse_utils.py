@@ -87,3 +87,11 @@ def pool_edge(cluster, edge_index, edge_attr=None):
         edge_index, edge_attr = coalesce(edge_index, edge_attr, num_nodes,
                                          num_nodes)
     return edge_index, edge_attr
+
+
+def consecutive_spmv(A, v, k=2):
+    if v.dim() == 1:
+        v = v.reshape(A.shape[-1], 1)
+    for i in range(k):
+        v = A @ v
+    return v

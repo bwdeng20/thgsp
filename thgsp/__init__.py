@@ -10,7 +10,7 @@ for tool in cpp_tools:
     torch.ops.load_library(importlib.machinery.PathFinder().
                            find_spec(tool, [osp.dirname(__file__)]).origin)
 
-from .convert import to_torch_sparse  # noqa
+from .convert import to_torch_sparse, to_scipy, to_np  # noqa
 from .io import loadmat  # noqa
 
 import thgsp.graphs  # noqa
@@ -21,4 +21,6 @@ import thgsp.utils  # noqa
 import thgsp.datasets  # noqa
 
 __all__ = ['to_torch_sparse',
+           'to_scipy',
+           'to_np',
            'loadmat']

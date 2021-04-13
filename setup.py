@@ -73,6 +73,7 @@ install_requires = [
     'torch-cluster',
     'scikit-sparse',
     'matplotlib',
+    'pandas',
     'plotly'
 ]
 

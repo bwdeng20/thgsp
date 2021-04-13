@@ -26,8 +26,10 @@ def to_tensor(x, dtype, device=None):
     return None if x is None else torch.as_tensor(x, dtype=dtype, device=device)
 
 
-def plot():
+def plot(plotly_fig=None):
     show_flag = os.environ.get('THGSP_PLT')
     show_flag = 0 if show_flag is None else int(show_flag)
     if show_flag:
+        if plotly_fig is not None:
+            plotly_fig.show()
         plt.plot()

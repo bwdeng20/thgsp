@@ -314,21 +314,18 @@ class NumQmf(QmfCore):
         dtype = self.adj.dtype()
         if strategy == "admm":
             if N < 80:
-                bptG_dense = admm_bga(self.adj.to_dense().to(
-                    torch.double), M=M, **kwargs)
+                bptG_dense = admm_bga(self.adj.to_dense().to(torch.double), M=M, **kwargs)
                 beta = bptG_dense.new_zeros(N, M, dtype=bool)
+                bptG_dense = bptG_dense.to(dtype).to(device)
                 bptG = []
                 for i, B in enumerate(bptG_dense):
                     _, vtx_color, _ = is_bipartite_fix(B, fix_flag=True)
                     beta[:, i] = torch.as_tensor(vtx_color)
-                    bptG.append(SparseTensor.from_dense(
-                        B).to(dtype).to(device))
+                    bptG.append(SparseTensor.from_dense(B))
 
             else:
-                bptG, beta, self.partptr, self.perm = admm_lbga_ray(
-                    self.adj, M, **kwargs)
-                bptG = [SparseTensor.from_scipy(B).to(
-                    dtype).to(device) for B in bptG]
+                bptG, beta, self.partptr, self.perm = admm_lbga_ray(self.adj, M, **kwargs)
+                bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
 
         elif strategy == "amfs":
             bptG, beta = amfs(self.adj, level=self.M, **kwargs)
@@ -423,17 +420,16 @@ class NumBiorth(BiorthCore):
                     torch.double), M=M, **kwargs)
                 beta = bptG_dense.new_zeros(N, M, dtype=bool)
                 bptG = []
+                bptG_dense = bptG_dense.to(dtype).to(device)
                 for i, B in enumerate(bptG_dense):
                     _, vtx_color, _ = is_bipartite_fix(B, fix_flag=True)
                     beta[:, i] = torch.as_tensor(vtx_color)
-                    bptG.append(SparseTensor.from_dense(
-                        B).to(dtype).to(device))
+                    bptG.append(SparseTensor.from_dense(B))
 
             else:
                 bptG, beta, self.partptr, self.perm = admm_lbga_ray(
                     self.adj, M, **kwargs)
-                bptG = [SparseTensor.from_scipy(B).to(
-                    dtype).to(device) for B in bptG]
+                bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
 
         elif strategy == "amfs":
             bptG, beta = amfs(self.adj, level=self.M, **kwargs)

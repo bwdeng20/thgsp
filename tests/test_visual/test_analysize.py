@@ -3,7 +3,7 @@ from scipy.sparse import lil_matrix
 from thgsp.datasets import Toy
 from thgsp.sampling import ess_sampling
 from thgsp.visual import show_transform
-
+from ..utils4t import plot
 
 class TestShowTransform:
     def test_on_usc_toy(self):
@@ -17,4 +17,4 @@ class TestShowTransform:
         highlights = lil_matrix((M, N))
         highlights[range(M), sampled_nodes] = 1
         fig, _, _ = show_transform(g, U.t(), fs, highlights, cluster=2, bands=bands)
-        fig.show()
+        plot(fig)

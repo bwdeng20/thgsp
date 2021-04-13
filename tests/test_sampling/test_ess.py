@@ -17,7 +17,6 @@ N = 30
 @pytest.mark.parametrize('lap', lap_types)
 class TestPowerIteration:
     def test_power_iteration_max(self, dtype, device, lap):
-        N = 20
         k = 2
         g = rand_udg(N, dtype=dtype, device=device).set_value_(None)
         L = laplace(g, lap_type=lap)
@@ -30,7 +29,7 @@ class TestPowerIteration:
         sigma = sigma[0]
         print(f"\nth vs sci: {val:.4f}:{sigma:.4f}")
         print(f"th vs sci: \n", vec.view(-1), "\n", psi.ravel())
-        assert (sigma - val) ** 2 < 1e-3
+        assert (sigma - val) ** 2 < 1e-2
 
     def test_power_iteration_shift(self, dtype, device, lap):
         N = 20

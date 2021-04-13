@@ -9,7 +9,7 @@ from thgsp.convert import spmatrix, SparseTensor, coo_matrix
 def mats():
     N = 4
     th_mat = torch.rand(N, N, dtype=torch.float)
-    th_mat_gpu = th_mat.cuda()
+    th_mat_gpu = th_mat.cuda() if torch.cuda.is_available() else th_mat
     ths_mat = th_mat.to_sparse()
     ths_mat_gpu = th_mat_gpu.to_sparse()
     np_mat = th_mat.numpy()

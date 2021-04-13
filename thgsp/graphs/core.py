@@ -71,7 +71,7 @@ class GraphBase(SparseTensor):
         The Laplacian matrix
         """
         assert lap_type in ["sym", "comb", "rw"]
-        if self._L is not None and lap_type is self._lap_type:
+        if self._L is not None and lap_type == self._lap_type:
             lap = self._L
         else:
             lap = laplace(self, lap_type)
@@ -87,12 +87,13 @@ class GraphBase(SparseTensor):
         else:
             fs, U = torch.symeig(lap.to_dense(), eigenvectors=True)
             if self.cache:
+                fs[fs.abs() < 1e-6] = 0
                 self._fs = fs
                 self._U = U
         return U
 
     def spectrum(self, lap_type: str = "sym"):
-        lap = self.L(lap_type).to_symmetric(reduce="mean")
+        lap = self.L(lap_type)
         if self._fs is not None:
             fs = self._fs
         else:
@@ -103,8 +104,12 @@ class GraphBase(SparseTensor):
         return fs
 
     def max_frequency(self, lap_type: str = "sym"):
-        lap = self.L(lap_type).to_symmetric(reduce="mean")
-        eigsh(lap.to_scipy(layout="csr"), k=1)
+        lap = self.L(lap_type)
+        if self._fs is not None:
+            max_f = max(self._fs).item()
+        else:
+            max_f = eigsh(lap.to_scipy(layout="csr"), k=1, which="LM", return_eigenvectors=False)[0]
+        return max_f
 
     def spectral(self, lap_type: str = "sym"):
         U = self.U(lap_type)

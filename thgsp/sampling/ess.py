@@ -13,13 +13,16 @@ def ess_sampling(operator, M, k=2):
     S = list()
     while len(S) < M:
         Sc = np.setdiff1d(V, S)
+        if len(Sc) == 1:
+            S.append(Sc[0])
+            break
         reduced = LtL[np.ix_(Sc, Sc)]
         try:
             sigma, psi = eigsh(reduced, k=1, which="SM")
         except ArpackNoConvergence as err:
             raise err
         psi = psi.ravel()
-        v = Sc[np.argmax(psi ** 2)]
+        v = Sc[np.argmax(np.abs(psi))]
         S.append(v)
     return S
 
@@ -55,8 +58,11 @@ def ess(operator, M, k=2, max_iter=int(5e2)):
     S = []
     while len(S) < M:
         Sc = np.setdiff1d(V, S)
+        if len(Sc) == 1:
+            S.append(Sc[0])
+            break
         sigma, psi = power_iteration4min(operator, Sc, k, max_iter)
-        v = Sc[th.argmax(psi ** 2)]
+        v = Sc[th.argmax(psi.abs())]
         S.append(v)
     return S
 

@@ -9,6 +9,7 @@ from scipy.sparse.linalg import eigsh
 
 np.set_printoptions(precision=5)
 th.set_printoptions(precision=5)
+N = 30
 
 
 @pytest.mark.parametrize('dtype', float_dtypes[1:])
@@ -70,19 +71,16 @@ class TestPowerIteration:
 @pytest.mark.parametrize('dtype', float_dtypes[1:])  # omit float32 since it may lead to ArpackNoConvergence error
 @pytest.mark.parametrize('device', devices)
 @pytest.mark.parametrize('lap', lap_types)
+@pytest.mark.parametrize('M', [N // 2, N])
 class TestEss:
-    def test_ess_sampling(self, dtype, device, lap):
-        N = 30
-        M = 10
+    def test_ess_sampling(self, dtype, device, lap, M):
         k = 2
         g = rand_udg(N, dtype=dtype, device=device)
         L = laplace(g, lap_type=lap)
         S = ess_sampling(L, M, k)
         print(S)
 
-    def test_ess(self, dtype, device, lap):
-        N = 30
-        M = 10
+    def test_ess(self, dtype, device, lap, M):
         k = 2
         g = rand_udg(N, dtype=dtype, device=device)
         L = laplace(g, lap_type=lap)

@@ -19,6 +19,7 @@ import thgsp.filters  # noqa
 import thgsp.bga  # noqa
 import thgsp.utils  # noqa
 import thgsp.datasets  # noqa
+import thgsp.sampling  # noqa
 
 __all__ = ['to_torch_sparse',
            'to_scipy',

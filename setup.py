@@ -64,6 +64,7 @@ def get_extensions():
 install_requires = [
     'torch',
     'ray',
+    'sklearn',
     'numpy',
     'scipy',
     'networkx',
@@ -72,6 +73,7 @@ install_requires = [
     'torch-cluster',
     'scikit-sparse',
     'matplotlib',
+    'plotly'
 ]
 
 tests_require = ['pytest',

@@ -276,7 +276,7 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
     # plot dots and highlight entries
     dots, highs = plot_dots(embedding_ordered, all_series, spectral_spacing, threshold=epsilon_support,
                             labels=emd_order,
-                            highlight_entry=highlight_entry,
+                            highlight_entry=highlight_entry[:, emd_order],
                             size=support_scatter_size * 1.5)
     fig.add_traces(dots)
     fig.add_traces(highs)

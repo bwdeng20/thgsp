@@ -63,6 +63,7 @@ def get_extensions():
 
 install_requires = [
     'torch',
+    'torchvision',
     'ray',
     'sklearn',
     'numpy',

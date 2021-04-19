@@ -1,6 +1,5 @@
 import io
 import pkgutil
-
 import scipy.io
 
 
@@ -11,7 +10,7 @@ def loadmat(path):
     Parameters
     ----------
     path : string
-        Path to the mat file from the data folder, without the .mat extension.
+        Path to the mat file from the data folder, without the .mat postfix.
 
     Returns
     -------
@@ -20,8 +19,7 @@ def loadmat(path):
         values.
     """
     try:
-        data = pkgutil.get_data(
-            'thgsp', 'datasets/data/pointclouds/' + path + '.mat')
+        data = pkgutil.get_data('thgsp', 'datasets/data/pointclouds/' + path + '.mat')
     except FileNotFoundError:
         data = open(path, 'rb').read()
     data = io.BytesIO(data)

@@ -7,7 +7,7 @@ from .utils import new_order, distribute_color, bipartite_mask
 
 
 def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
-    """
+    r"""
     Harary bipartite decomposition
 
     Parameters
@@ -15,7 +15,7 @@ def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
     A:      :py:class:`SparseTensor`
         The adjacency matrix
     vtx_color: array_like, optional
-        All valid type for :py:func:`np.asarray` is desired, including :py:class:`torch.Tensor` on cpu. If None,
+        All valid type for :py:func:`np.asarray` is acceptable, including :py:class:`torch.Tensor` on cpu. If None,
         this function will invoke :py:func:`thgsp.alg.dsatur` silently.
 
     threshold: float, optional
@@ -23,7 +23,7 @@ def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
     Returns
     -------
     bptG:    array
-        A array consisting of :obj`M` bipartite subgraphs formatted as :class:`scipy.sparse.lil_matrix`.
+        An array consisting of :obj:`M` bipartite subgraphs formatted as :class:`scipy.sparse.lil_matrix`.
     beta:   array
         :obj:`beta[:,i]` is the bipartite set indicator of :obj:`i`-th subgraph.
     beta_dist:  array
@@ -31,16 +31,16 @@ def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
     new_vtx_color:  array
         The node colors
     mapper:     dict
-        Map **new_vtx_color** to the original ordinal group. For example mapper={1:2, 2:3, 3:1} will
+        Map **new_vtx_color** to the original ones. For example mapper={1:2, 2:3, 3:1} will
         map 1,2 and 3-th color to 2,3 and 1, respectively.
+
     """
     if vtx_color is None:
         vtx_color = dsatur(A)
     vtx_color = np.asarray(vtx_color)
     n_color = max(vtx_color) + 1
     if n_color > 256:
-        raise RuntimeError(
-            "Too many colors will lead to a too complicated channel division")
+        raise RuntimeError("Too many colors will lead to a too complicated channel division")
 
     A = A.to_scipy(layout='csr').tolil()
     M = int(np.ceil(np.log2(n_color)))  # the number of bipartite graphs

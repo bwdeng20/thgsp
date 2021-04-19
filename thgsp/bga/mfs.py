@@ -12,6 +12,41 @@ from .utils import laplace, bipartite_mask, np
 
 def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, priority=True, verbose=False) \
         -> Tuple[List[lil_matrix], np.ndarray]:
+    r"""
+    AMFS bipartite approximation for graph  wavelet signal processing [3]_.
+
+    Parameters
+    ----------
+    A:          SparseTensor
+        The adjacency matrix.
+    Sigma:      scipy.spmatrix, optional
+        The covariance matrix specified by the Laplacian matrix L. If None, :math:`\Sigma^{-1}=L+\delta I`
+    level:      int, optional
+        The number of bipartite subgraphs, i.e., the decomposition level. If None,
+        :math:`level=\lceil log_2( \mathcal{X}) \rceil`, where :math:`\mathcal{X}` is the chromatic number of  :obj:`A`.
+    delta:      float, optional
+        :math:`1/\delta` is interpreted as the variance of the DC compnent. Refer to [4]_ for more details.
+    thresh_kld: float, optional
+        Threshold of Kullback-Leibler divergence to perform `AMFS` decomposition.
+    priority:   bool,optional
+        If True, KLD holds priority.
+    verbose:    bool,optional
+
+    Returns
+    -------
+    bptG:   List[SparseTensor]
+        The bipartite subgraphs.
+    beta:   Tensor(N, M)
+        The indicator of bipartite sets
+
+    References
+    ----------
+    .. [3] Jing Zen, et al, "Bipartite Subgraph Decomposition for Critically Sampledwavelet Filterbanks on Arbitrary
+            Graphs," IEEE trans on SP, 2016.
+    .. [4] A. Gadde, et al, "A probablistic interpretation of sampling theory of graph signals". ICASSP, 2015.
+
+    """
+
     N = A.size(-1)
     # compute_sigma consists of laplace matrix which prefers "coo"
     A = A.to_scipy(layout='coo')

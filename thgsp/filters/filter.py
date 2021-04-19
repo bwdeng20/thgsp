@@ -169,16 +169,16 @@ class Filter:
         ----------
         x:  Tensor
             The signal to filter. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and :obj:`N` are the numbers of input
-            channels and graph ndoes, separately.
+            channels and graph nodes, separately.
         cheby: bool
-            If :py:obj:`True`, conduct filtering via Chebysheve approximation. Otherwise signals are filtered in a
-            brute-force way - do a complete eigenvalue decompositon of Laplacian :math:`L` to get the GFT and IGFT
-            matrces.
+            If :py:obj:`True`, conduct filtering via Chebyshev approximation. Otherwise signals are filtered in a
+            brute-force way - do a complete eigenvalue decomposition of Laplacian :math:`L` to get the GFT and IGFT
+            matrices.
 
         Returns
         -------
         Tensor
-            Filtered signsls. Shape: :obj:`(N,Co)`. :obj:`Co` is the output channels.
+            Filtered signals. Shape: :obj:`(N,Co)`. :obj:`Co` is the output channels.
         """
         out = self.cheby_filter(x) if cheby else self.filter(x)
         # (Co, N ,Ci) @ (Co, Ci, 1) = (Co, N, 1)

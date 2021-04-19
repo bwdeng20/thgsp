@@ -65,7 +65,7 @@ def meyer_mirror_kernel(x):
 def design_p(K):
     r"""
     Auxiliary to design the biorthgonal kernel :math:`h_0(\lambda)`
-    and :math:`g_0(\lambda)` metioned in :py:func:`.design_biorth_kernel`.
+    and :math:`g_0(\lambda)` metioned in :func:`design_biorth_kernel`.
 
     .. math::
         p(\lambda)	=(2-\lambda)^{K}[1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}

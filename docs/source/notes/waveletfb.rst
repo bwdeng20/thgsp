@@ -25,7 +25,7 @@ that no same color are assigned to adjacent nodes. You can easily access to the 
     from thgsp.alg import dsatur
     from thgsp.visual import draw_signal, draw_cn, draw
     import matplotlib.pyplot as plt
-    data=Minnesota(connected=True)
+    data=Minnesota(download=True,connected=True)
     minne=data[0]
     print(minne)
 

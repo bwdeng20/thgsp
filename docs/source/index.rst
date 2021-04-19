@@ -5,9 +5,7 @@ Welcome to thgsp's documentation!
 
 Thgsp is a graph signal processing package based on `PyTorch <https://pytorch.org/>`_.
 
-It mainly consists of the following stuffs:
-
-The repository now mainly consists of:
+The repository now mainly includes:
 
 -  GFT-based filter(banks) processing multi-dimensional signals in a Multiple Input Multiple Output(MIMO) manner.
 -  GraphQmf and GraphBiorth wavelet filter bank.

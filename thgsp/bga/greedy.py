@@ -16,5 +16,5 @@ def greedy_bga(A, iterations=5, verbose=False):
             best_B = Br
             thresh = err
         if verbose:
-            print("Iter: {:3d}, \t FrobeniusNorm^2: {:4f}".format(i, err))
+            print(f"Iter: {i:3d}, \t FrobeniusNorm^2: {err:4f}")
     return best_B, vtx_color

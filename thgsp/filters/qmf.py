@@ -14,8 +14,62 @@ from .kernels import meyer_kernel, meyer_mirror_kernel, get_kernel_name, design_
 
 
 class QmfCore:
-    def __init__(self, bptG: List[SparseTensor], beta, analyze_kernels=None, synthesis_kernels=None, in_channels=1,
-                 order=24, lam_max=2., zeroDC=False):
+    r""" The core implementation of GraphQmf [2]_ and GraphBiorth [3]_ filterbanks.
+
+    .. note::
+        There is no need to change :attr:`in_channels` when the signals of all input channels share a
+        same filterbank since :class:`QmfCore` can automatically broadcast one filterbank among all input channels.
+
+    Attributes
+    ----------
+    N: int
+        The number of nodes.
+    M: int
+        The number of bipartite (sub)graphs.
+    beta: (Bool)Tensor(N,M)
+        Each column of :attr:`beta` corresponds to one bipartite (sub)graph It has ones at the
+        locations of nodes sampled by the lowpass filter, with zeros at that by the highpass filter
+    analyze_kernels:    List[function], Tuple[function], np.ndarray[function], optional
+
+        1. If None, use meyer kernels, following [2]_.
+
+        2. A tuple or list consisting of two kernel functions designed for low-pass and high-pass filtering, separately.
+           Then the other kernels functions for all :obj:`Co=2^M` channels are derived.
+
+        3. An array of kernel functions with a shape of :obj:`(M, Co, Ci)`. :obj:`Ci` and :obj:`Co` is the #s of
+           input channels, i.e., :attr:`in_channels` and output channels, respectively. Note that :obj:`Co` is
+           the channels of wavelet coefficients and hence is actually :obj:`2^M`
+
+    synthesis_kernels:  List[function], Tuple[function], np.ndarray[function], optional
+        This arg is almost the same with :attr:`analyze_kernels` except that this is for synthesis stage.
+    in_channels: int, optional
+        The # of input channels. Default :obj:`1`. Consider this only when you want to process :obj:`(N,Ci)` graph
+        signals and for all :obj:`Ci` channels you want to build different graphQmf or graphBiorth wavelet filterbanks
+        (via using different analysis and synthesis kernel functions).
+    order: int, optional
+        The order of Chebyshev approximation.
+    lam_max: float, optional
+        Compute the Chebyshev approximation within the interval :obj:`[0, lam_max]`.
+    zeroDC: bool, optional
+         If True, the zeroDC filter bank is employed.
+
+
+    References
+    ----------
+    .. [2]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter Banks for Graph Structured Data",
+            IEEE trans on Signal Processing, 2012.
+    .. [3]  S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks for arbitrary undirected graphs,”
+            IEEE Trans on Signal Processing, 2013.
+
+    """
+
+    def __init__(self, bptG: List[SparseTensor],
+                 beta: torch.Tensor,
+                 analyze_kernels=None, synthesis_kernels=None,
+                 in_channels=1,
+                 order=24,
+                 lam_max=2.,
+                 zeroDC=False):
         assert len(bptG) == beta.shape[-1]
         assert bptG[0].size(-1) == beta.shape[0]
         assert lam_max > 0
@@ -44,20 +98,19 @@ class QmfCore:
         self.kernel_a = self.parse_kernels(analyze_kernels)
         self.kernel_s = self.parse_kernels(synthesis_kernels)
 
-        self.coefficient_a = cheby_coeff(self.kernel_a, lam_max=lam_max, K=order, dtype=self.dtype,
-                                         device=self.device)
+        self.coefficient_a = cheby_coeff(self.kernel_a, lam_max=lam_max, K=order,
+                                         dtype=self.dtype, device=self.device)
 
         if synthesis_kernels is None:  # GraphQmf Meyer
             self.coefficient_s = self.coefficient_a
         else:  # GraphBiorth
-            self.coefficient_s = cheby_coeff(self.kernel_s, lam_max=lam_max, K=order, dtype=self.dtype,
-                                             device=self.device)
+            self.coefficient_s = cheby_coeff(self.kernel_s, lam_max=lam_max, K=order,
+                                             dtype=self.dtype, device=self.device)
 
     def compute_laplace(self, bptG):
         bptL = []
         N = bptG[0].size(-1)
-        bptD05 = torch.zeros(
-            self.M, self.N, device=self.device) if self.zeroDC else None
+        bptD05 = torch.zeros(self.M, self.N, device=self.device) if self.zeroDC else None
         loop_index = torch.arange(N, device=self.device).unsqueeze_(0)
         for i, adj in enumerate(bptG):
             deg = adj.sum(0)
@@ -70,8 +123,7 @@ class QmfCore:
 
             deg05[deg05 == float('inf')] = 0
             wgt = deg05[row] * val * deg05[col]
-            wgt = torch.cat(
-                [-wgt.unsqueeze_(0), val.new_ones(1, N)], 1).squeeze_()
+            wgt = torch.cat([-wgt.unsqueeze_(0), val.new_ones(1, N)], 1).squeeze_()
 
             row = torch.cat([row.unsqueeze_(0), loop_index], 1).squeeze_()
             col = torch.cat([col.unsqueeze_(0), loop_index], 1).squeeze_()
@@ -81,11 +133,10 @@ class QmfCore:
 
     def parse_kernels(self, raw_kernels):
         if raw_kernels is None:
-            kernel = self.kernel_array_from_beta_dist(
-                meyer_kernel, meyer_mirror_kernel)
+            kernel = self.kernel_array_from_beta_dist(meyer_kernel, meyer_mirror_kernel)
 
         # only pass two kernel functions, the then remainder will be derived
-        elif isinstance(raw_kernels, tuple):
+        elif isinstance(raw_kernels, (tuple, list)):
             kernel = self.kernel_array_from_beta_dist(*raw_kernels)
 
         # a complete np.ndarray of kernels(functions)
@@ -94,8 +145,7 @@ class QmfCore:
             kernel = raw_kernels
 
         else:
-            raise TypeError(
-                "{} is not a valid type of kernel".format(type(raw_kernels)))
+            raise TypeError(f"{type(raw_kernels)} is not a valid type of kernel")
         return kernel
 
     def kernel_array_from_beta_dist(self, kernel1, kernel2):
@@ -115,9 +165,8 @@ class QmfCore:
         info = "{}(in_channels={}, order={}, max_lambda={}, " \
                "    n_channel={}, n_channel(non-empty)={}, N={},\n" \
                "    analyze_kernels:\n{},\n synthesize_kernels:\n{} \n)". \
-            format(self.__class__.__name__, self.in_channels, self.order,
-                   self.lam_max, self.out_channels, len(
-                self.not_empty_channels()), self.N,
+            format(self.__class__.__name__, self.in_channels, self.order, self.lam_max,
+                   self.out_channels, len(self.not_empty_channels()), self.N,
                    get_kernel_name(self.kernel_a[0], True),
                    get_kernel_name(self.kernel_s[0], True))
         return info
@@ -130,38 +179,52 @@ class QmfCore:
         elif x.dim() == 3:  # keep Co x N x Ci or 1 x N x Ci # Check for synthesis
             x = x
         else:
-            raise RuntimeError(
-                "rank-1,2,3 tensor expected, but got rank-{}".format(x.dim()))
+            raise RuntimeError("rank-1,2,3 tensor expected, but got rank-{}".format(x.dim()))
 
         if x.shape[-2] != self.N:
-            raise RuntimeError(
-                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of nodes: {self.N}")
+            raise RuntimeError(f"The penultimate dimension of signal:{x.shape[-2]}!= the number of nodes: {self.N}")
 
         return x.to(self.dtype)
 
     def _analyze(self, x):
         y = x  # Co x N x Ci
         for g in range(self.M):
-            if self.zeroDC:
-                y = self.bptD05[g].pow(-1) * y
-            y = cheby_op(
-                y, self.bptL[g], self.coefficient_a[g], lam_max=self.lam_max)
+            y = self.bptD05[g].pow(-1) * y if self.zeroDC else y
+            y = cheby_op(y, self.bptL[g], self.coefficient_a[g], lam_max=self.lam_max)
         # Co x N --> Co x N x 1 for broadcast 'masked_fill_'
         mask = self.channel_mask.unsqueeze(-1)
         y.masked_fill_(~mask, 0)
         return y
 
     def analyze(self, x):
+        """
+        Conduct a wavelet transform on the input signal.
+
+        .. note::
+            Although the returned coefficients are a :obj:`(2^M,N,Ci)` tensor :obj:`Z`, there are only :obj:`N` non-zero
+            entries in those coefficients corresponding to one input channel. For instance, :obj:`Z[..., 0]` has only
+            :obj:`N` non-zero items.
+
+        Parameters
+        ----------
+        x: Tensor
+            The signal to transform. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and :obj:`N` are the numbers of
+            input channels and graph nodes, separately.
+
+        Returns
+        -------
+        Tensor
+            The wavelet coefficients with a shape of :obj:`(Co,N,Ci)` or equally :obj:`(2^M,N,Ci)`. :attr:`M` is the #
+            of output channels.
+        """
         x = self._check_signal(x)
         return self._analyze(x)
 
     def _synthesize(self, y):
         z = y
         for g in range(self.M - 1, -1, -1):  # M-1, M-2, ..., 0 totally M bipartite graphs
-            z = cheby_op(
-                z, self.bptL[g], self.coefficient_s[g], lam_max=self.lam_max)
-            if self.zeroDC:
-                z = self.bptD05[g] * z
+            z = cheby_op(z, self.bptL[g], self.coefficient_s[g], lam_max=self.lam_max)
+            z = self.bptD05[g] * z if self.zeroDC else z
         return z  # Co x N x Ci
 
     def synthesize(self, y):
@@ -244,16 +307,13 @@ class BiorthOperator:
         self.synthesis_krn = np.array([[[g0],
                                         [g1]]])
 
-        # (1,2,1,K) --> (2,K)
-        ana_coeff = cheby_coeff(
-            self.analysis_krn, K=2 * k, lam_max=lam_max).squeeze_()
+        ana_coeff = cheby_coeff(self.analysis_krn, K=2 * k, lam_max=lam_max).squeeze_()  # (1,2,1,K) --> (2,K)
+        syn_coeff = cheby_coeff(self.synthesis_krn, K=2 * k, lam_max=lam_max).squeeze_()  # (1,2,1,K) --> (2,K)
 
-        syn_coeff = cheby_coeff(
-            self.synthesis_krn, K=2 * k, lam_max=lam_max).squeeze_()  # (1,2,1,K) --> (2,K)
         operator = QmfOperator.compute_basis(bptG, ana_coeff, beta, lam_max)
         self.operator = SparseTensor.from_scipy(operator).to(device)
-        inv_operator = QmfOperator.compute_basis(
-            bptG, syn_coeff, beta, lam_max)
+
+        inv_operator = QmfOperator.compute_basis(bptG, syn_coeff, beta, lam_max)
         self.inv_operator = SparseTensor.from_scipy(inv_operator).to(device)
 
     def transform(self, x):
@@ -270,15 +330,12 @@ class ColorQmf(QmfCore):
         self.strategy = strategy
 
         if strategy == "harary":
-            bptG, beta, beta_dist, vtx_color, mapper = harary(
-                self.adj, vtx_color=vtx_color, **kwargs)
+            bptG, beta, beta_dist, vtx_color, mapper = harary(self.adj, vtx_color=vtx_color, **kwargs)
         elif strategy == "osglm":
-            bptG, beta, append_nodes, vtx_color = osglm(
-                self.adj, vtx_color=vtx_color, **kwargs)
+            bptG, beta, append_nodes, vtx_color = osglm(self.adj, vtx_color=vtx_color, **kwargs)
             self.append_nodes = append_nodes
         else:
-            raise RuntimeError(
-                "{} is not a valid color-based decomposition algorithm.".format(str(strategy)))
+            raise RuntimeError(f"{strategy} is not a valid color-based decomposition algorithm.")
         self.vtx_color = vtx_color
 
         bptG = [SparseTensor.from_scipy(B).to(G.device()) for B in bptG]
@@ -302,11 +359,10 @@ class ColorQmf(QmfCore):
 
 
 class NumQmf(QmfCore):
-    def __init__(self, G, kernel=None, in_channels=1, order=24, strategy: str = "admm", M=1, lam_max=2., zeroDC=False,
-                 **kwargs):
+    def __init__(self, G: Graph, kernel=None, in_channels=1, order=24, strategy: str = "admm",
+                 M=1, lam_max=2., zeroDC=False, **kwargs):
         self.adj = G
         N = self.adj.size(-1)
-
         self.strategy = strategy
         self.M = M
 
@@ -329,8 +385,7 @@ class NumQmf(QmfCore):
 
         elif strategy == "amfs":
             bptG, beta = amfs(self.adj, level=self.M, **kwargs)
-            bptG = [SparseTensor.from_scipy(B).to(
-                dtype).to(device) for B in bptG]
+            bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
 
         else:
             raise RuntimeError(
@@ -372,21 +427,17 @@ class ColorBiorth(BiorthCore):
         self.strategy = strategy
 
         if strategy == "harary":
-            bptG, beta, beta_dist, vtx_color, mapper = harary(
-                self.adj, vtx_color=vtx_color, **kwargs)
+            bptG, beta, beta_dist, vtx_color, mapper = harary(self.adj, vtx_color=vtx_color, **kwargs)
         elif strategy == "osglm":
-            bptG, beta, append_nodes, vtx_color = osglm(
-                self.adj, vtx_color=vtx_color, **kwargs)
+            bptG, beta, append_nodes, vtx_color = osglm(self.adj, vtx_color=vtx_color, **kwargs)
             self.append_nodes = append_nodes
         else:
-            raise RuntimeError(
-                "{} is not a valid color-based decomposition algorithm.".format(str(strategy)))
+            raise RuntimeError(f"{strategy} is not a valid color-based decomposition algorithm.")
         self.vtx_color = vtx_color
 
         bptG = [SparseTensor.from_scipy(B).to(G.device()) for B in bptG]
 
-        super(ColorBiorth, self).__init__(bptG, beta,
-                                          k, in_channels, order, lam_max, zeroDC)
+        super(ColorBiorth, self).__init__(bptG, beta, k, in_channels, order, lam_max, zeroDC)
         self.N = self.adj.size(-1)  # osglm compatible
 
     def analyze(self, x):
@@ -408,7 +459,6 @@ class NumBiorth(BiorthCore):
         self.adj = G
         N = self.adj.size(-1)
         self.lam_max = lam_max
-
         self.strategy = strategy
         self.M = M
 
@@ -416,8 +466,7 @@ class NumBiorth(BiorthCore):
         dtype = self.adj.dtype()
         if strategy == "admm":
             if N < 80:
-                bptG_dense = admm_bga(self.adj.to_dense().to(
-                    torch.double), M=M, **kwargs)
+                bptG_dense = admm_bga(self.adj.to_dense().to(torch.double), M=M, **kwargs)
                 beta = bptG_dense.new_zeros(N, M, dtype=bool)
                 bptG = []
                 bptG_dense = bptG_dense.to(dtype).to(device)
@@ -427,18 +476,14 @@ class NumBiorth(BiorthCore):
                     bptG.append(SparseTensor.from_dense(B))
 
             else:
-                bptG, beta, self.partptr, self.perm = admm_lbga_ray(
-                    self.adj, M, **kwargs)
+                bptG, beta, self.partptr, self.perm = admm_lbga_ray(self.adj, M, **kwargs)
                 bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
 
         elif strategy == "amfs":
             bptG, beta = amfs(self.adj, level=self.M, **kwargs)
-            bptG = [SparseTensor.from_scipy(B).to(
-                dtype).to(device) for B in bptG]
+            bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
 
         else:
-            raise RuntimeError(
-                "{} is not a valid numerical decomposition algorithm supported at present.".format(str(strategy)))
+            raise RuntimeError(f"{strategy} is not a valid numerical decomposition algorithm supported at present.")
 
-        super(NumBiorth, self).__init__(bptG, beta,
-                                        k, in_channels, order, lam_max, zeroDC)
+        super(NumBiorth, self).__init__(bptG, beta, k, in_channels, order, lam_max, zeroDC)

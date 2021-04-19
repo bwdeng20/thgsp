@@ -53,6 +53,57 @@ def admm_simple(A, n_eig=None, min_eig=0.0):
 def admm_bga(A, M=1, alpha=100.0, metric='fro21', cut_edge=True, init_B=None,
              convergence_marker=1e-8, check_step=1000, verbose=False, nonnegative=True,
              rho=0.01, eta=1.01, max_iter=int(1e5), early_stop=False, max_rho=1e10):
+    r"""
+    The program is to find the bipartite graph approximation via solving the following optimization problem [2]_ .
+
+    .. math::
+        \begin{array}{ll}
+        \min _{\left\{\mathbf{B}_{i}\right\}} & \sum_{i=1}^{L}\left\|\mathbf{A}-\mathbf{B}_{i}\right\|_{F}^{2}+\alpha
+        \sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T} \mathbf{B}_{j}\right\} \\
+        \text { s.t. } & \mathbf{B}_{i} \in \mathcal{B}
+        \end{array}
+
+    Parameters
+    ----------
+    A:Tensor(N x N)
+        N is the number of graph nodes
+    M:int, optional
+        The number of bipartite graphs to learn
+    alpha: float,optional
+        The parameter which controls the orthogonality among learnt bipartite graphs
+    metric:str,optional
+        The error metric between the learned bipartite graphs and the original graph
+    cut_edge:bool,optional
+         If True, cut the edges in the learned bipartite graphs that not exist in the original graph
+    init_B:Tensor,optional
+         The initialization of B
+    convergence_marker:float,optional
+         the procedure converges if the error between B and A < this value
+    check_step:int,optional
+         the step interval to display iteration information
+    verbose:bool,optional
+    nonnegative:bool,optional
+         If True, allow negative edge weight in the learned bipartite graphs B
+    rho: float,optional
+         A step argument
+    eta: float,optional
+         The update factor of rho
+    max_iter:int,optional
+         The max ADMM iteration times
+    early_stop: bool,optional
+         If True, the procedure will return B once all learned graphs are bipartite
+    max_rho: float,optional
+
+    Returns
+    -------
+    B:Tensor(M,N,N)
+        The learnt bipartite subgraph(s)
+
+    References
+    ----------
+    .. [2] Aimin Jiang, et al, "Admm-based Bipartite Graph Approximation", ICASSP, 2019.
+
+    """
     if A.dtype is not torch.double:
         warnings.warn("ADMM-based method is sensitive to the precision(double is much faster)")
     N = A.shape[0]

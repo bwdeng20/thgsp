@@ -34,8 +34,7 @@ GraphQmf FilterBank
 .. autoclass:: thgsp.filters.NumBiorth
    :members:
 
-
-
-
+.. autoclass:: thgsp.filters.QmfCore
+   :members:
 
 

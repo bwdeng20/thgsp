@@ -2,6 +2,7 @@ import os
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+from thgsp.datasets.utils import remove_file_or_dir, get_data_dir_of_thgsp, os
 
 dtypes = [torch.float, torch.double, torch.int, torch.long]
 
@@ -33,3 +34,8 @@ def plot(plotly_fig=None):
         if plotly_fig is not None:
             plotly_fig.show()
         plt.plot()
+
+
+def remove_downloaded_dataset(name):
+    dire = get_data_dir_of_thgsp()
+    remove_file_or_dir(os.path.join(dire, name))

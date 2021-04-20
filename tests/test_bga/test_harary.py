@@ -1,6 +1,7 @@
 from thgsp.bga.harary import harary
 from thgsp.bga.utils import is_bipartite_fix
 from thgsp.graphs.generators import rand_udg
+from ..utils4t import remove_downloaded_dataset
 
 
 def test_harary():
@@ -25,3 +26,4 @@ def test_harary_minnesota():
     bptG, beta, beta_dist, vtx_color, _ = harary(SparseTensor.from_scipy(A))
     for i in range(len(bptG)):
         assert is_bipartite_fix(bptG[i])
+    remove_downloaded_dataset("minnesota-usc")

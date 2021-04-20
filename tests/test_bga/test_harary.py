@@ -20,7 +20,7 @@ def test_harary():
 def test_harary_minnesota():
     from thgsp.datasets import Minnesota
     from thgsp.convert import SparseTensor
-    ds = Minnesota(connected=True)
+    ds = Minnesota(download=True, connected=True)
     A = ds.A
     bptG, beta, beta_dist, vtx_color, _ = harary(SparseTensor.from_scipy(A))
     for i in range(len(bptG)):

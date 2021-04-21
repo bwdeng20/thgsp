@@ -11,14 +11,27 @@ from .utils import get_data_dir_of_thgsp, remove_file_or_dir
 
 
 class Minnesota:
-    """
-    Minnesota traffic network shipped with "avelet Filterbanks on Graph" project by STAC group
-    http://biron.usc.edu/wiki/index.php/Graph_Filterbanks
+    r"""
+    The Minnesota traffic network shipped with "Wavelet Filterbanks on Graph" [1]_ project by USC-STAC
+    group(see http://biron.usc.edu/wiki/index.php/Graph_Filterbanks). This road network is also carried
+    by MatlabBGL [2]_ toolbox and a part of "The National Highway Planning Network (NHPN) 2000-Present dataset" [3]_.
 
     Parameters
     ----------
+    root:   str, optional
+        The root directory to place the downloaded files. If :obj:`None`, set the root dir as "thgsp.datasets.data".
     connected: bool
-        If True, connect the traffic network
+        If True, connect the traffic network.
+    download: bool
+        If True, download the raw .zip file and process it.
+
+    References
+    ----------
+    .. [1]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter Banks for Graph Structured Data",
+            IEEE trans on Signal Processing, 2012.
+    .. [2] D. Gleich, "https://github.com/dgleich/matlab-bgl", GitHub, 2011
+    .. [3] https://www.fhwa.dot.gov/planning/processes/tools/nhpn/
+
     """
     filename = "Graph_Wavelets_Demo.zip"
     zip_md5 = '83bf2aef1ad7e75badfc6296ca336d44'

@@ -34,6 +34,7 @@ PyTorch pipeline.
    modules/bga
    modules/filters
    modules/alg
+   modules/datasets
 
 Indices and tables
 ==================

@@ -40,11 +40,11 @@ def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_
     K:  int
         The desired number of sampling nodes.
     mu: float
-        The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7)[2]_ for the details.
+        The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7) [2]_ for the details.
     epsilon: float
         The numerical precision for binary search (1e-5 by default
     p_hops: int
-        Estimate the coverage subsets(refer to Definition 1[2]_) within the :obj:`p_hops` neighborhood.
+        Estimate the coverage subsets(refer to Definition 1 [2]_) within the :obj:`p_hops` neighborhood.
 
     Returns
     -------

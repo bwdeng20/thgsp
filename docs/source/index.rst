@@ -35,6 +35,7 @@ PyTorch pipeline.
    modules/filters
    modules/alg
    modules/datasets
+   modules/sampling
 
 Indices and tables
 ==================

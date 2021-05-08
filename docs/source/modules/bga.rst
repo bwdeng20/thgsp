@@ -1,7 +1,7 @@
 thgsp.bga
 ===============
 
-.. contents::Contents
+.. contents:: Contents
     :local:
     
 Harary

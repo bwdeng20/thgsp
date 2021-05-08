@@ -24,7 +24,7 @@ int argmax(const unordered_map<int, int> &dict) {
     return idx_max;
 }
 
-torch::Tensor dsatur_cpu(torch::Tensor rowptr, torch::Tensor col) {
+torch::Tensor dsatur_cpu(torch::Tensor& rowptr, torch::Tensor& col) {
     int n = rowptr.size(-1) - 1;
 
     auto deg = rowptr.index({Slice(1, None)}) - rowptr.index({Slice(None, -1)});

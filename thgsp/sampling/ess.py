@@ -6,6 +6,10 @@ from thgsp.utils import consecutive_spmv
 
 
 def ess_sampling(operator, M, k=2):
+    r"""
+        This function has the same functionality as :func:`ess` but directly computes the matrix power of specific
+        variation operator, e.g., normalized Laplacian.
+    """
     L = to_scipy(operator)
     N = L.shape[-1]
     LtL = L.T ** k * L ** k
@@ -29,7 +33,7 @@ def ess_sampling(operator, M, k=2):
 
 def ess(operator, M, k=2, max_iter=int(5e2)):
     r"""
-    An efficient sampling set selection method for bandlimited graph signals.
+    An efficient sampling set selection method for bandlimited graph signals [1]_.
 
     Parameters
     ----------

@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Installation &mdash; thgsp 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Introduction by Example" href="introduction.html" />
+    <link rel="prev" title="Welcome to thgsp’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">1.Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-pytorch">1.1 Install PyTorch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-pytorch-extensions">1.2 Install PyTorch Extensions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#install-torch-sparse">1.2.1 Install torch_sparse</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#install-suitesparse-for-scikit-sparse">1.3 Install SuiteSparse for scikit-sparse</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-thgsp">2.Install thgsp</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#from-source">2.1 From source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction by Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="waveletfb.html">GraphQmf Wavelet Filterbank</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/graphs.html">thgsp.graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/bga.html">thgsp.bga</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/filters.html">thgsp.filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/alg.html">thgsp.alg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/datasets.html">thgsp.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/sampling.html">thgsp.sampling</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">thgsp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/notes/installation.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>1.Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="install-pytorch">
+<h3>1.1 Install PyTorch<a class="headerlink" href="#install-pytorch" title="Permalink to this headline">¶</a></h3>
+<p>We recommend users to install pytorch_gsp in an <a class="reference external" href="https://conda.io/docs/user-guide/install/index.html/">conda</a>
+virtual environment. Install PyTorch1.5 or later
+following <a class="reference external" href="https://pytorch.org/">the official instructions</a>. Type the following in the terminal to check if PyTorch
+is installed successfully.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;import torch; print(torch.__version__)&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="mf">1.7.0</span>  <span class="c1"># here my pytorch version is 1.7.0 </span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-pytorch-extensions">
+<h3>1.2 Install PyTorch Extensions<a class="headerlink" href="#install-pytorch-extensions" title="Permalink to this headline">¶</a></h3>
+<p>Matthias Fey provides excellent PyTorch extensions for graph-related computations. Please install
+<a class="reference external" href="https://github.com/rusty1s/pytorch_scatter">pytorch_scatter</a> and
+<a class="reference external" href="https://github.com/rusty1s/pytorch_cluster">pytorch_cluster</a> following the
+<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html">official guide</a>.
+Remember <strong>NOT</strong> to install <a class="reference external" href="https://github.com/rusty1s/pytorch_sparse">pytorch_sparse</a>
+before installing <a class="reference external" href="http://glaros.dtc.umn.edu/gkhome/metis/metis/download">METIS</a>.</p>
+<div class="section" id="install-torch-sparse">
+<h4>1.2.1 Install torch_sparse<a class="headerlink" href="#install-torch-sparse" title="Permalink to this headline">¶</a></h4>
+<p>There is one bipartite graph approximation algorithm in <strong>thgsp</strong> requiring
+<a class="reference external" href="http://glaros.dtc.umn.edu/gkhome/metis/metis/download">METIS</a> to partition graphs. You need to following the
+instructions in <code class="docutils literal notranslate"><span class="pre">Install.txt</span></code> file to install it. Then, set an environment variable to inform <code class="docutils literal notranslate"><span class="pre">torch_sparse</span></code> to build
+with <code class="docutils literal notranslate"><span class="pre">METIS</span></code> support.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">WITH_METIS</span><span class="o">=</span><span class="mi">1</span> <span class="c1"># for linux</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">sparse</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="install-suitesparse-for-scikit-sparse">
+<h3>1.3 Install SuiteSparse for scikit-sparse<a class="headerlink" href="#install-suitesparse-for-scikit-sparse" title="Permalink to this headline">¶</a></h3>
+<p>On Debian/Ubuntu systems, the following command should suffice:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libsuitesparse</span><span class="o">-</span><span class="n">dev</span>
+</pre></div>
+</div>
+<p>On Arch Linux, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pacman</span> <span class="o">-</span><span class="n">S</span> <span class="n">suitesparse</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="install-thgsp">
+<h2>2.Install thgsp<a class="headerlink" href="#install-thgsp" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="from-source">
+<h3>2.1 From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h3>
+<p>You can only install it from source at present.</p>
+<p>1 . Clone the thgsp repository from  <code class="docutils literal notranslate"><span class="pre">github</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">bwdeng20</span><span class="o">/</span><span class="n">thgsp</span><span class="o">.</span><span class="n">git</span> <span class="c1"># from github</span>
+</pre></div>
+</div>
+<p>2 . build thgsp from source.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">thgsp</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="introduction.html" class="btn btn-neutral float-right" title="Introduction by Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to thgsp’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Bowen Deng.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

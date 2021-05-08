@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>GraphQmf Wavelet Filterbank &mdash; thgsp 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="thgsp.graphs" href="../modules/graphs.html" />
+    <link rel="prev" title="Introduction by Example" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction by Example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GraphQmf Wavelet Filterbank</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#read-and-plot-minnesota">Read and Plot Minnesota</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wavelet-transform-via-graphqmf">Wavelet Transform via GraphQmf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/graphs.html">thgsp.graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/bga.html">thgsp.bga</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/filters.html">thgsp.filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/alg.html">thgsp.alg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/datasets.html">thgsp.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/sampling.html">thgsp.sampling</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">thgsp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>GraphQmf Wavelet Filterbank</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/notes/waveletfb.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="graphqmf-wavelet-filterbank">
+<h1>GraphQmf Wavelet Filterbank<a class="headerlink" href="#graphqmf-wavelet-filterbank" title="Permalink to this headline">¶</a></h1>
+<p>We introduce the usage of graphQmf wavelet filterbank in <strong>thgsp</strong> here.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#read-and-plot-minnesota" id="id13">Read and Plot Minnesota</a></p></li>
+<li><p><a class="reference internal" href="#wavelet-transform-via-graphqmf" id="id14">Wavelet Transform via GraphQmf</a></p></li>
+<li><p><a class="reference internal" href="#evaluation" id="id15">Evaluation</a></p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a thorough understanding of this note. You are supposed to have already understand GraphQmf
+and GraphBiorth wavelet filterbanks. However, if you care about how to use it, that’s not necessary and
+remember that they are just filterbanks which define critically-sampling wavelet transform.
+Besides, code blocks in this note are all pieces of one whole.</p>
+</div>
+<div class="section" id="read-and-plot-minnesota">
+<h2><a class="toc-backref" href="#id13">Read and Plot Minnesota</a><a class="headerlink" href="#read-and-plot-minnesota" title="Permalink to this headline">¶</a></h2>
+<p>The minnesota traffic network is a classic network pervasive in graph signal processing community. It has 2642
+nodes and 3304 undirected edges, with a chromatic number of 3, meaning that it can be colored with 3 colors such
+that no same color are assigned to adjacent nodes. You can easily access to the minnesota graph from <strong>thgsp</strong>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thgsp.datasets</span> <span class="kn">import</span> <span class="n">Minnesota</span>
+<span class="kn">from</span> <span class="nn">thgsp.filters</span> <span class="kn">import</span> <span class="n">ColorQmf</span>
+<span class="kn">from</span> <span class="nn">thgsp.alg</span> <span class="kn">import</span> <span class="n">dsatur</span>
+<span class="kn">from</span> <span class="nn">thgsp.visual</span> <span class="kn">import</span> <span class="n">draw_signal</span><span class="p">,</span> <span class="n">draw_cn</span><span class="p">,</span> <span class="n">draw</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">data</span><span class="o">=</span><span class="n">Minnesota</span><span class="p">(</span><span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">connected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">minne</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">minne</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>GraphQmf <a class="footnote-reference brackets" href="#id8" id="id1">1</a>  and GraphBiorth <a class="footnote-reference brackets" href="#id9" id="id2">2</a> filter bank require bipartite decomposition of the original graph into edge-disjoint
+bipartite subgraphs on each of which one GraphQmf filterbank is constructed. All contructed GraphQmfs are then stacked
+as a whole to perform multi-dimensional separable wavelet analysis.
+The vanilla GraphQmf and GraphBiorth get the bipartite subgraphs in terms of the graph coloring result.
+Though in those papers a <span class="math notranslate nohighlight">\(O(n^3)\)</span> exact coloring is employed, many experiments show that inaccurate greedy
+coloring is not likely to decrease the performance, i.e., the
+reconstruction SNR. Therefore, we color the minnesota graph with the classic <code class="xref py py-obj docutils literal notranslate"><span class="pre">dsatur</span></code> algorithm.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="../modules/filters.html#thgsp.filters.ColorQmf" title="thgsp.filters.ColorQmf"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.ColorQmf</span></code></a> and <a class="reference internal" href="../modules/filters.html#thgsp.filters.ColorBiorth" title="thgsp.filters.ColorBiorth"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.ColorBiorth</span></code></a> have already been integrated with
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">dsatur</span></code> algorithm, meaning that a graph coloring is invoked silently during the initialization of them.
+However, you can also initialize them with pre-computed coloring result to skip it. Here we firstly
+color the graph explicitly for a convenient visualization of coloring result.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ==&gt; continue the last code block</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="n">dsatur</span><span class="p">(</span><span class="n">minne</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">draw</span><span class="p">(</span><span class="n">minne</span><span class="p">,</span> <span class="n">minne</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">node_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span><span class="n">with_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;the traffic network&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">draw_cn</span><span class="p">(</span><span class="n">minne</span><span class="p">,</span> <span class="n">minne</span><span class="o">.</span><span class="n">coords</span> <span class="p">,</span><span class="n">colors</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span><span class="n">with_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;coloring of Minnesota(chromatic=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">)),</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can see the figure below.</p>
+<img alt="../_images/colorMinnesota.svg" class="align-center" src="../_images/colorMinnesota.svg" /></div>
+<div class="section" id="wavelet-transform-via-graphqmf">
+<h2><a class="toc-backref" href="#id14">Wavelet Transform via GraphQmf</a><a class="headerlink" href="#wavelet-transform-via-graphqmf" title="Permalink to this headline">¶</a></h2>
+<p>This section we initialize a :  <a class="reference internal" href="../modules/filters.html#thgsp.filters.ColorQmf" title="thgsp.filters.ColorQmf"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.ColorQmf</span></code></a> and evaluate the wavelet transform determined by it
+on a signal used in the original paper.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===&gt; continue the last code block</span>
+<span class="n">K</span><span class="o">=</span><span class="mi">30</span>              <span class="c1"># the order of Chebyshev approximation</span>
+<span class="n">qmf</span> <span class="o">=</span> <span class="n">ColorQmf</span><span class="p">(</span><span class="n">minne</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">vtx_color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">f</span>                                     <span class="c1"># (2642,) The signal</span>
+<span class="n">wc</span><span class="o">=</span> <span class="n">qmf</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                             <span class="c1"># analyze,            i.e., wavelet transform</span>
+<span class="n">f4_hat</span><span class="o">=</span> <span class="n">qmf</span><span class="o">.</span><span class="n">synthesize</span><span class="p">(</span><span class="n">wc</span><span class="p">)</span>                     <span class="c1"># synthesize,         i.e., inverse transform</span>
+<span class="n">f_hat</span><span class="o">=</span><span class="n">f4_hat</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>                  <span class="c1"># (4,2642,1)--&gt; (2642,1) --&gt; (2642)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Though GraphQmf wavelet filterbank determines a critically graph wavelet transform, <code class="xref py py-obj docutils literal notranslate"><span class="pre">4x2642</span></code> floats is needed
+to store these coefficients other than <code class="xref py py-obj docutils literal notranslate"><span class="pre">2642</span></code> floats. Such memory waste arises from the computation scheme
+adopted by the authors <a class="footnote-reference brackets" href="#id8" id="id3">1</a> and us.</p>
+</div>
+</div>
+<div class="section" id="evaluation">
+<h2><a class="toc-backref" href="#id15">Evaluation</a><a class="headerlink" href="#evaluation" title="Permalink to this headline">¶</a></h2>
+<p>To evaluate the construction performance, SNR and MSE are taken into account. The next block will print them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===&gt; continue the last code block</span>
+<span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">snr</span><span class="p">,</span> <span class="n">mse</span>
+<span class="n">MSE</span> <span class="o">=</span> <span class="n">mse</span><span class="p">(</span><span class="n">f_hat</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="n">SNR</span> <span class="o">=</span> <span class="n">snr</span><span class="p">(</span><span class="n">f_hat</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;==============================&gt; SUMMARY &lt;=========================================&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|Mean Square Error :  </span><span class="si">{</span><span class="n">MSE</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|Reconstruction SNR: </span><span class="si">{</span><span class="n">SNR</span><span class="si">:</span><span class="s2"> .3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">dis</span> <span class="o">=</span> <span class="p">(</span><span class="n">f_hat</span> <span class="o">-</span> <span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|Max distortion    :  </span><span class="si">{</span><span class="n">dis</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">dis</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2">-th node&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;|Min distortion    :  </span><span class="si">{</span><span class="n">dis</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">dis</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2">-th node&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;==============================&gt; SUMMARY &lt;=========================================&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/graphQmf_summary.png" class="align-center" src="../_images/graphQmf_summary.png" />
+<p>Let’s draw the input and reconstructed signal and check the difference between them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===&gt; continue the last code block</span>
+<span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">f_hat</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="n">min_val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">f_hat</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Order: </span><span class="si">{}</span><span class="s2">, SNR: </span><span class="si">{:3f}</span><span class="s2">dB, MSE: </span><span class="si">{:3e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">SNR</span><span class="p">,</span> <span class="n">MSE</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;input signal&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">draw_signal</span><span class="p">(</span><span class="n">minne</span><span class="p">,</span> <span class="n">minne</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">min_val</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">max_val</span><span class="p">,</span><span class="n">node_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;reconstructed signal&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">draw_signal</span><span class="p">(</span><span class="n">minne</span><span class="p">,</span> <span class="n">minne</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">f_hat</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">min_val</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">max_val</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/qmf_recons.svg" class="align-center" src="../_images/qmf_recons.svg" /><p>In addition to the default coloring-based bipartite approximation strategy <a class="footnote-reference brackets" href="#id8" id="id4">1</a>, there are OSGLM <a class="footnote-reference brackets" href="#id10" id="id5">3</a>, MFS <a class="footnote-reference brackets" href="#id11" id="id6">4</a>, and
+ADMM-BGA <a class="footnote-reference brackets" href="#id12" id="id7">5</a> strategies to transform the original arbitrary undirected graph into bipartite one(s). You can use them
+by passing corresponding strategy <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> to <a class="reference internal" href="../modules/filters.html#thgsp.filters.ColorQmf" title="thgsp.filters.ColorQmf"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.ColorQmf</span></code></a> and <a class="reference internal" href="../modules/filters.html#thgsp.filters.NumQmf" title="thgsp.filters.NumQmf"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.NumQmf</span></code></a>.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id8"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
+<dd><p>Sunil K. Narang, et al, Perfect Reconstruction Two-Channel Wavelet Filter Banks for Graph Structured Data, 2012.</p>
+</dd>
+<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Sunil K. Narang, et al, Compact Support Biorthogonal Wavelet Filterbanks for Arbitrary Undirected Graphs, 2013.</p>
+</dd>
+<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
+<dd><p>Akie Sakiyama, et al, Oversampled Graph Laplacian Matrix for Graph Filter Banks, 2014.</p>
+</dd>
+<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id6">4</a></span></dt>
+<dd><p>Jin Zeng, et al, Bipartite subgraph decomposition for critically sampled wavelet filterbanks on arbitrary graphs, 2016.</p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id7">5</a></span></dt>
+<dd><p>Aimin Jiang, et al, ADMM-BASED BIPARTITE GRAPH APPROXIMATION, 2019.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../modules/graphs.html" class="btn btn-neutral float-right" title="thgsp.graphs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction by Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Bowen Deng.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -97,7 +97,7 @@ def compute_eigen_of_rw(G: GraphBase, k=2, which="SM"):
     L = G.L("comb").to_scipy("csr")
     D = G.D().to_scipy("csr")
     vals, vecs = eigsh(L, k=k, M=D, which=which)
-    return vals, -vecs
+    return vals, vecs
 
 
 def plot_basis(x, y, spectral_spacing, num=150, size=None):
@@ -206,6 +206,8 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
     elif isinstance(embedding, (np.ndarray, th.Tensor, list, tuple)):
         if len(embedding) != N:
             raise RuntimeError(f"Incorrect 1-D embedding size, {len(embedding)}!={N}")
+        if verbose:
+            print("Embedding Done(Using input embedding).")
     else:
         raise TypeError(f"{type(embedding)} is not a supported type of arg 'embedding'")
 

@@ -12,9 +12,10 @@ from .utils import get_data_dir_of_thgsp, remove_file_or_dir
 
 class Minnesota:
     r"""
-    The Minnesota traffic network shipped with "Wavelet Filterbanks on Graph" [1]_ project by USC-STAC
-    group(see http://biron.usc.edu/wiki/index.php/Graph_Filterbanks). This road network is also carried
-    by MatlabBGL [2]_ toolbox and a part of "The National Highway Planning Network (NHPN) 2000-Present dataset" [3]_.
+    The Minnesota traffic network shipped with "Wavelet Filterbanks on Graph" [1]_ project(with a license of GPL V3)
+    by USC-STAC group(see http://biron.usc.edu/wiki/index.php/Graph_Filterbanks). This road network is a part of
+    "The National Highway Planning Network (NHPN) 2000-Present dataset" [3]_ and also carried by MatlabBGL [2]_
+    toolbox(released under BSD).
 
     Parameters
     ----------

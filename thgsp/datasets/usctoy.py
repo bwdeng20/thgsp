@@ -7,7 +7,7 @@ from .utils import get_data_dir_of_thgsp
 
 class Toy:
     """
-    USC toy graph by STAC group(https://github.com/STAC-USC/GraphStructures).
+    USC toy graph(released under GPL v2) by STAC group(https://github.com/STAC-USC/GraphStructures).
 
     Parameters
     ----------

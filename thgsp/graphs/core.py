@@ -50,8 +50,7 @@ class GraphBase(SparseTensor):
 
     def edge_info(self):
         row, col, val = self.coo()
-        edge_idx = torch.cat(
-            [row.clone().unsqueeze_(1), col.clone().unsqueeze_(1)], 1)
+        edge_idx = torch.cat([row.clone().unsqueeze_(0), col.clone().unsqueeze_(0)], 0)
         val = val.clone()
         return edge_idx, val
 

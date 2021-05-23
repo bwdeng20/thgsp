@@ -1,9 +1,7 @@
 from typing import Optional
 
-import networkx as nx
 import torch
-from scipy.sparse.linalg import eigsh
-
+import networkx as nx
 from thgsp.convert import to_torch_sparse, SparseTensor
 from .degree import in_degree, out_degree, degree_matrix
 from .is_bipartite import is_bipartite
@@ -39,6 +37,20 @@ class GraphBase(SparseTensor):
         self._L = None
         self._fs = None
         self._U = None
+        self._max_fs = None
+
+    def to(self, *args, **kwargs):
+        new_spm = super(GraphBase, self).to(*args, **kwargs)
+        new_instance = GraphBase(new_spm, coords=self.coords, cache=self.cache, requires_grad=self.requires_grad(),
+                                 **self.extra)
+        new_instance._lap_type = self._lap_type
+        new_instance._L = None if self._L is None else self._L.to(*args, **kwargs)
+        new_instance._fs = None if self._fs is None else self._fs.to(*args, **kwargs)
+        new_instance._U = None if self._U is None else self._U.to(*args, **kwargs)
+        return new_instance
+
+    def to_spm(self, *args, **kwargs):
+        return super(GraphBase, self).to(*args, **kwargs)
 
     @property
     def lap_type(self):
@@ -104,11 +116,13 @@ class GraphBase(SparseTensor):
 
     def max_frequency(self, lap_type: str = "sym"):
         lap = self.L(lap_type)
-        if self._fs is not None:
-            max_f = max(self._fs).item()
+        if self._max_fs is not None:
+            max_fs = self._max_fs
         else:
-            max_f = eigsh(lap.to_scipy(layout="csr"), k=1, which="LM", return_eigenvectors=False)[0]
-        return max_f
+            max_fs = torch.lobpcg(lap.to_torch_sparse_coo_tensor(), k=1, largest=True)[0].item()
+            if self.cache:
+                self._max_fs = max_fs
+        return max_fs
 
     def spectral(self, lap_type: str = "sym"):
         U = self.U(lap_type)

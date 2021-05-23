@@ -16,14 +16,14 @@ def laplace(adj: SparseTensor, lap_type=None):
         wgt = deg05[row] * val * deg05[col]
         wgt = torch.cat([-wgt.unsqueeze_(0), val.new_ones(1, N)], 1).squeeze_()
 
-    elif lap_type is "rw":
+    elif lap_type == "rw":
         deg_inv = 1.0 / deg
         deg_inv[deg_inv == float("inf")] = 0
         wgt = deg_inv[row] * val
 
         wgt = torch.cat([-wgt.unsqueeze_(0), val.new_ones(1, N)], 1).squeeze_()
 
-    elif lap_type is "comb":
+    elif lap_type == "comb":
         wgt = torch.cat([-val.unsqueeze_(0), deg.unsqueeze_(0)], 1).squeeze_()
 
     else:

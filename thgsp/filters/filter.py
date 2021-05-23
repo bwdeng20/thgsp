@@ -74,7 +74,7 @@ class Filter:
             else:
                 assert kernels.shape == (Co, Ci)
 
-        else:  # ideal low pass filter bank in defualt
+        else:  # ideal low pass filter bank by default
             Ci = 1 if Ci is None else Ci
             Co = 1 if Co is None else Co
             single_krn = np.array(

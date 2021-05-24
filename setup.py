@@ -121,7 +121,7 @@ setup(
         'graph-signal-processing',
         'graph-wavelet-filterbank'
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.6',
     install_requires=install_requires,
     tests_require=tests_require,
     ext_modules=get_extensions(),

@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+import numba as nb
 import torch
 from torch_cluster import knn_graph, radius_graph
 from torch_sparse import SparseTensor
@@ -105,9 +106,9 @@ def random_graph(N, density=0.01, directed=False, dtype=None, device=None, weigh
         col = np.concatenate([j, i])
         data = None if data is None else np.tile(data, 2)
 
-        row = torch.as_tensor(row)
-        col = torch.as_tensor(col)
-        value = None if data is None else torch.as_tensor(data).to(dtype)
+        row = torch.as_tensor(row, device=device, dtype=torch.long)
+        col = torch.as_tensor(col, device=device, dtype=torch.long)
+        value = None if data is None else torch.as_tensor(data, dtype=dtype, device=device)
 
     else:
         n_all_edge = N * (N - 1)
@@ -118,28 +119,27 @@ def random_graph(N, density=0.01, directed=False, dtype=None, device=None, weigh
         ind = random_state.choice(n_all_edge, size=k, replace=False)
         data = random_state.rand(k) if weighted else None
         i, j = flat2squre(ind, N)
-        row = torch.as_tensor(i)
-        col = torch.as_tensor(j)
-        value = None if data is None else torch.as_tensor(data).to(dtype)
+        row = torch.as_tensor(i, device=device, dtype=torch.long)
+        col = torch.as_tensor(j, device=device, dtype=torch.long)
+        value = None if data is None else torch.as_tensor(data, dtype=dtype, device=device)
 
-    coo_adj = SparseTensor(row=row, col=col, value=value,
-                           sparse_sizes=(N, N)).to(device)
+    coo_adj = SparseTensor(row=row, col=col, value=value, sparse_sizes=(N, N))
     return DiGraph(coo_adj) if directed else Graph(coo_adj)
 
 
+@nb.jit("UniTuple(f8[:],2)(i8[:])", nopython=True)
 def tri2square(tri_idx):
-    tri_idx = np.asarray(tri_idx).astype(np.float64, copy=False)
     up_bound = (1 + np.sqrt(1 + 8 * tri_idx)) / 2
     i = np.floor(up_bound)
     j = tri_idx - (i - 1) * i / 2
-    return i.astype(np.int64, copy=False), j.astype(np.int64, copy=False)
+    return i, j
 
 
+@nb.jit("UniTuple(i8[:],2)(i8[:],i8)", nopython=True)
 def flat2squre(flat_idx, N):
     N1 = N - 1
-    idx = np.asarray(flat_idx).astype(np.int64, copy=False)
-    i = idx // N1
-    j = idx - N1 * i
+    i = flat_idx // N1
+    j = flat_idx - N1 * i
     j = j + (j >= i)
     return i, j
 

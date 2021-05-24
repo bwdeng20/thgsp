@@ -40,13 +40,11 @@ class Filter:
 
     def __init__(self, G: GraphBase, kernels=None, in_channels=None, out_channels=None, order=20, lam_max=None,
                  lap_type="sym", weight=None):
-        assert lam_max > 0
         assert order > 1
-
         self.G = G
         self.order = order
         self.lam_max = G.max_frequency(lap_type) if lam_max is None else lam_max
-        assert lam_max > 0
+        assert self.lam_max > 0
 
         self.kernels, self.in_channels, self.out_channels = self._check_kernels(
             kernels, in_channels, out_channels)
@@ -106,7 +104,7 @@ class Filter:
         if high is None:
             high = self.lam_max
         assert low <= high
-        fs = self.G.spectrum()
+        fs = self.G.spectrum(self.lap_type)
 
         if in_channels is None:
             in_channels = range(self.in_channels)
@@ -114,7 +112,7 @@ class Filter:
             out_channels = range(self.out_channels)
 
         mask1 = low <= fs
-        mask2 = fs <= high
+        mask2 = fs <= (1 + 1e-6) * high
         ls2eval = fs[mask1 & mask2]
         if len(ls2eval) == 0:
             raise RuntimeError(

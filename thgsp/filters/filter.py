@@ -38,14 +38,15 @@ class Filter:
 
     """
 
-    def __init__(self, G: GraphBase, kernels=None, in_channels=None, out_channels=None, order=20, lam_max=2.,
-                 weight=None):
+    def __init__(self, G: GraphBase, kernels=None, in_channels=None, out_channels=None, order=20, lam_max=None,
+                 lap_type="sym", weight=None):
         assert lam_max > 0
         assert order > 1
 
         self.G = G
         self.order = order
-        self.lam_max = lam_max
+        self.lam_max = G.max_frequency(lap_type) if lam_max is None else lam_max
+        assert lam_max > 0
 
         self.kernels, self.in_channels, self.out_channels = self._check_kernels(
             kernels, in_channels, out_channels)
@@ -55,6 +56,7 @@ class Filter:
         self.N = G.n_node
         self.dtype = G.dtype()
         self.device = G.device()
+        self.lap_type = lap_type
 
         if weight is None:
             weight = torch.ones(
@@ -158,7 +160,7 @@ class Filter:
                 f"The coefficients of Chebyshev polynomials beyond order {self.order} are not computed")
         x = self._check_signal(x)
         coeff = self.cheby_coefficients[:, :, :order + 1]  # Co x Ci x K+1
-        out = cheby_op(x, self.G.L(), coeff, self.lam_max)  # Co x N X Ci
+        out = cheby_op(x, self.G.L(self.lap_type), coeff, self.lam_max)  # Co x N X Ci
         return out
 
     def __call__(self, x, cheby=True):
@@ -186,7 +188,7 @@ class Filter:
         return out_aggr.permute(1, 0, 2).squeeze_()
 
     def __repr__(self):
-        info = self.__class__.__name__+"(in_channels={}, out_channels={}, N={},\nkernels:\n{})". \
-            format(self.in_channels, self.out_channels, self.N,
+        info = self.__class__.__name__ + "(lap_type={} ,in_channels={}, out_channels={}, N={},\nkernels:\n{})". \
+            format(self.lap_type, self.in_channels, self.out_channels, self.N,
                    get_kernel_name(self.kernels, True))
         return info

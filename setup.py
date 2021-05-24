@@ -88,6 +88,7 @@ install_requires = [
     'numpy',
     'scipy',
     'networkx',
+    'numba',
     'torch-scatter',
     'torch-sparse',
     'torch-cluster',
@@ -120,7 +121,7 @@ setup(
         'graph-signal-processing',
         'graph-wavelet-filterbank'
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     install_requires=install_requires,
     tests_require=tests_require,
     ext_modules=get_extensions(),

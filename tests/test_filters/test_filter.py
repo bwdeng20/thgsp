@@ -16,6 +16,7 @@ def filters():
                       [meyer_kernel, ideal_kernel]])  # 3(Cout) x 2(Cin) kernel
 
     def identity(x): return 1
+
     krns2 = np.tile(np.array([identity]), [3, 2])
     krns2[1][0] = meyer_kernel
     krns2[2][1] = meyer_kernel
@@ -58,7 +59,7 @@ class TestFilter:
         assert y.shape == (flt.Co, flt.N, flt.Ci)
         print(x)
         print(y)
-        assert torch.allclose(y[0], x)
+        assert torch.allclose(y[0], x, atol=1e-6)
         assert not torch.allclose(y[1], x)
         assert not torch.allclose(y[2], x)
 

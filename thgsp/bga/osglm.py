@@ -67,7 +67,7 @@ def osglm(A, lc=None, vtx_color=None):
     bptG[0][:N, :N] = Gb
     bptG[0][N:, :N] = A[append_nodes, :]
 
-    beta = np.zeros((Nos, 1), dtype=np.bool)
+    beta = np.zeros((Nos, 1), dtype=bool)
     beta[idx_s1, 0] = 1
     # appended nodes corresponding to idx_s2 are assigned to the L channel of oversampled graph with idx_s1
     _, node_ordinal_append, _ = np.intersect1d(append_nodes, idx_s2, return_indices=True)

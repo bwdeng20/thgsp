@@ -198,7 +198,7 @@ def laplace(adj: spmatrix, lap_type=None, add_loop=False) -> coo_matrix:
         else:
             m.setdiag(1 - isolated_node_mask)
 
-    elif lap_type is "comb":
+    elif lap_type == "comb":
         m.data *= -1
         if add_loop:
             m.setdiag(1)
@@ -207,7 +207,7 @@ def laplace(adj: spmatrix, lap_type=None, add_loop=False) -> coo_matrix:
 
         m.setdiag(w)
 
-    elif lap_type is "rw":
+    elif lap_type == "rw":
         w = np.where(isolated_node_mask, 1, w)
         m.data /= w[m.row]
         m.data *= -1

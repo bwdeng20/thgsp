@@ -53,12 +53,12 @@ def img2graph(img, threshold: int = None, grid=False):
     Ar = SparseTensor.from_scipy(Ar)
     Ad = SparseTensor.from_scipy(Ad)
 
-    beta_r = np.zeros((H, W), dtype=np.bool)
+    beta_r = np.zeros((H, W), dtype=bool)
     beta_r[::2, ::2] = 1
     beta_r[1::2, 1::2] = 1
     beta_r = beta_r.reshape(-1)
 
-    beta_d = np.zeros((H, W), dtype=np.bool)
+    beta_d = np.zeros((H, W), dtype=bool)
     beta_d[::2] = 1
     beta_d = beta_d.reshape(-1)
 

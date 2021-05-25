@@ -1,4 +1,4 @@
-name: CI
+name: doc
 
 on:
   push:
@@ -9,10 +9,9 @@ on:
 jobs:
   build:
     strategy:
-      max-parallel: 20 # max for free user
       matrix:
-        python-version: [ 3.6, 3.7, 3.8 ]
-        os: [ ubuntu-20.04, ubuntu-18.04, ubuntu-16.04 ]
+        python-version: [ 3.8 ]
+        os: [ ubuntu-20.04 ]
 
     runs-on: ${{ matrix.os }}
     env:
@@ -25,7 +24,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Install System Dependencies
+      - name: System Dependencies
         run: |
           sh scripts/gcc.sh
           sh scripts/scikit-sparse.sh
@@ -55,20 +54,21 @@ jobs:
           pip install networkx
           pip install matplotlib
 
-      - name: Test Dependencies
+      - name: Install(may build some cpp and cu files)
         shell: bash -l {0}
-        run: |
-          python -c "import torch; print(torch.__version__)"
-          pip install pytest
-          pip install pytest-cov
-
-      - name: Install and Test with Pytest
-        shell: bash -l {0}
-        run: |
-          pip install -e .
-          pytest --cov=./thgsp/
+        run: pip install -e .
 
       - name: Build Docs
         shell: bash -l {0}
         run: cd docs && pip install -r requirements.txt && make html && cd ..
+
+      - name: Deploy Docs 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages # The branch the action should deploy to.
+          publish_dir: ./docs # The folder the action should deploy.
+          enable_jekyll: true
+
 

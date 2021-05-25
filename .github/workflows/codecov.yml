@@ -1,4 +1,4 @@
-name: CI
+name: cov
 
 on:
   push:
@@ -9,10 +9,9 @@ on:
 jobs:
   build:
     strategy:
-      max-parallel: 20 # max for free user
       matrix:
-        python-version: [ 3.6, 3.7, 3.8 ]
-        os: [ ubuntu-20.04, ubuntu-18.04, ubuntu-16.04 ]
+        python-version: [ 3.8 ]
+        os: [ ubuntu-20.04 ]
 
     runs-on: ${{ matrix.os }}
     env:
@@ -25,7 +24,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Install System Dependencies
+      - name: System Dependencies
         run: |
           sh scripts/gcc.sh
           sh scripts/scikit-sparse.sh
@@ -68,7 +67,6 @@ jobs:
           pip install -e .
           pytest --cov=./thgsp/
 
-      - name: Build Docs
+      - name: Codecov via Bash
         shell: bash -l {0}
-        run: cd docs && pip install -r requirements.txt && make html && cd ..
-
+        run: bash <(curl -s https://codecov.io/bash)

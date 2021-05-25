@@ -1,8 +1,9 @@
 # *thgsp*
 
 ![](./docs/source/_static/img/logo.svg) \
-[![Build Status](https://travis-ci.com/bwdeng20/thgsp.svg?branch=main)](https://travis-ci.com/bwdeng20/thgsp)
+[![Travis Build Status](https://travis-ci.com/bwdeng20/thgsp.svg?branch=main)](https://travis-ci.com/bwdeng20/thgsp)
 ![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/thgsp-build-test.yml/badge.svg)
+[![Github Doc Status](https://github.com/bwdeng20/thgsp/actions/workflows/ghdocs.yml/badge.svg)](https://bwdeng20.github.io/thgsp)
 [![codecov](https://codecov.io/gh/bwdeng20/thgsp/branch/main/graph/badge.svg?token=H45AEGPM0P)](https://codecov.io/gh/bwdeng20/thgsp)
 ![license](https://img.shields.io/static/v1?label=license&message=BSD&color=yellow) \
 A **g**raph **s**ignal **p**rocessing toolbox built on [py**tor**ch](https://github.com/pytorch/pytorch). The repository

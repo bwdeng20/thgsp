@@ -16,22 +16,17 @@ python -c "import torch; print(torch.__version__)"
 ### 1.2 Install PyTorch Extensions
 
 Matthias Fey provides excellent PyTorch extensions for graph-related computations. Please install 
-[pytorch_scatter](https://github.com/rusty1s/pytorch_scatter) and 
+[pytorch_scatter](https://github.com/rusty1s/pytorch_scatter),
+[pytorch_sparse](https://github.com/rusty1s/pytorch_sparse) and 
 [pytorch_cluster](https://github.com/rusty1s/pytorch_cluster) following the 
 [official guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html).
-Remember **NOT** to install [pytorch_sparse](https://github.com/rusty1s/pytorch_sparse) 
-before installing [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/download).
-#### 1.2.1 Install torch_sparse
-
-There is one bipartite graph approximation algorithm in **thgsp** requiring 
-[METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/download) to partition graphs. You need to following the 
-instructions in `Install.txt` file to install it. Then, set an environment variable to inform `torch_sparse` to build 
-with `METIS` support.
-
+Given `PyTorch1.8.x` with `cudatoolkit11.1`, the following commands suffice.
 ```
-export WITH_METIS=1 # for linux
-pip install torch-sparse
+pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
+pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
+pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
 ```
+
 
 ### 1.3 Install SuiteSparse for scikit-sparse
 On Debian/Ubuntu systems, the following command should suffice:

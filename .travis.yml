@@ -13,13 +13,12 @@ install:
   - source scripts/gcc.sh
   - source scripts/conda.sh
   - source scripts/scikit-sparse.sh
-  - source scripts/metis.sh
   - conda create --yes -n test python="${PYTHON_VERSION}"
   - source activate test
   - conda install pytorch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} cpuonly -c pytorch --yes
   - pip install --user scikit-sparse
   - pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}+${IDX}.html
-  - pip install torch-sparse
+  - pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}+${IDX}.html
   - pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}+${IDX}.html
   - pip install -U ray
   - pip install scipy
@@ -40,7 +39,7 @@ deploy:
   github_token: $github_token
   local_dir: ./docs/
   on:
-      branch: main
-      condition: $PYTHON_VERSION = 3.7
+    branch: main
+    condition: $PYTHON_VERSION = 3.7
 notifications:
   email: false

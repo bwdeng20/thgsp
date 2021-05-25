@@ -1,0 +1,78 @@
+name: test_thgsp
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
+        os: [ ubuntu-20.04 ]
+
+    runs-on: ${{ matrix.os }}
+    env:
+      TORCH_VERSION: 1.8.1
+      TORCHVISION_VERSION: 0.9.1
+      IDX: cpu
+      WITH_METIS: 1
+      THGSP_PLT: 0
+      PYTHON_VERSION: ${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@master
+      - name: "Install System Dependencies"
+        run: |
+          sh scripts/gcc.sh
+          sh scripts/scikit-sparse.sh
+          sh scripts/metis.sh
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: test
+          python-version: ${{ matrix.python-version }}
+          allow-softlinks: true
+          channel-priority: flexible
+          show-channel-urls: true
+
+      - name: Install Python Dependencies
+        run: |
+          conda install pytorch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} cpuonly -c pytorch --yes
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+
+      - name: Install Pytest Dependencies
+        run: |
+          pip install pytest
+          pip install pytest-cov
+          pip install -e .
+
+      - name: Test with Pytest
+        run: |
+          pytest --cov=./thgsp/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          env_vars: ${{ matrix.python-version }}, ${{ matrix.os }}, pythno3.111
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: Build Docs
+        run: |
+          cd docs && pip install -r requirements.txt && make html && cd ..
+
+      - name: Deploy Docs 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages # The branch the action should deploy to.
+          publish_dir: ./docs # The folder the action should deploy.
+          enable_jekyll: true
+
+

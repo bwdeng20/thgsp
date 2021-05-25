@@ -13,7 +13,7 @@ if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
   make
   sudo make install
 else
-  echo "Don't consider windows at present!"
+  echo "Don't consider other operation systems at present!"
 fi
 
 cd ..

@@ -40,9 +40,22 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          conda install pytorch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} cpuonly -c pytorch --yes
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
+          conda install pytorch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} cpuonly -c pytorch --yes
+          pip install --user scikit-sparse
+          pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}+${IDX}.html
+          pip install torch-sparse
+          pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}+${IDX}.html
+          pip install -U ray
+          pip install scipy
+          pip install networkx
+          pip install matplotlib
+          pip install pytest
+          pip install flake8
+          pip install pytest-cov
+          pip install -e .
+
 
       - name: Install Pytest Dependencies
         run: |

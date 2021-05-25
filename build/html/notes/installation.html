@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -95,19 +96,14 @@
               <p class="caption"><span class="caption-text">Notes</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#requirements">1.Requirements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pip">1. Pip</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-pytorch">1.1 Install PyTorch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#install-pytorch-extensions">1.2 Install PyTorch Extensions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#install-torch-sparse">1.2.1 Install torch_sparse</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#install-pytorch-extensions">1.2 Install PyTorch Extensions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#install-suitesparse-for-scikit-sparse">1.3 Install SuiteSparse for scikit-sparse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-source">1.4 From source</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#install-thgsp">2.Install thgsp</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#from-source">2.1 From source</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#docker">2. Docker</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction by Example</a></li>
@@ -190,8 +186,8 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="requirements">
-<h2>1.Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pip">
+<h2>1. Pip<a class="headerlink" href="#pip" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="install-pytorch">
 <h3>1.1 Install PyTorch<a class="headerlink" href="#install-pytorch" title="Permalink to this headline">¶</a></h3>
 <p>We recommend users to install pytorch_gsp in an <a class="reference external" href="https://conda.io/docs/user-guide/install/index.html/">conda</a>
@@ -206,21 +202,15 @@ is installed successfully.</p>
 <div class="section" id="install-pytorch-extensions">
 <h3>1.2 Install PyTorch Extensions<a class="headerlink" href="#install-pytorch-extensions" title="Permalink to this headline">¶</a></h3>
 <p>Matthias Fey provides excellent PyTorch extensions for graph-related computations. Please install
-<a class="reference external" href="https://github.com/rusty1s/pytorch_scatter">pytorch_scatter</a> and
+<a class="reference external" href="https://github.com/rusty1s/pytorch_scatter">pytorch_scatter</a>,
+<a class="reference external" href="https://github.com/rusty1s/pytorch_sparse">pytorch_sparse</a> and
 <a class="reference external" href="https://github.com/rusty1s/pytorch_cluster">pytorch_cluster</a> following the
 <a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html">official guide</a>.
-Remember <strong>NOT</strong> to install <a class="reference external" href="https://github.com/rusty1s/pytorch_sparse">pytorch_sparse</a>
-before installing <a class="reference external" href="http://glaros.dtc.umn.edu/gkhome/metis/metis/download">METIS</a>.</p>
-<div class="section" id="install-torch-sparse">
-<h4>1.2.1 Install torch_sparse<a class="headerlink" href="#install-torch-sparse" title="Permalink to this headline">¶</a></h4>
-<p>There is one bipartite graph approximation algorithm in <strong>thgsp</strong> requiring
-<a class="reference external" href="http://glaros.dtc.umn.edu/gkhome/metis/metis/download">METIS</a> to partition graphs. You need to following the
-instructions in <code class="docutils literal notranslate"><span class="pre">Install.txt</span></code> file to install it. Then, set an environment variable to inform <code class="docutils literal notranslate"><span class="pre">torch_sparse</span></code> to build
-with <code class="docutils literal notranslate"><span class="pre">METIS</span></code> support.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">WITH_METIS</span><span class="o">=</span><span class="mi">1</span> <span class="c1"># for linux</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">sparse</span>
+Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.8.x</span></code> with <code class="docutils literal notranslate"><span class="pre">cudatoolkit11.1</span></code>, the following commands suffice.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">scatter</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">geometric</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.8.0</span><span class="o">+</span><span class="n">cu111</span><span class="o">.</span><span class="n">html</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">sparse</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">geometric</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.8.0</span><span class="o">+</span><span class="n">cu111</span><span class="o">.</span><span class="n">html</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">cluster</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">geometric</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.8.0</span><span class="o">+</span><span class="n">cu111</span><span class="o">.</span><span class="n">html</span>
 </pre></div>
-</div>
 </div>
 </div>
 <div class="section" id="install-suitesparse-for-scikit-sparse">
@@ -234,22 +224,38 @@ with <code class="docutils literal notranslate"><span class="pre">METIS</span></
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="install-thgsp">
-<h2>2.Install thgsp<a class="headerlink" href="#install-thgsp" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="from-source">
-<h3>2.1 From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h3>
+<h3>1.4 From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h3>
 <p>You can only install it from source at present.</p>
-<p>1 . Clone the thgsp repository from  <code class="docutils literal notranslate"><span class="pre">github</span></code>.</p>
+<p>Clone the thgsp repository from  <code class="docutils literal notranslate"><span class="pre">github</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">bwdeng20</span><span class="o">/</span><span class="n">thgsp</span><span class="o">.</span><span class="n">git</span> <span class="c1"># from github</span>
 </pre></div>
 </div>
-<p>2 . build thgsp from source.</p>
+<p>Build thgsp from source, and this may take many minutes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">thgsp</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="docker">
+<h2>2. Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>We also provide docker images for thgsp. Check <a class="reference external" href="https://hub.docker.com/r/bowen20/thgsp">here</a>
+for all available tags.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">bowen20</span><span class="o">/</span><span class="n">thgsp</span><span class="p">:</span><span class="n">v0</span><span class="mf">.11</span><span class="o">-</span><span class="n">dev</span>
+</pre></div>
+</div>
+<p>All images are integrated with ssh services to ease the usage. In general, you should expose container ports
+(especially <code class="docutils literal notranslate"><span class="pre">22</span></code>)and map them to those of the host. If some external data(e.g., datasets) are in need, one has to
+mount  host volume to the container. An example command is below</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>docker run -it --gpus all -v  /home/USER_NAME:/workspace -v /data/datasets：/datasets --name thgspdev -p 2222:22 -p 7777:8888 --restart always thgsp:v0.11-dev
+</pre></div>
+</div>
+<p>With this line, the host paths <code class="docutils literal notranslate"><span class="pre">/home/USER_NAME</span></code> and <code class="docutils literal notranslate"><span class="pre">/data/datasets</span></code> are mapped into <code class="docutils literal notranslate"><span class="pre">/workspace</span></code> and <code class="docutils literal notranslate"><span class="pre">/datasets</span></code> of
+container named <code class="docutils literal notranslate"><span class="pre">thgspdev</span></code>, separately. In addition, container ports <code class="docutils literal notranslate"><span class="pre">22</span></code> and <code class="docutils literal notranslate"><span class="pre">8888</span></code> are bind to host ports
+<code class="docutils literal notranslate"><span class="pre">2222</span></code> and <code class="docutils literal notranslate"><span class="pre">7777</span></code>, respectively. The port <code class="docutils literal notranslate"><span class="pre">22</span></code> is for <code class="docutils literal notranslate"><span class="pre">ssh</span></code> service, and the password for the default user <code class="docutils literal notranslate"><span class="pre">root</span></code> is
+<code class="docutils literal notranslate"><span class="pre">106996</span></code>.</p>
+<p>Once container started, one can use the internal conda python interpreter located at container path <code class="docutils literal notranslate"><span class="pre">/opt/conda/bin/python</span></code>.</p>
 </div>
 </div>
 

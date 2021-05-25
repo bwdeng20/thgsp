@@ -6,7 +6,7 @@
 SPHINXBUILD   = sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
-SPHINXPROJ    = torgsp
+SPHINXPROJ    = thgsp
 
 # Put it first so that "make" without argument is like "make help".
 help:

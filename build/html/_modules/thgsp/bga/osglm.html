@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -239,7 +240,7 @@
     <span class="n">bptG</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="n">N</span><span class="p">,</span> <span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">Gb</span>
     <span class="n">bptG</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">N</span><span class="p">:,</span> <span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">append_nodes</span><span class="p">,</span> <span class="p">:]</span>
 
-    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nos</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nos</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="n">beta</span><span class="p">[</span><span class="n">idx_s1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="c1"># appended nodes corresponding to idx_s2 are assigned to the L channel of oversampled graph with idx_s1</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">node_ordinal_append</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">append_nodes</span><span class="p">,</span> <span class="n">idx_s2</span><span class="p">,</span> <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

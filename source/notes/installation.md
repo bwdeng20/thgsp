@@ -1,6 +1,6 @@
 # Installation
 
-## 1.Requirements
+## 1. Pip
 
 ### 1.1 Install PyTorch
 
@@ -16,22 +16,17 @@ python -c "import torch; print(torch.__version__)"
 ### 1.2 Install PyTorch Extensions
 
 Matthias Fey provides excellent PyTorch extensions for graph-related computations. Please install 
-[pytorch_scatter](https://github.com/rusty1s/pytorch_scatter) and 
+[pytorch_scatter](https://github.com/rusty1s/pytorch_scatter),
+[pytorch_sparse](https://github.com/rusty1s/pytorch_sparse) and 
 [pytorch_cluster](https://github.com/rusty1s/pytorch_cluster) following the 
 [official guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html).
-Remember **NOT** to install [pytorch_sparse](https://github.com/rusty1s/pytorch_sparse) 
-before installing [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/download).
-#### 1.2.1 Install torch_sparse
-
-There is one bipartite graph approximation algorithm in **thgsp** requiring 
-[METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/download) to partition graphs. You need to following the 
-instructions in `Install.txt` file to install it. Then, set an environment variable to inform `torch_sparse` to build 
-with `METIS` support.
-
+Given `PyTorch1.8.x` with `cudatoolkit11.1`, the following commands suffice.
 ```
-export WITH_METIS=1 # for linux
-pip install torch-sparse
+pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
+pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
+pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
 ```
+
 
 ### 1.3 Install SuiteSparse for scikit-sparse
 On Debian/Ubuntu systems, the following command should suffice:
@@ -43,20 +38,43 @@ On Arch Linux, run:
 sudo pacman -S suitesparse
 ```
 
-## 2.Install thgsp
-### 2.1 From source
+### 1.4 From source
 
 You can only install it from source at present. 
 
-1 . Clone the thgsp repository from  `github`.
+Clone the thgsp repository from  `github`.
 
 ```
 git clone git@github.com:bwdeng20/thgsp.git # from github
 ```
 
-2 . build thgsp from source.
+Build thgsp from source, and this may take many minutes.
 
 ```
 cd thgsp
-python setup.py
+pip install .
 ```
+
+
+## 2. Docker
+We also provide docker images for thgsp. Check [here](https://hub.docker.com/r/bowen20/thgsp)
+for all available tags. 
+
+```
+docker pull bowen20/thgsp:v0.11-dev
+```
+
+All images are integrated with ssh services to ease the usage. In general, you should expose container ports 
+(especially `22`)and map them to those of the host. If some external data(e.g., datasets) are in need, one has to
+mount  host volume to the container. An example command is below
+
+```
+docker run -it --gpus all -v  /home/USER_NAME:/workspace -v /data/datasets：/datasets --name thgspdev -p 2222:22 -p 7777:8888 --restart always thgsp:v0.11-dev
+```
+
+With this line, the host paths `/home/USER_NAME` and `/data/datasets` are mapped into `/workspace` and `/datasets` of
+container named `thgspdev`, separately. In addition, container ports `22` and `8888` are bind to host ports 
+`2222` and `7777`, respectively. The port `22` is for `ssh` service, and the password for the default user `root` is
+`106996`.
+
+Once container started, one can use the internal conda python interpreter located at container path `/opt/conda/bin/python`.

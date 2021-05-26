@@ -85,5 +85,5 @@ def test_cheby_op_basis(dtype):
     y0 = H0 @ xnp
     y1 = H1 @ xnp
     err = 1e-5 if dtype is float_dtypes[0] else 1e-12
-    assert (yts0 - y0[:]).sum() < err
-    assert (yts1 - y1[:]).sum() < err
+    assert np.abs(yts0 - y0.ravel()).sum() < err
+    assert np.abs(yts1 - y1.ravel()).sum() < err

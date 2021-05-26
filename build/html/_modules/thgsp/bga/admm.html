@@ -176,7 +176,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">block_diag</span><span class="p">,</span> <span class="n">lil_matrix</span><span class="p">,</span> <span class="n">coo_matrix</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">block_diag</span><span class="p">,</span> <span class="n">coo_matrix</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">partition</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">is_bipartite_fix</span><span class="p">,</span> <span class="n">bipartite_mask</span><span class="p">,</span> <span class="n">graclus_coarsen</span><span class="p">,</span> <span class="n">graclus_refine_raw</span><span class="p">,</span> <span class="n">dict2perm</span>
@@ -235,6 +235,11 @@
 <span class="sd">        \sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T} \mathbf{B}_{j}\right\} \\</span>
 <span class="sd">        \text { s.t. } &amp; \mathbf{B}_{i} \in \mathcal{B}</span>
 <span class="sd">        \end{array}</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        This algorithm does NOT guarantee bipartite output graphs in some cases. Nevertheless, the output graphs are</span>
+<span class="sd">        almost bipartite,i.e., only a few edges violate the bipartiteness. One can use</span>
+<span class="sd">        :func:`is_bipartite_fix` to fix the output under such circumstances.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

@@ -272,6 +272,12 @@ grouped into the low-pass channel while those with a larger color ordinal are in
 \sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T} \mathbf{B}_{j}\right\} \\
 \text { s.t. } &amp; \mathbf{B}_{i} \in \mathcal{B}
 \end{array}\end{split}\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This algorithm does NOT guarantee bipartite output graphs in some cases. Nevertheless, the output graphs are
+almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
+<code class="xref py py-func docutils literal notranslate"><span class="pre">is_bipartite_fix()</span></code> to fix the output under such circumstances.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

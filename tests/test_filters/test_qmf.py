@@ -243,7 +243,7 @@ class TestNumBiorth:
                                                                                                           device),
                                                                                                       str(dtype)))
         kwargs = dict()
-        if strategy is "admm":
+        if strategy == "admm":
             print("|admm-lbga part strategy: {}".format(part))
             kwargs["part"] = part
         N = 32 * 3

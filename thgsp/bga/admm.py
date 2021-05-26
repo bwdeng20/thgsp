@@ -3,7 +3,7 @@ import warnings
 import numpy as np
 import ray
 import torch
-from scipy.sparse import block_diag, lil_matrix, coo_matrix
+from scipy.sparse import block_diag, coo_matrix
 from torch_sparse import SparseTensor, partition
 
 from .utils import is_bipartite_fix, bipartite_mask, graclus_coarsen, graclus_refine_raw, dict2perm
@@ -62,6 +62,11 @@ def admm_bga(A, M=1, alpha=100.0, metric='fro21', cut_edge=True, init_B=None,
         \sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T} \mathbf{B}_{j}\right\} \\
         \text { s.t. } & \mathbf{B}_{i} \in \mathcal{B}
         \end{array}
+
+    .. note::
+        This algorithm does NOT guarantee bipartite output graphs in some cases. Nevertheless, the output graphs are
+        almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
+        :func:`is_bipartite_fix` to fix the output under such circumstances.
 
     Parameters
     ----------

@@ -12,8 +12,11 @@ def test_admm_bga(density, M, dtype):
     N = 32
     G = rand_udg(N, density, dtype)
     bptGs = admm_bga(G.to_dense(), M=M)
-    for i in range(M):
-        assert is_bipartite_fix(bptGs[i])[0]
+    for i in range(M):  # use is_bipartite_fix() is recommended to ensure the bipartiteness
+        assert is_bipartite_fix(bptGs[i], fix_flag=True)[0]
+
+    for i in range(M):  # Check the bipartiteness
+        assert is_bipartite_fix(bptGs[i], fix_flag=False)[0]
 
 
 @pytest.mark.parametrize('device', devices)

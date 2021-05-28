@@ -171,7 +171,7 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
     vecs = None
     vals = None
     # Clusters
-    if cluster is None:
+    if cluster in (None, 1):
         num_clusters = 1  # all nodes belong to one cluster
         cluster = np.ones(N)
     elif isinstance(cluster, int):
@@ -201,7 +201,28 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
             print("Embedding Done.")
 
     elif embedding == "equispaced":  # for a regular embedding
-        raise NotImplemented
+        grid1D = np.linspace(0, 1, N)
+        if num_clusters == 1:
+            embedding = grid1D
+        else:
+            if vecs is None:
+                vals, vecs = compute_eigen_of_rw(G, 2)
+            idx2nd = vals.argsort()[1]  # the second smallest
+            raw_order = np.argsort(vecs[:, idx2nd])
+
+            num_processed_nodes = 0
+            vertex_ordering_wrt_clusters = np.zeros(N, dtype=int)
+            for i in range(num_clusters):
+                cluster_mask = cluster == i
+                raw_order_i = raw_order[cluster_mask]
+                len_i = cluster_mask.sum()
+
+                new_order_assigned = np.zeros(len_i, dtype=int)
+                new_order_assigned[np.argsort(raw_order_i)] = np.arange(len_i) + num_processed_nodes
+
+                vertex_ordering_wrt_clusters[cluster_mask] = new_order_assigned
+                num_processed_nodes += len_i
+            embedding = grid1D[vertex_ordering_wrt_clusters]
 
     elif isinstance(embedding, (np.ndarray, th.Tensor, list, tuple)):
         if len(embedding) != N:

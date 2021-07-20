@@ -80,6 +80,8 @@ def test_cheby_op_basis(dtype):
     c0, c1 = coeff[0].squeeze_()
     H0 = cheby_op_basis(Lts, c0, return_st=False)
     H1 = cheby_op_basis(Lts, c1, return_st=True)
+    assert H1.dtype() == Lts.dtype()
+    assert H1.device() == Lts.device()
 
     y0 = H0 @ xnp
     y1 = H1 @ torch.as_tensor(xnp)

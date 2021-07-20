@@ -77,11 +77,14 @@ def test_matrix_abs_elementwise(device, dtype):
 def test_get_ddd():
     a = torch.rand(3, 3)
     spa = a.to_sparse()
-    acu = a.cuda()
-    spacu = spa.cuda()
     spa2 = SparseTensor.from_dense(a)
+    if torch.cuda.is_available():
+        acu = a.cuda()
+        spacu = spa.cuda()
+        spa2cu = spa2.cuda()
+        print(get_ddd(acu))
+        print(get_ddd(spacu))
+        print(get_ddd(spa2cu))
     print(get_ddd(a))
     print(get_ddd(spa))
-    print(get_ddd(acu))
-    print(get_ddd(spacu))
     print(get_ddd(spa2))

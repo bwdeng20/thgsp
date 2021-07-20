@@ -1,4 +1,6 @@
 import warnings
+
+import scipy.sparse
 import torch
 import numpy as np
 from scipy.sparse import eye as scipy_eye
@@ -68,12 +70,25 @@ def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: flo
     return result
 
 
-def cheby_op_basis(L: SparseTensor, coeff, lam_max=2., return_st=True):
+def cheby_op_basis(L, coeff, lam_max=2., return_st=False):
     assert coeff.ndim == 1
-    on_gpu = L.is_cuda()
-    device = L.device()
     K = len(coeff)
-    N = L.size(-1)
+
+    if isinstance(L, SparseTensor):
+        on_gpu = L.is_cuda()
+        device = L.device()
+        N = L.size(-1)
+    elif isinstance(L, scipy.sparse.spmatrix):
+        on_gpu = False
+        device = torch.device("cpu")
+        N = L.shape[-1]
+    else:
+        on_gpu = True
+        xp, xscipy = get_array_module(on_gpu)
+        if xp == np:  # cupy not installed
+            raise TypeError(f"{type(L)}  is not supported now")
+        device = torch.device("cuda")
+        N = L.shape[-1]
 
     if on_gpu:
         try:

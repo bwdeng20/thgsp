@@ -268,13 +268,15 @@ class QmfOperator:
 
         bptL = [laplace(B, lap_type='sym', add_loop=True) for B in bptG]
 
-        H0, H1 = cheby_op_basis(bptL[0].tocsr(), coeff, lam_max)
+        H0 = cheby_op_basis(bptL[0], coeff[0], lam_max)
+        H1 = cheby_op_basis(bptL[0], coeff[1], lam_max)
         t1 = H0 + H1
         t2 = H1 - H0
         Ta = t1 + diags(beta[:, 0]) @ t2
 
         for i in range(1, M):
-            H0, H1 = cheby_op_basis(bptL[i].tocsr(), coeff, lam_max)
+            H0 = cheby_op_basis(bptL[i], coeff[0], lam_max)
+            H1 = cheby_op_basis(bptL[i], coeff[1], lam_max)
             t1 = H0 + H1
             t2 = H1 - H0
             Ta_sub = t1 + diags(beta[:, i]) @ t2

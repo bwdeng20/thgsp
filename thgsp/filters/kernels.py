@@ -9,7 +9,7 @@ from scipy.special import comb
 # Utils
 def get_kernel_name(kernel_array, identation=False):
     get_name = np.vectorize(lambda f: '_'.join(f.__name__.split('_')[
-                            :-1]) if '_' in f.__name__ else f.__name__)
+                                               :-1]) if '_' in f.__name__ else f.__name__)
     info = get_name(kernel_array)
     return "\t" + str(info).replace('\n', '\n\t') if identation else str(info)
 
@@ -205,3 +205,7 @@ def design_biorth_kernel(k):
     h0_c = sign * h0_c_highest * h0_best
     g0_c = sign * g0_c_highest * g0_best
     return h0_c, g0_c, theta_best
+
+
+def heat_kernel(x, tau=10.):
+    return torch.exp(-tau * x)

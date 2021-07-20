@@ -1,8 +1,10 @@
-import os
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from thgsp.datasets.utils import remove_file_or_dir, get_data_dir_of_thgsp, os
+
+np.set_printoptions(linewidth=10000, precision=4)
+torch.set_printoptions(linewidth=10000, precision=4)
 
 dtypes = [torch.float, torch.double, torch.int, torch.long]
 

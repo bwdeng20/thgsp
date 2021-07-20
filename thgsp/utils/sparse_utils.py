@@ -1,6 +1,9 @@
+import torch
+import warnings
 import numpy as np
 from scipy.sparse import coo_matrix
 from torch_sparse import SparseTensor, coalesce
+from torch_sparse import eye as ts_eye
 
 
 def img2graph(img, threshold: int = None, grid=False):
@@ -89,9 +92,93 @@ def pool_edge(cluster, edge_index, edge_attr=None):
     return edge_index, edge_attr
 
 
-def consecutive_spmv(A, v, k=2):
+def consecutive_spmv(A: SparseTensor, v: torch.Tensor, k=2):
     if v.dim() == 1:
         v = v.reshape(A.shape[-1], 1)
     for i in range(k):
         v = A @ v
     return v
+
+
+def eye(n, dtype=None, device=None):
+    index, value = ts_eye(n, dtype, device)
+    return SparseTensor(row=index[0], col=index[1], value=value, sparse_sizes=(n, n), is_sorted=True)
+
+
+def matrix_power(A, k: int):
+    if isinstance(A, SparseTensor):
+        m, n = A.sparse_sizes()
+        dt = A.dtype()
+        dv = A.device()
+    else:
+        m, n = A.shape
+        dt = A.dtype
+        dv = A.device
+
+    if m != n:
+        raise RuntimeError("The input matrix is not square!")
+    if k < 0 or not isinstance(k, int):
+        warnings.warn(f"The input power{k} is not a positive integer!")
+    if k == 0:
+        return eye(m, dt, dv) if isinstance(A, SparseTensor) else torch.eye(m, dtype=dt, device=dv)
+
+    z = result = None
+    while k > 0:
+        z = A if z is None else z @ z
+        k, bit = divmod(k, 2)
+        if bit:
+            result = z if result is None else result @ z
+    return result
+
+
+def absv(src: SparseTensor):
+    """
+    The input and ouput SparseTensors will share the memory of row,col,rowptr fields except value.
+    Parameters
+    ----------
+    src: SparseTensor
+
+    Returns
+    -------
+    SparseTensor
+    """
+    val = src.storage.value()
+    assert val is not None
+    abs_val = val.abs()
+    return src.set_value(abs_val, layout="csr")
+
+
+def absv_(src: SparseTensor):
+    """
+    The input and ouput SparseTensors will share the memory of row,col,rowptr, and value. Inplace version of
+    :func:`absv`
+
+    Parameters
+    ----------
+    src
+
+    Returns
+    -------
+
+    """
+    val = src.storage.value()
+    assert val is not None
+    return src.set_value_(val.abs_(), layout="csr")
+
+
+def get_ddd(A):
+    if isinstance(A, SparseTensor):
+        density = A.density()
+        dt = A.dtype()
+        dv = A.device()
+        on_gpu = A.is_cuda()
+    elif isinstance(A, torch.Tensor):
+        num = torch.prod(torch.as_tensor(A.shape))
+        nnz = A._nnz() if A.is_sparse else A.count_nonzero()
+        density = (nnz / num).item()
+        dt = A.dtype
+        dv = A.device
+        on_gpu = A.is_cuda
+    else:
+        raise TypeError(f"Type {type(A)} is not supported")
+    return dt, dv, density, on_gpu

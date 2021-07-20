@@ -30,7 +30,7 @@ if torch.cuda.is_available():  # pragma: no cover
             f'{major}.{minor}. Please reinstall the thgsp that '
             f'matches your PyTorch install.')
 
-from .convert import to_torch_sparse, to_scipy, to_np  # noqa
+from .convert import to_torch_sparse, to_scipy, to_np, to_cpx, from_cpx # noqa
 from .io import loadmat  # noqa
 
 import thgsp.graphs  # noqa
@@ -44,4 +44,6 @@ import thgsp.sampling  # noqa
 __all__ = ['to_torch_sparse',
            'to_scipy',
            'to_np',
+           'to_cpx',
+           'from_cpx',
            'loadmat']

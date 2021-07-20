@@ -1,8 +1,8 @@
 import torch
 import pytest
-
-from thgsp.utils.sparse_utils import img2graph
-from ..utils4t import plot
+import numpy as np
+from thgsp.utils.sparse_utils import img2graph, absv, absv_, matrix_power, SparseTensor
+from ..utils4t import plot, devices, float_dtypes
 
 
 @pytest.mark.parametrize('threshold', [None, 50])
@@ -27,3 +27,48 @@ def test_img2graph(shape, threshold):
         draw_cn(Graph(Ad), pos=xy, node_color=beta_d,
                 font_size=5, node_size=10, with_labels=False)
         plot()
+
+
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("k", [0, 2, 5])
+def test_matrix_power(device, dtype, k):
+    n = 5
+    a = torch.rand(n, n, dtype=dtype, device=device)
+    out0 = matrix_power(a, k)
+    tar = torch.matrix_power(a, k)
+    tar2 = np.linalg.matrix_power(a.cpu().numpy(), k)
+    tar2 = torch.from_numpy(tar2)
+    out = matrix_power(SparseTensor.from_dense(a), k).to_dense()
+    if not torch.allclose(tar.cpu(), tar2):  # when numpy and torch differ in the matrix_power
+        print("\n", tar2 - tar.cpu())
+        print(out - tar)
+        print(out.cpu() - tar2)
+        print(out0.cpu() - tar2)
+    assert torch.allclose(out.cpu(), tar2)
+    #  the  results of dense torch.Tensor coincide with native pytorch
+    assert torch.allclose(out0.cpu(), tar.cpu())
+
+
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+def test_matrix_abs_elementwise(device, dtype):
+    n = 5
+    a = torch.rand(n, n, dtype=dtype, device=device)
+
+    spa = SparseTensor.from_dense(a)
+    row, col, val = spa.coo()
+
+    out = absv(spa)
+    row0, col0, val0 = out.coo()
+    assert id(row) == id(row0)
+    assert id(col) == id(col0)
+    assert id(val) != id(val0)
+
+    assert torch.allclose(out.to_dense(), a.abs())
+    c = absv_(spa)
+    row1, col1, val1 = c.coo()
+    assert id(row) == id(row1)
+    assert id(col) == id(col1)
+    assert id(val) == id(val1)
+    #   assert torch.allclose(out, tar)  # use np.linalg.norm() as the target

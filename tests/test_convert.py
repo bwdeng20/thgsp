@@ -1,7 +1,7 @@
 import torch
 import pytest
 import numpy as np
-from thgsp.convert import to_np, to_scipy, to_torch_sparse
+from thgsp.convert import to_np, to_scipy, to_torch_sparse, to_cpx, from_cpx
 from thgsp.convert import spmatrix, SparseTensor, coo_matrix
 
 
@@ -45,3 +45,21 @@ def test_to_scipy(mats):
 
     with pytest.raises(TypeError):
         to_scipy(mats[-1])
+
+
+def test_cp():
+    try:
+        import cupy as cp
+    except ImportError:
+        pytest.skip("cupy is not installed, skip the test")
+    A = SparseTensor.from_dense(torch.rand(3, 3))
+    with pytest.raises(AssertionError):
+        to_cpx(A)
+    to_cpx(A.cuda())
+
+    B = A.cuda()
+    Br = from_cpx(to_cpx(B))
+    ptr, col, wgt = B.csr()
+    ptr1, col1, wgt1 = Br.csr()
+    assert (ptr - ptr1).sum() == 0
+    assert (wgt - wgt1).sum() == 0

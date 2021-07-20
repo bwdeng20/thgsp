@@ -65,25 +65,24 @@ def test_cheby_op_basis(dtype):
     A.fill_diagonal_(0)
 
     Ats = SparseTensor.from_dense(A)
-    Asc = Ats.to_scipy('csr')
     x = torch.ones(N, 1, dtype=dtype)
     xnp = x.numpy()
 
-    from thgsp.bga.utils import laplace as sci_laplace
     from thgsp.graphs.laplace import laplace as ts_laplace
     Lts = ts_laplace(Ats, 'sym')
-    Lsc = sci_laplace(Asc, 'sym').tocsr()
 
     krn = np.array([[[meyer_kernel],
                      [meyer_mirror_kernel]]])  # 1(n_graph) x 2(Cout) x 1(Cin) kernel
-    coeff = cheby_coeff(krn, K=6)
+    coeff = cheby_coeff(krn, K=6)  # M x Co x Ci x K+1
     yts = cheby_op(x, Lts, coeff[0])
     yts0, yts1 = yts[..., 0].numpy()
 
-    H0, H1 = cheby_op_basis(Lsc, coeff[0].squeeze_())
+    c0, c1 = coeff[0].squeeze_()
+    H0 = cheby_op_basis(Lts, c0, return_st=False)
+    H1 = cheby_op_basis(Lts, c1, return_st=True)
 
     y0 = H0 @ xnp
-    y1 = H1 @ xnp
+    y1 = H1 @ torch.as_tensor(xnp)
     err = 1e-5 if dtype is float_dtypes[0] else 1e-12
     assert np.abs(yts0 - y0.ravel()).sum() < err
-    assert np.abs(yts1 - y1.ravel()).sum() < err
+    assert np.abs(yts1 - y1.cpu().numpy().ravel()).sum() < err

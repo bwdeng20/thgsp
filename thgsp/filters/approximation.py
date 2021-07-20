@@ -1,7 +1,9 @@
-import numpy as np
+import warnings
 import torch
-from scipy.sparse import csr_matrix, eye
+import numpy as np
+from scipy.sparse import eye as scipy_eye
 from torch_sparse import SparseTensor
+from thgsp.convert import to_cpx, from_cpx, to_scipy, get_array_module
 
 
 def normalize_laplace(L: SparseTensor, lam_max: float = 2.):
@@ -66,31 +68,43 @@ def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: flo
     return result
 
 
-def cheby_op_basis(L: csr_matrix, coeff: torch.Tensor, lam_max=2.):
-    Co, K = coeff.shape
-    K = K - 1
-    dt = L.dtype
-    c = np.asarray(coeff)
-    N = L.shape[-1]
-    I = eye(N, dtype=L.dtype)
+def cheby_op_basis(L: SparseTensor, coeff, lam_max=2., return_st=True):
+    assert coeff.ndim == 1
+    on_gpu = L.is_cuda()
+    device = L.device()
+    K = len(coeff)
+    N = L.size(-1)
+
+    if on_gpu:
+        try:
+            L = to_cpx(L)
+        except ModuleNotFoundError:
+            warnings.warn("CuPy is not installed")
+            L = to_scipy(L)
+    else:
+        L = to_scipy(L)
+
+    xp, xscipy = get_array_module(on_gpu)
+
+    coeff = xp.asarray(coeff)
+    I = xscipy.sparse.eye(N, dtype=L.dtype, format="csr")
+
     Ln = L * (2 / lam_max) - I
     Tl_old = I
-    Th_old = I
     Tl_cur = Ln
-    Th_cur = Ln
-    Hl = 0.5 * c[0, 0] * Tl_old + c[0, 1] * Tl_cur
-    Hh = 0.5 * c[1, 0] * Th_old + c[1, 1] * Th_cur
-    for k in range(2, K + 1):
-        Tl_new = 2 * Ln @ Tl_cur - Tl_old
-        Hl = Hl + c[0, k] * Tl_new
+    Hl = 0.5 * coeff[0] * Tl_old + coeff[1] * Tl_cur
+    for k in range(2, K):
+        Tl_new = 2 * Ln * Tl_cur - Tl_old
+        Hl = Hl + coeff[k] * Tl_new
         Tl_old = Tl_cur
         Tl_cur = Tl_new
 
-        Th_new = 2 * Ln @ Th_cur - Th_old
-        Hh = Hh + c[1, k] * Th_new
-        Th_old = Th_cur
-        Th_cur = Th_new
-    return Hl.astype(dt), Hh.astype(dt)
+    if return_st:
+        result = SparseTensor.from_scipy(Hl) if xp == np else from_cpx(Hl)
+        result = result.to(device)
+    else:
+        result = Hl
+    return result
 
 
 def cheby_coeff(kernels, K=10, lam_max=2., num_points=None, dtype=None, device=None):

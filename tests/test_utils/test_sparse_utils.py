@@ -1,7 +1,7 @@
 import torch
 import pytest
 import numpy as np
-from thgsp.utils.sparse_utils import img2graph, absv, absv_, matrix_power, SparseTensor
+from thgsp.utils.sparse_utils import img2graph, absv, absv_, matrix_power, SparseTensor, get_ddd
 from ..utils4t import plot, devices, float_dtypes
 
 
@@ -72,3 +72,16 @@ def test_matrix_abs_elementwise(device, dtype):
     assert id(col) == id(col1)
     assert id(val) == id(val1)
     #   assert torch.allclose(out, tar)  # use np.linalg.norm() as the target
+
+
+def test_get_ddd():
+    a = torch.rand(3, 3)
+    spa = a.to_sparse()
+    acu = a.cuda()
+    spacu = spa.cuda()
+    spa2 = SparseTensor.from_dense(a)
+    print(get_ddd(a))
+    print(get_ddd(spa))
+    print(get_ddd(acu))
+    print(get_ddd(spacu))
+    print(get_ddd(spa2))

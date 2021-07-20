@@ -77,7 +77,7 @@ We also provide docker images for thgsp. Check [here](https://hub.docker.com/r/b
 for all available tags.
 
 ```
-docker pull bowen20/thgsp:v0.11-dev
+docker pull bowen20/thgsp:v0.11
 ```
 
 All images are integrated with ssh services to ease the usage. In general, you should expose container ports

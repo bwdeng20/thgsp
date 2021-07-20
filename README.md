@@ -5,13 +5,15 @@
 ![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/thgsp-build-test.yml/badge.svg)
 [![Github Doc Status](https://github.com/bwdeng20/thgsp/actions/workflows/ghdocs.yml/badge.svg)](https://bwdeng20.github.io/thgsp)
 [![codecov](https://codecov.io/gh/bwdeng20/thgsp/branch/main/graph/badge.svg?token=H45AEGPM0P)](https://codecov.io/gh/bwdeng20/thgsp)
-![license](https://img.shields.io/static/v1?label=license&message=BSD&color=yellow) \
-A **g**raph **s**ignal **p**rocessing toolbox built on [py**tor**ch](https://github.com/pytorch/pytorch). The repository
+[![license](https://img.shields.io/static/v1?label=license&message=BSD&color=red)](https://github.com/bwdeng20/thgsp/blob/main/LICENSE) \
+A **g**raph **s**ignal **p**rocessing toolbox built on [py**t**orc**h**](https://github.com/pytorch/pytorch). The repository
 now mainly consists of the following stuffs:
 
 1. GFT-based filter(banks) processing multi-dimensional signals in a Multiple Input Multiple Output(MIMO) manner.
 2. GraphQmf and GraphBiorth wavelet filter bank.
 3. Many strategies to decompose an arbitrary graph into many(usually <10) bipartite graphs.
+4. Many graph signal sampling(which differs slightly with
+   [general graph sampling](https://github.com/benedekrozemberczki/littleballoffur>)) and reconstruction algorithms.
 
 As this package is built on [PyTorch](https://pytorch.org)  and
 [pytorch_sparse](https://github.com/rusty1s/pytorch_sparse>), you can easily integrate functionalities from

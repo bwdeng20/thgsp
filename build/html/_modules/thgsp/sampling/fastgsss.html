@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>thgsp.sampling.fastgsss &mdash; thgsp 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html">
+          
+
+          
+            
+            <img src="../../../_static/logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/introduction.html">Introduction by Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/waveletfb.html">GraphQmf Wavelet Filterbank</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/graphs.html">thgsp.graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/bga.html">thgsp.bga</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/filters.html">thgsp.filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/alg.html">thgsp.alg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/datasets.html">thgsp.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/sampling.html">thgsp.sampling</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">thgsp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>thgsp.sampling.fastgsss</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for thgsp.sampling.fastgsss</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">thgsp.graphs.core</span> <span class="kn">import</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">SparseTensor</span>
+<span class="kn">from</span> <span class="nn">thgsp.filters</span> <span class="kn">import</span> <span class="n">cheby_coeff</span><span class="p">,</span> <span class="n">heat_kernel</span><span class="p">,</span> <span class="n">cheby_op_basis</span>
+<span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">matrix_power</span><span class="p">,</span> <span class="n">absv</span><span class="p">,</span> <span class="n">get_ddd</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_cpx</span><span class="p">,</span> <span class="n">to_scipy</span><span class="p">,</span> <span class="n">get_array_module</span>
+
+
+<div class="viewcode-block" id="fastgsss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.fastgsss">[docs]</a><span class="k">def</span> <span class="nf">fastgsss</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">75.</span><span class="p">,</span> <span class="n">cheby</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FastGSSS proposed in [4]_ .</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    G:      GraphBase</span>
+<span class="sd">        The graph whose signals are to sample</span>
+<span class="sd">    M:      int</span>
+<span class="sd">        The desired number of sampled nodes</span>
+<span class="sd">    bandwidth: int</span>
+<span class="sd">        The estimated bandwidth of original signals</span>
+<span class="sd">    nu: float</span>
+<span class="sd">        The parameter controlling the width of the heat diffusion filter kernel.</span>
+<span class="sd">    cheby:  bool</span>
+<span class="sd">        If :obj:`True`, compute the localization operator with Chebyshev approximation; otherwise</span>
+<span class="sd">        compute it from a direct expensive EVD.</span>
+<span class="sd">    order: int</span>
+<span class="sd">        The order of Chebyshev approximation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    S:      List</span>
+<span class="sd">        The sample set</span>
+<span class="sd">    T: SparseTensor</span>
+<span class="sd">        The localization operator</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free sampling set selection</span>
+<span class="sd">            for graph signals,&quot; IEEE Transactions on Signal Processing, 202.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">num_edge</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">pe</span> <span class="o">=</span> <span class="n">num_edge</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># edge probability</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">M</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># sampling ratio</span>
+    <span class="n">pf</span> <span class="o">=</span> <span class="n">bandwidth</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># normalized bandwidth</span>
+
+    <span class="k">assert</span> <span class="n">pe</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">ps</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">pf</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">dtype</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cheby</span><span class="p">:</span>
+        <span class="n">fs</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="n">lap_type</span><span class="o">=</span><span class="s2">&quot;sym&quot;</span><span class="p">)</span>
+        <span class="n">lmax</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">g_lam</span> <span class="o">=</span> <span class="n">heat_kernel</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">nu</span> <span class="o">*</span> <span class="n">pe</span> <span class="o">*</span> <span class="n">ps</span> <span class="o">*</span> <span class="n">pf</span> <span class="o">/</span> <span class="n">lmax</span><span class="p">)</span>
+        <span class="n">T_g_tmp</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">torch</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">g_lam</span><span class="p">)</span> <span class="o">@</span> <span class="n">U</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">from_dense</span><span class="p">(</span><span class="n">T_g_tmp</span><span class="p">)</span>
+        <span class="n">T_g_tmp</span> <span class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">from_dense</span><span class="p">(</span><span class="n">T_g_tmp</span><span class="o">.</span><span class="n">abs_</span><span class="p">())</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">heat_krn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">heat_kernel</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">nu</span> <span class="o">*</span> <span class="n">pe</span> <span class="o">*</span> <span class="n">ps</span> <span class="o">*</span> <span class="n">pf</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">cheby_coeff</span><span class="p">(</span><span class="n">heat_krn</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>  <span class="c1"># cpu coefficient</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">cheby_op_basis</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">L</span><span class="p">(</span><span class="s2">&quot;sym&quot;</span><span class="p">),</span> <span class="n">coeff</span><span class="o">.</span><span class="n">squeeze_</span><span class="p">(),</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">return_st</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">T_g_tmp</span> <span class="o">=</span> <span class="n">absv</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">T_g</span> <span class="o">=</span> <span class="n">T_g_tmp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">T_g</span><span class="p">[</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_g</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="n">Ts</span> <span class="o">=</span> <span class="n">T_g_tmp</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">Ts</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">Ts</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">relu_</span><span class="p">()</span>
+        <span class="n">T_g</span> <span class="o">=</span> <span class="n">T_g_tmp</span> <span class="o">@</span> <span class="n">W</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">T_g</span><span class="p">[</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">selected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_g</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span></div>
+
+
+<div class="viewcode-block" id="recon_fastssss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.recon_fastssss">[docs]</a><span class="k">def</span> <span class="nf">recon_fastssss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A primary implementation of reconstruction method associated with &quot;FastSSS&quot; sampling algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y:  Tensor</span>
+<span class="sd">        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density</span>
+<span class="sd">        greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，</span>
+<span class="sd">        or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.</span>
+<span class="sd">    S:  List</span>
+<span class="sd">        A list consisting of all indices of sampled nodes.</span>
+<span class="sd">    T:  Tensor, SparseTensor</span>
+<span class="sd">        The localization operator</span>
+<span class="sd">    order: int</span>
+<span class="sd">    sd: float</span>
+<span class="sd">        The threshold of :obj:`T`&#39;s density that controls when we use a dense or sparse linear solver.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tensor</span>
+<span class="sd">        The signal recovered from the measurements :obj:`y` .</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">T_k</span> <span class="o">=</span> <span class="n">matrix_power</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">dt</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">on_gpu</span> <span class="o">=</span> <span class="n">get_ddd</span><span class="p">(</span><span class="n">T_k</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">density</span> <span class="o">&gt;</span> <span class="n">sd</span><span class="p">:</span>
+        <span class="n">T_k</span> <span class="o">=</span> <span class="n">T_k</span><span class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">T_k</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span><span class="p">)],</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="n">T_k</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span> <span class="o">@</span> <span class="n">tmp</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">T_k</span> <span class="o">=</span> <span class="n">to_cpx</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="k">if</span> <span class="n">on_gpu</span> <span class="k">else</span> <span class="n">to_scipy</span><span class="p">(</span><span class="n">T_k</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+        <span class="n">xp</span><span class="p">,</span> <span class="n">xscipy</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">xscipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">T_k</span><span class="p">[</span><span class="n">xp</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span><span class="p">)],</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="n">T_k</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">x_hat</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Bowen Deng.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

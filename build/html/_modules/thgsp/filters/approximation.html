@@ -91,13 +91,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Notes</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notes/introduction.html">Introduction by Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notes/waveletfb.html">GraphQmf Wavelet Filterbank</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Package Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/graphs.html">thgsp.graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/bga.html">thgsp.bga</a></li>
@@ -171,10 +171,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for thgsp.filters.approximation</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csr_matrix</span><span class="p">,</span> <span class="n">eye</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">eye</span> <span class="k">as</span> <span class="n">scipy_eye</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_cpx</span><span class="p">,</span> <span class="n">from_cpx</span><span class="p">,</span> <span class="n">to_scipy</span><span class="p">,</span> <span class="n">get_array_module</span>
 
 
 <span class="k">def</span> <span class="nf">normalize_laplace</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">lam_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.</span><span class="p">):</span>
@@ -239,31 +241,43 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<span class="k">def</span> <span class="nf">cheby_op_basis</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">csr_matrix</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.</span><span class="p">):</span>
-    <span class="n">Co</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">K</span> <span class="o">=</span> <span class="n">K</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="n">dt</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">I</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cheby_op_basis</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">return_st</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">coeff</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">on_gpu</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">is_cuda</span><span class="p">()</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">device</span><span class="p">()</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">on_gpu</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">to_cpx</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;CuPy is not installed&quot;</span><span class="p">)</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">to_scipy</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">to_scipy</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+    <span class="n">xp</span><span class="p">,</span> <span class="n">xscipy</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
+
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">xscipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+
     <span class="n">Ln</span> <span class="o">=</span> <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="n">lam_max</span><span class="p">)</span> <span class="o">-</span> <span class="n">I</span>
     <span class="n">Tl_old</span> <span class="o">=</span> <span class="n">I</span>
-    <span class="n">Th_old</span> <span class="o">=</span> <span class="n">I</span>
     <span class="n">Tl_cur</span> <span class="o">=</span> <span class="n">Ln</span>
-    <span class="n">Th_cur</span> <span class="o">=</span> <span class="n">Ln</span>
-    <span class="n">Hl</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">Tl_old</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Tl_cur</span>
-    <span class="n">Hh</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">Th_old</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Th_cur</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">K</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">Tl_new</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Ln</span> <span class="o">@</span> <span class="n">Tl_cur</span> <span class="o">-</span> <span class="n">Tl_old</span>
-        <span class="n">Hl</span> <span class="o">=</span> <span class="n">Hl</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">Tl_new</span>
+    <span class="n">Hl</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">Tl_old</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Tl_cur</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+        <span class="n">Tl_new</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Ln</span> <span class="o">*</span> <span class="n">Tl_cur</span> <span class="o">-</span> <span class="n">Tl_old</span>
+        <span class="n">Hl</span> <span class="o">=</span> <span class="n">Hl</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">Tl_new</span>
         <span class="n">Tl_old</span> <span class="o">=</span> <span class="n">Tl_cur</span>
         <span class="n">Tl_cur</span> <span class="o">=</span> <span class="n">Tl_new</span>
 
-        <span class="n">Th_new</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Ln</span> <span class="o">@</span> <span class="n">Th_cur</span> <span class="o">-</span> <span class="n">Th_old</span>
-        <span class="n">Hh</span> <span class="o">=</span> <span class="n">Hh</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">Th_new</span>
-        <span class="n">Th_old</span> <span class="o">=</span> <span class="n">Th_cur</span>
-        <span class="n">Th_cur</span> <span class="o">=</span> <span class="n">Th_new</span>
-    <span class="k">return</span> <span class="n">Hl</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dt</span><span class="p">),</span> <span class="n">Hh</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_st</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">from_scipy</span><span class="p">(</span><span class="n">Hl</span><span class="p">)</span> <span class="k">if</span> <span class="n">xp</span> <span class="o">==</span> <span class="n">np</span> <span class="k">else</span> <span class="n">from_cpx</span><span class="p">(</span><span class="n">Hl</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Hl</span>
+    <span class="k">return</span> <span class="n">result</span>
 
 
 <span class="k">def</span> <span class="nf">cheby_coeff</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

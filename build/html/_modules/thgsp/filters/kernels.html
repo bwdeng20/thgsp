@@ -91,13 +91,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Notes</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Notes</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notes/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notes/introduction.html">Introduction by Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notes/waveletfb.html">GraphQmf Wavelet Filterbank</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Package Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/graphs.html">thgsp.graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/bga.html">thgsp.bga</a></li>
@@ -182,7 +182,7 @@
 <span class="c1"># Utils</span>
 <span class="k">def</span> <span class="nf">get_kernel_name</span><span class="p">(</span><span class="n">kernel_array</span><span class="p">,</span> <span class="n">identation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">get_name</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span>
-                            <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">else</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                                               <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">else</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">get_name</span><span class="p">(</span><span class="n">kernel_array</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">identation</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
@@ -378,6 +378,10 @@
     <span class="n">h0_c</span> <span class="o">=</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">h0_c_highest</span> <span class="o">*</span> <span class="n">h0_best</span>
     <span class="n">g0_c</span> <span class="o">=</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">g0_c_highest</span> <span class="o">*</span> <span class="n">g0_best</span>
     <span class="k">return</span> <span class="n">h0_c</span><span class="p">,</span> <span class="n">g0_c</span><span class="p">,</span> <span class="n">theta_best</span></div>
+
+
+<span class="k">def</span> <span class="nf">heat_kernel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">10.</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 
            </div>

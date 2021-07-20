@@ -10,6 +10,8 @@ The repository now mainly includes:
 -  GFT-based filter(banks) processing multi-dimensional signals in a Multiple Input Multiple Output(MIMO) manner.
 -  GraphQmf and GraphBiorth wavelet filter bank.
 -  Many strategies to decompose an arbitrary graph into many(usually <10) bipartite graphs.
+-  Many graph signal sampling(which differs slightly with
+   `general graph sampling <https://github.com/benedekrozemberczki/littleballoffur>`_ ) and reconstruction algorithms.
 
 As this package is built on `PyTorch <https://pytorch.org/>`_  and
 `pytorch_sparse <https://github.com/rusty1s/pytorch_sparse>`_, you can easily integrate functionalities here into a

@@ -24,3 +24,9 @@ Random sampling of bandlimited signals
 .. automodule:: thgsp.sampling.rsbs
    :members:
 
+Eigen-decomposition free sampling
+---------------------------------
+
+.. automodule:: thgsp.sampling.fastgsss
+   :members:
+

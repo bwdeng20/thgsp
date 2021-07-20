@@ -93,14 +93,15 @@
               
             
             
-              <p class="caption"><span class="caption-text">Notes</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Notes</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#pip">1. Pip</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-pytorch">1.1 Install PyTorch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#install-pytorch-extensions">1.2 Install PyTorch Extensions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#install-suitesparse-for-scikit-sparse">1.3 Install SuiteSparse for scikit-sparse</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#from-source">1.4 From source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-cupy-for-linear-algebra-on-gpu-optional">1.4 Install cupy for linear algebra on GPU(Optional)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-source">1.5 From source</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#docker">2. Docker</a></li>
@@ -109,7 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction by Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="waveletfb.html">GraphQmf Wavelet Filterbank</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Package Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules/graphs.html">thgsp.graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/bga.html">thgsp.bga</a></li>
@@ -191,11 +192,10 @@
 <div class="section" id="install-pytorch">
 <h3>1.1 Install PyTorch<a class="headerlink" href="#install-pytorch" title="Permalink to this headline">¶</a></h3>
 <p>We recommend users to install pytorch_gsp in an <a class="reference external" href="https://conda.io/docs/user-guide/install/index.html/">conda</a>
-virtual environment. Install PyTorch1.5 or later
-following <a class="reference external" href="https://pytorch.org/">the official instructions</a>. Type the following in the terminal to check if PyTorch
-is installed successfully.</p>
+virtual environment. Install PyTorch1.5 or later following <a class="reference external" href="https://pytorch.org/">the official instructions</a>. Type the
+following in the terminal to check if PyTorch is installed successfully.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;import torch; print(torch.__version__)&quot;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="mf">1.7.0</span>  <span class="c1"># here my pytorch version is 1.7.0 </span>
+<span class="o">&gt;&gt;&gt;</span> <span class="mf">1.8.0</span>  <span class="c1"># here my pytorch version is 1.8.0 </span>
 </pre></div>
 </div>
 </div>
@@ -205,8 +205,8 @@ is installed successfully.</p>
 <a class="reference external" href="https://github.com/rusty1s/pytorch_scatter">pytorch_scatter</a>,
 <a class="reference external" href="https://github.com/rusty1s/pytorch_sparse">pytorch_sparse</a> and
 <a class="reference external" href="https://github.com/rusty1s/pytorch_cluster">pytorch_cluster</a> following the
-<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html">official guide</a>.
-Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.8.x</span></code> with <code class="docutils literal notranslate"><span class="pre">cudatoolkit11.1</span></code>, the following commands suffice.</p>
+<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html">official guide</a>. Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.8.x</span></code>
+with <code class="docutils literal notranslate"><span class="pre">cudatoolkit11.1</span></code>, the following commands suffice.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">scatter</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">geometric</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.8.0</span><span class="o">+</span><span class="n">cu111</span><span class="o">.</span><span class="n">html</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">sparse</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">geometric</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.8.0</span><span class="o">+</span><span class="n">cu111</span><span class="o">.</span><span class="n">html</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">cluster</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pytorch</span><span class="o">-</span><span class="n">geometric</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.8.0</span><span class="o">+</span><span class="n">cu111</span><span class="o">.</span><span class="n">html</span>
@@ -224,9 +224,19 @@ Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.8.x<
 </pre></div>
 </div>
 </div>
+<div class="section" id="install-cupy-for-linear-algebra-on-gpu-optional">
+<h3>1.4 Install cupy for linear algebra on GPU(Optional)<a class="headerlink" href="#install-cupy-for-linear-algebra-on-gpu-optional" title="Permalink to this headline">¶</a></h3>
+<p>If you do NOT have an Nvidia GPU, please skip this section.</p>
+<p>Follow the <a class="reference external" href="https://docs.cupy.dev/en/stable/install.html">official instruction</a> to install
+<code class="docutils literal notranslate"><span class="pre">CuPy</span></code>, a GPU-based <code class="docutils literal notranslate"><span class="pre">NumPy</span></code> and <code class="docutils literal notranslate"><span class="pre">SciPy</span></code>, via either <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code>. Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.8.x</span></code> with <code class="docutils literal notranslate"><span class="pre">cudatoolkit11.1</span></code>,
+the following command is suitable.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">cupy</span> <span class="n">cudatoolkit</span><span class="o">=</span><span class="mf">11.1</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="from-source">
-<h3>1.4 From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h3>
-<p>You can only install it from source at present.</p>
+<h3>1.5 From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h3>
+<p>You can only install it from source at present since it’s pre-released.</p>
 <p>Clone the thgsp repository from  <code class="docutils literal notranslate"><span class="pre">github</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">bwdeng20</span><span class="o">/</span><span class="n">thgsp</span><span class="o">.</span><span class="n">git</span> <span class="c1"># from github</span>
 </pre></div>
@@ -242,12 +252,12 @@ Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.8.x<
 <h2>2. Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
 <p>We also provide docker images for thgsp. Check <a class="reference external" href="https://hub.docker.com/r/bowen20/thgsp">here</a>
 for all available tags.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">bowen20</span><span class="o">/</span><span class="n">thgsp</span><span class="p">:</span><span class="n">v0</span><span class="mf">.11</span><span class="o">-</span><span class="n">dev</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">bowen20</span><span class="o">/</span><span class="n">thgsp</span><span class="p">:</span><span class="n">v0</span><span class="mf">.11</span>
 </pre></div>
 </div>
 <p>All images are integrated with ssh services to ease the usage. In general, you should expose container ports
-(especially <code class="docutils literal notranslate"><span class="pre">22</span></code>)and map them to those of the host. If some external data(e.g., datasets) are in need, one has to
-mount  host volume to the container. An example command is below</p>
+(especially <code class="docutils literal notranslate"><span class="pre">22</span></code>)and map them to those of the host. If some external data(e.g., datasets) are in need, one has to mount
+host volume to the container. An example command is below</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>docker run -it --gpus all -v  /home/USER_NAME:/workspace -v /data/datasets：/datasets --name thgspdev -p 2222:22 -p 7777:8888 --restart always thgsp:v0.11-dev
 </pre></div>
 </div>
@@ -255,7 +265,8 @@ mount  host volume to the container. An example command is below</p>
 container named <code class="docutils literal notranslate"><span class="pre">thgspdev</span></code>, separately. In addition, container ports <code class="docutils literal notranslate"><span class="pre">22</span></code> and <code class="docutils literal notranslate"><span class="pre">8888</span></code> are bind to host ports
 <code class="docutils literal notranslate"><span class="pre">2222</span></code> and <code class="docutils literal notranslate"><span class="pre">7777</span></code>, respectively. The port <code class="docutils literal notranslate"><span class="pre">22</span></code> is for <code class="docutils literal notranslate"><span class="pre">ssh</span></code> service, and the password for the default user <code class="docutils literal notranslate"><span class="pre">root</span></code> is
 <code class="docutils literal notranslate"><span class="pre">106996</span></code>.</p>
-<p>Once container started, one can use the internal conda python interpreter located at container path <code class="docutils literal notranslate"><span class="pre">/opt/conda/bin/python</span></code>.</p>
+<p>Once container started, one can use the internal conda python interpreter located at container
+path <code class="docutils literal notranslate"><span class="pre">/opt/conda/bin/python</span></code>.</p>
 </div>
 </div>
 

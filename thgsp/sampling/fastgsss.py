@@ -53,7 +53,7 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
     assert pf > 0
 
     dtype = G.dtype()
-
+    device = G.device()
     if not cheby:
         fs, U = G.spectral(lap_type="sym")
         lmax = fs.max().item()
@@ -64,8 +64,8 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
 
     else:
         heat_krn = partial(heat_kernel, tau=nu * pe * ps * pf / 2.)
-        coeff = cheby_coeff(heat_krn, order, dtype=dtype)  # cpu coefficient
-        T = cheby_op_basis(G.L("sym"), coeff.squeeze_(), lam_max=2., return_st=True)
+        coeff = cheby_coeff(heat_krn, order, dtype=dtype, device=device)  # cpu coefficient
+        T = cheby_op_basis(G.L("sym"), coeff.squeeze_(), lam_max=2., return_ts=True)
         T_g_tmp = absv(T)
 
     S = []

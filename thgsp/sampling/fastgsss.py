@@ -1,10 +1,12 @@
 import torch
 import numpy as np
+from tqdm import trange
 from functools import partial
+from thgsp.convert import get_ddd
 from thgsp.graphs.core import GraphBase, SparseTensor
 from thgsp.filters import cheby_coeff, heat_kernel, cheby_op_basis
-from thgsp.utils import matrix_power, absv, get_ddd
-from thgsp.convert import to_cpx, to_scipy, get_array_module
+from thgsp.utils import matrix_power, absv
+from thgsp.convert import to_xcipy, get_array_module
 
 
 def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
@@ -36,14 +38,14 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
 
     References
     ----------
-    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, "Eigendecomposition-free sampling set selection
+    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, "Eigendecomposition-free rsbs_recon_compare2matlab set selection
             for graph signals," IEEE Transactions on Signal Processing, 202.
 
     """
     N = G.size(1)
     num_edge = G.numel() // 2
     pe = num_edge / N  # edge probability
-    ps = M / N  # sampling ratio
+    ps = M / N  # rsbs_recon_compare2matlab ratio
     pf = bandwidth / N  # normalized bandwidth
 
     assert pe > 0
@@ -72,7 +74,7 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
     selected = torch.argmax(T_g).item()
     S.append(selected)
 
-    for i in range(1, M):
+    for _ in trange(1, M, initial=1, desc=f"Sampling nodes", total=M):
         Ts = T_g_tmp[:, S].sum(1)
         W = Ts.mean() - Ts
         W = W.relu_()
@@ -86,12 +88,12 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
 
 def recon_fastssss(y, S, T, order, sd=0.5):
     """
-    A primary implementation of reconstruction method associated with "FastSSS" sampling algorithm.
+    A primary implementation of reconstruction method associated with "FastSSS" rsbs_recon_compare2matlab algorithm.
 
     Parameters
     ----------
     y:  Tensor
-        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density
+        The measurements on rsbs_recon_compare2matlab set :obj:S:. If the localization operator :obj:`T` has a density
         greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，
         or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.
     S:  List
@@ -115,8 +117,8 @@ def recon_fastssss(y, S, T, order, sd=0.5):
         x_hat = T_k[:, S] @ tmp
 
     else:
-        T_k = to_cpx(T) if on_gpu else to_scipy(T_k, layout="csr")
-        xp, xscipy = get_array_module(on_gpu)
-        tmp = xscipy.sparse.spsolve(T_k[xp.ix_(S, S)], xp.asarray(y))
+        T_k = to_xcipy(T_k)
+        xp, xcipy, xsplin = get_array_module(on_gpu)
+        tmp = xsplin.spsolve(T_k[xp.ix_(S, S)], xp.asarray(y))
         x_hat = T_k[:, S] * tmp
-    return torch.as_tensor(x_hat)
+    return torch.as_tensor(x_hat, device=dv)

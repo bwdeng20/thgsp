@@ -1,9 +1,10 @@
 import pytest
 import numpy as np
 import torch as th
-from ..utils4t import float_dtypes, lap_types, devices
-from thgsp.sampling.ess import ess_sampling, power_iteration, power_iteration4min, ess
+from ..utils4t import float_dtypes, lap_types, devices, snr_and_mse
+from thgsp.sampling.ess import ess_sampling, power_iteration, power_iteration4min, ess, recon_ess
 from thgsp.graphs import rand_udg, laplace
+from thgsp.utils import snr, mse
 import scipy.sparse as sparse
 from scipy.sparse.linalg import eigsh, ArpackNoConvergence
 
@@ -69,7 +70,7 @@ class TestPowerIteration:
 
 @pytest.mark.parametrize('dtype', float_dtypes[1:])  # omit float32 since it may lead to ArpackNoConvergence error
 @pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('lap', lap_types)
+@pytest.mark.parametrize('lap', lap_types[:-1])
 @pytest.mark.parametrize('M', [N // 2, N])
 class TestEss:
     def test_ess_sampling(self, dtype, device, lap, M):
@@ -88,3 +89,14 @@ class TestEss:
         L = laplace(g, lap_type=lap)
         S = ess(L, M, k)
         print(S)
+
+    def test_recon(self, dtype, device, lap, M):
+        g = rand_udg(N, dtype=dtype, device=device)
+        L = laplace(g, lap_type=lap)
+        S = ess(L, M)
+
+        num_sig = 10
+        f = th.rand(N, num_sig, dtype=dtype, device=device)
+        fs = f[S, :]
+        f_hat = recon_ess(fs, S, g.U(lap), bd=int(3 * N / 4))
+        snr_and_mse(f_hat, f)

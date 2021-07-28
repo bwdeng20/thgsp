@@ -2,8 +2,10 @@ import torch
 import warnings
 import numpy as np
 from numba import jit, prange
-from thgsp.graphs import GraphBase
+from thgsp.graphs.core import GraphBase, SparseTensor
 from thgsp.filters import cheby_op
+from thgsp.convert import get_ddd, to_xcipy, to_xp, get_array_module
+from ._utils import construct_sampling_matrix, construct_dia
 
 
 @jit('f8[:](f8,f8,f8,f8,i4)', nopython=True)
@@ -26,7 +28,7 @@ def cheby_coeff4ideal_band_pass(a, b, lmin, lmax, order):
 def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None,
                 return_coherence=True, order=30, lap_type="comb", verbose=False):
     r"""
-    Estimate the optimal sampling distribution according to which the bandlimited graph signals are
+    Estimate the optimal rsbs_recon_compare2matlab distribution according to which the bandlimited graph signals are
     sampled [3]_ .
 
     Parameters
@@ -64,8 +66,8 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
 
     References
     ----------
-    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random sampling of bandlimited signals on graphs,”
-            Applied and Computational Harmonic Analysis, 2018.
+    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random rsbs_recon_compare2matlab of
+            bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2018.
     """
     N = G.size(1)
     appropriate_num_rv = np.int32(2 * np.round(np.log(N)))
@@ -121,10 +123,10 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
     return lambda_k, cum_coh
 
 
-def rsbs(G, M, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None, order=30, lap_type="comb",
+def rsbs(G, M, k=None, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None, order=30, lap_type="comb",
          return_list=False, verbose=False):
     r"""
-    Random sampling algorithm for bandlimited signals [3]_ .
+    Random rsbs_recon_compare2matlab algorithm for bandlimited signals [3]_ .
 
     Parameters
     ----------
@@ -132,8 +134,8 @@ def rsbs(G, M, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=N
         The graph to be handled
     M: int
         The number of vertices to be sampled
-    k: int
-        The :obj:`k`-th smallest eigenvalue of graph Laplacian
+    k: int, optional
+        The :obj:`k`-th smallest eigenvalue of graph Laplacian. If None, :obj:`k = M`.
     num_estimation: int
         The number of times the estimation of :math:`\lambda_{k}` is going to run
     num_rv:    int, None
@@ -154,12 +156,47 @@ def rsbs(G, M, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=N
         Laplacian, separately
     verbose: bool
 
-
     Returns
     -------
-    List, Tensor
+    sampled_nodes: List, Tensor
+        The rsbs_recon_compare2matlab set
+    cum_coh: Tensor
+        The rsbs_recon_compare2matlab possibilities of all nodes
 
     """
     lambda_k, cum_coh = estimate_lk(G, k, num_estimation, num_rv, epsilon, lmin, lmax, True, order, lap_type, verbose)
     sampled_nodes = torch.multinomial(cum_coh, M, replacement=True)
-    return sampled_nodes.cpu().tolist() if return_list else sampled_nodes
+    sampled_nodes = sampled_nodes.cpu().tolist() if return_list else sampled_nodes
+    return sampled_nodes, cum_coh
+
+
+def recon_rsbs(y, S, L: SparseTensor, cum_coh, mu: float = 0.01, reg_order: int = 1, **kwargs):
+    N = L.size(-1)
+    M = len(S)
+    assert M > 0
+    if y.shape[0] != M:
+        raise RuntimeError(f"y is expected to have a shape ({M},num_signal) or ({M},), not {y.shape}")
+
+    dt, dv, density, on_gpu = get_ddd(L)
+    xp, xcipy, xsplin = get_array_module(on_gpu)
+
+    yp = to_xp(y).astype("d")
+
+    L = to_xcipy(L, layout="csr").astype("d")
+    H = construct_sampling_matrix(N, S, torch.double, dv)
+    Psinv = construct_dia(S, cum_coh, ps=True, inverse=True, dtype=torch.double, device=dv)
+
+    Bl = H.T * Psinv
+    B = Bl * H + mu * L ** reg_order
+
+    HPy = Bl @ yp
+
+    if xp == np:
+        x_hat = xsplin.spsolve(B, HPy, **kwargs)
+    else:
+        num_sig = yp.shape[-1]
+        x_hat = xp.empty((N, num_sig), dtype=yp.dtype)
+        for j in range(num_sig):
+            x_hat[:, j] = xsplin.spsolve(B, HPy[:, j], **kwargs)
+
+    return torch.as_tensor(x_hat, device=dv)

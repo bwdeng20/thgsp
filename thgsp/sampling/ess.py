@@ -1,7 +1,8 @@
 import numpy as np
+import torch
 import torch as th
 from scipy.sparse.linalg import eigsh, ArpackNoConvergence
-from thgsp.convert import to_scipy, SparseTensor
+from thgsp.convert import to_scipy, SparseTensor, get_array_module
 from thgsp.utils import consecutive_spmv
 
 
@@ -33,7 +34,7 @@ def ess_sampling(operator, M, k=2):
 
 def ess(operator, M, k=2, max_iter=int(5e2)):
     r"""
-    An efficient sampling set selection method for bandlimited graph signals [1]_.
+    An efficient rsbs_recon_compare2matlab set selection method for bandlimited graph signals [1]_.
 
     Parameters
     ----------
@@ -49,11 +50,11 @@ def ess(operator, M, k=2, max_iter=int(5e2)):
     Returns
     -------
     S:  list
-        A list containing sampled nodes with the sampling order
+        A list containing sampled nodes with the rsbs_recon_compare2matlab order
 
     References
     ----------
-    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient sampling set selection for bandlimited graph
+    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient rsbs_recon_compare2matlab set selection for bandlimited graph
             signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.
 
     """
@@ -102,3 +103,33 @@ def power_iteration4min(L: SparseTensor, Sc: iter, k=2, num_iter=50):
     lam_min_minus_max, v = power_iteration(L, Sc, k, shift=lam_max, num_iter=num_iter)
     lam_min = lam_min_minus_max + lam_max
     return lam_min, v
+
+
+def recon_ess(y, S, U, bd, **kwargs):
+    """
+    Naive implementation of ESS rsbs_recon_compare2matlab reconstruction.
+
+    Parameters
+    ----------
+    y:  Tensor
+        Dense Shape: :obj:`(N)`
+    S:  List
+        The rsbs_recon_compare2matlab set
+    U:  Tensor
+        Dense :obj:`(N, bd)`
+    bd: int
+        The bandwidth of target signal
+    kwargs: dict
+        The optional arguments of `xp.linalg.lstsq`
+    Returns
+    -------
+    f_hat:  Tensor
+        The reconstructed signal
+    """
+    assert bd > 1
+    assert len(S) > 1
+    dv = U.device
+    xp, _ = get_array_module(U.is_cuda)
+    tmp = xp.linalg.lstsq(xp.asarray(U[S, :bd]), xp.asarray(y), **kwargs)[0]
+    f_hat = U[:, :bd] @ torch.as_tensor(tmp, device=dv)
+    return f_hat

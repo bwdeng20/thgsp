@@ -2,7 +2,7 @@ import pytest
 import torch
 import math
 from thgsp.graphs.generators import random_graph
-from ..utils4t import devices, float_dtypes
+from ..utils4t import devices, float_dtypes, snr_and_mse
 from thgsp.sampling.fastgsss import fastgsss, recon_fastssss
 
 
@@ -11,7 +11,7 @@ from thgsp.sampling.fastgsss import fastgsss, recon_fastssss
 @pytest.mark.parametrize("cheb", [True, False])
 class TestFastGSSS:
     def test_fastgsss(self, device, dtype, cheb):
-        N = 100
+        N = 1000
         ds = 0.1
         order = 12
         M = 10
@@ -34,6 +34,5 @@ class TestFastGSSS:
         K = 12
         S, T = fastgsss(g, M, bw, nu, cheb, order=K)
         f_hat = recon_fastssss(f_band_noise[S], S, T, order=K)
-        mse = (f_hat - f_band).pow(2).mean()
-        print(mse)
-        assert mse < 0.5
+        s, m = snr_and_mse(f_hat, f_band)
+        assert m < 0.5

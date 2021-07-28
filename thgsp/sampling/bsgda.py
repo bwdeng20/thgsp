@@ -1,6 +1,9 @@
 import torch
 import warnings
-from torch_sparse import SparseTensor
+import numpy as np
+from sksparse.cholmod import cholesky
+from thgsp.convert import SparseTensor
+from ._utils import construct_sampling_matrix, construct_hth
 from typing import Tuple, List
 
 
@@ -31,14 +34,14 @@ def greedy_gda_sampling(spm, K, T, mu=0.01, p_hops=12):
 
 def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_hops: int = 12) -> Tuple[List, float]:
     r"""
-    A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.
+    A fast deterministic vertex rsbs_recon_compare2matlab algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.
 
     Parameters
     ----------
     spm: SparseTensor
         The sparse adjacency matrix.
     K:  int
-        The desired number of sampling nodes.
+        The desired number of rsbs_recon_compare2matlab nodes.
     mu: float
         The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7) [2]_ for the details.
     epsilon: float
@@ -56,7 +59,7 @@ def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_
 
     References
     ----------
-    .. [2] Y. Bai, et al., “Fast graph sampling set selection using Gershgorin disc alignment,” IEEE TSP, 2020.
+    .. [2] Y. Bai, et al., “Fast graph rsbs_recon_compare2matlab set selection using Gershgorin disc alignment,” IEEE TSP, 2020.
 
     """
     assert K >= 1
@@ -84,3 +87,28 @@ def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_
 
     sampled_nodes, _ = greedy_gda_sampling(spm, K, T, mu, p_hops)
     return sampled_nodes, left
+
+
+def recon_bsgda(y, S, L: SparseTensor, mu: float = 0.01, reg_order: int = 1, **kwargs):
+    N = L.size(-1)
+    M = len(S)
+    assert N >= M > 0
+    if y.ndim == 1:
+        y = y.view(-1, 1)
+    if y.shape[0] != M:
+        raise RuntimeError(f"y is expected to have a shape ({M},num_signal) or ({M},), not {y.shape}")
+    dv = L.device()
+    dt = L.dtype()
+    L = L.to_scipy("csc")
+    Ht = construct_sampling_matrix(N, S, dtype=dt, device="cpu").T
+    HtH = construct_hth(N, S, dtype=dt, device="cpu")
+    B = HtH + mu * L ** reg_order
+    fc = cholesky(B, **kwargs)
+
+    Hty = Ht @ np.asarray(y.cpu())
+    x_hat = fc.solve_A(Hty)
+    p = fc.P()
+    p_inverse = np.empty_like(p)
+    p_inverse[p] = np.arange(N)
+    x_hat = x_hat[p_inverse]
+    return torch.as_tensor(x_hat, device=dv)

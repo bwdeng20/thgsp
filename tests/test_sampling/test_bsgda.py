@@ -1,16 +1,18 @@
 import pytest
 import time
 import numpy as np
+import torch
 import torch as th
-from ..utils4t import float_dtypes
-from thgsp.sampling.bsgda import bsgda, greedy_sampling, computing_sets, solving_set_covering, greedy_gda_sampling
+from ..utils4t import float_dtypes, snr_and_mse
+from thgsp.sampling.bsgda import bsgda, greedy_sampling, computing_sets, solving_set_covering, greedy_gda_sampling, \
+    recon_bsgda
 from thgsp.graphs import rand_udg
 
 np.set_printoptions(precision=5)
 th.set_printoptions(precision=5)
-N = 20
+N = 200
 T = 0.001
-K = 4
+K = N // 10
 max_hops = 3
 
 
@@ -68,6 +70,19 @@ def test_consistency_greedy_sampling(dtype):
 @pytest.mark.parametrize('dtype', float_dtypes)
 def test_bsgda(dtype):
     g = rand_udg(N, 0.1, dtype=dtype).fill_value_(1.)
-    sampled_nodes, thresh = bsgda(g, K*2)
+    sampled_nodes, thresh = bsgda(g, K * 2)
     print("sampled nodes: ", sampled_nodes)
     print("thresh(T):     ", thresh)
+
+
+def test_recon_bsgda():
+    mu = 0.01
+    g = rand_udg(N, 0.1, dtype=torch.double)
+    sampled_nodes, thresh = bsgda(g, K * 8, mu=mu, epsilon=1e-8)
+
+    print("sampled nodes: ", sampled_nodes)
+    print("thresh(T):     ", thresh)
+
+    f = torch.randn(N, 100, dtype=torch.double)
+    f_hat = recon_bsgda(f[sampled_nodes], sampled_nodes, g.L("comb"), mu)
+    m, s = snr_and_mse(f_hat, f)

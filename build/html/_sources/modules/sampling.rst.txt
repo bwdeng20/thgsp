@@ -30,3 +30,9 @@ Eigen-decomposition free sampling
 .. automodule:: thgsp.sampling.fastgsss
    :members:
 
+Utils
+-----
+
+.. automodule:: thgsp.sampling._utils
+   :members:
+

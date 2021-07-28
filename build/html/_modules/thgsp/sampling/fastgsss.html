@@ -173,11 +173,13 @@
   <h1>Source code for thgsp.sampling.fastgsss</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">get_ddd</span>
 <span class="kn">from</span> <span class="nn">thgsp.graphs.core</span> <span class="kn">import</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">SparseTensor</span>
 <span class="kn">from</span> <span class="nn">thgsp.filters</span> <span class="kn">import</span> <span class="n">cheby_coeff</span><span class="p">,</span> <span class="n">heat_kernel</span><span class="p">,</span> <span class="n">cheby_op_basis</span>
-<span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">matrix_power</span><span class="p">,</span> <span class="n">absv</span><span class="p">,</span> <span class="n">get_ddd</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_cpx</span><span class="p">,</span> <span class="n">to_scipy</span><span class="p">,</span> <span class="n">get_array_module</span>
+<span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">matrix_power</span><span class="p">,</span> <span class="n">absv</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_xcipy</span><span class="p">,</span> <span class="n">get_array_module</span>
 
 
 <div class="viewcode-block" id="fastgsss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.fastgsss">[docs]</a><span class="k">def</span> <span class="nf">fastgsss</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">75.</span><span class="p">,</span> <span class="n">cheby</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
@@ -209,14 +211,14 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free sampling set selection</span>
+<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free rsbs_recon_compare2matlab set selection</span>
 <span class="sd">            for graph signals,&quot; IEEE Transactions on Signal Processing, 202.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">num_edge</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span>
     <span class="n">pe</span> <span class="o">=</span> <span class="n">num_edge</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># edge probability</span>
-    <span class="n">ps</span> <span class="o">=</span> <span class="n">M</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># sampling ratio</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">M</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># rsbs_recon_compare2matlab ratio</span>
     <span class="n">pf</span> <span class="o">=</span> <span class="n">bandwidth</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># normalized bandwidth</span>
 
     <span class="k">assert</span> <span class="n">pe</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -245,7 +247,7 @@
     <span class="n">selected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_g</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Sampling nodes&quot;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">M</span><span class="p">):</span>
         <span class="n">Ts</span> <span class="o">=</span> <span class="n">T_g_tmp</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">W</span> <span class="o">=</span> <span class="n">Ts</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">Ts</span>
         <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">relu_</span><span class="p">()</span>
@@ -259,12 +261,12 @@
 
 <div class="viewcode-block" id="recon_fastssss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.recon_fastssss">[docs]</a><span class="k">def</span> <span class="nf">recon_fastssss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A primary implementation of reconstruction method associated with &quot;FastSSS&quot; sampling algorithm.</span>
+<span class="sd">    A primary implementation of reconstruction method associated with &quot;FastSSS&quot; rsbs_recon_compare2matlab algorithm.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y:  Tensor</span>
-<span class="sd">        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density</span>
+<span class="sd">        The measurements on rsbs_recon_compare2matlab set :obj:S:. If the localization operator :obj:`T` has a density</span>
 <span class="sd">        greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，</span>
 <span class="sd">        or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.</span>
 <span class="sd">    S:  List</span>
@@ -288,11 +290,11 @@
         <span class="n">x_hat</span> <span class="o">=</span> <span class="n">T_k</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span> <span class="o">@</span> <span class="n">tmp</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">T_k</span> <span class="o">=</span> <span class="n">to_cpx</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="k">if</span> <span class="n">on_gpu</span> <span class="k">else</span> <span class="n">to_scipy</span><span class="p">(</span><span class="n">T_k</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
-        <span class="n">xp</span><span class="p">,</span> <span class="n">xscipy</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">xscipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">T_k</span><span class="p">[</span><span class="n">xp</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span><span class="p">)],</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="n">T_k</span> <span class="o">=</span> <span class="n">to_xcipy</span><span class="p">(</span><span class="n">T_k</span><span class="p">)</span>
+        <span class="n">xp</span><span class="p">,</span> <span class="n">xcipy</span><span class="p">,</span> <span class="n">xsplin</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">xsplin</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">T_k</span><span class="p">[</span><span class="n">xp</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span><span class="p">)],</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
         <span class="n">x_hat</span> <span class="o">=</span> <span class="n">T_k</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">x_hat</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

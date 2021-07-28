@@ -175,8 +175,10 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">prange</span>
-<span class="kn">from</span> <span class="nn">thgsp.graphs</span> <span class="kn">import</span> <span class="n">GraphBase</span>
+<span class="kn">from</span> <span class="nn">thgsp.graphs.core</span> <span class="kn">import</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">SparseTensor</span>
 <span class="kn">from</span> <span class="nn">thgsp.filters</span> <span class="kn">import</span> <span class="n">cheby_op</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">to_xcipy</span><span class="p">,</span> <span class="n">to_xp</span><span class="p">,</span> <span class="n">get_array_module</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">construct_sampling_matrix</span><span class="p">,</span> <span class="n">construct_dia</span>
 
 
 <span class="nd">@jit</span><span class="p">(</span><span class="s1">&#39;f8[:](f8,f8,f8,f8,i4)&#39;</span><span class="p">,</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -199,7 +201,7 @@
 <div class="viewcode-block" id="estimate_lk"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.rsbs.estimate_lk">[docs]</a><span class="k">def</span> <span class="nf">estimate_lk</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">num_estimation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">return_coherence</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lap_type</span><span class="o">=</span><span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Estimate the optimal sampling distribution according to which the bandlimited graph signals are</span>
+<span class="sd">    Estimate the optimal rsbs_recon_compare2matlab distribution according to which the bandlimited graph signals are</span>
 <span class="sd">    sampled [3]_ .</span>
 
 <span class="sd">    Parameters</span>
@@ -237,8 +239,8 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random sampling of bandlimited signals on graphs,”</span>
-<span class="sd">            Applied and Computational Harmonic Analysis, 2018.</span>
+<span class="sd">    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random rsbs_recon_compare2matlab of</span>
+<span class="sd">            bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2018.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">appropriate_num_rv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">N</span><span class="p">)))</span>
@@ -294,10 +296,10 @@
     <span class="k">return</span> <span class="n">lambda_k</span><span class="p">,</span> <span class="n">cum_coh</span></div>
 
 
-<div class="viewcode-block" id="rsbs"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.rsbs.rsbs">[docs]</a><span class="k">def</span> <span class="nf">rsbs</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">num_estimation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lap_type</span><span class="o">=</span><span class="s2">&quot;comb&quot;</span><span class="p">,</span>
+<div class="viewcode-block" id="rsbs"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.rsbs.rsbs">[docs]</a><span class="k">def</span> <span class="nf">rsbs</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_estimation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lap_type</span><span class="o">=</span><span class="s2">&quot;comb&quot;</span><span class="p">,</span>
          <span class="n">return_list</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Random sampling algorithm for bandlimited signals [3]_ .</span>
+<span class="sd">    Random rsbs_recon_compare2matlab algorithm for bandlimited signals [3]_ .</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -305,8 +307,8 @@
 <span class="sd">        The graph to be handled</span>
 <span class="sd">    M: int</span>
 <span class="sd">        The number of vertices to be sampled</span>
-<span class="sd">    k: int</span>
-<span class="sd">        The :obj:`k`-th smallest eigenvalue of graph Laplacian</span>
+<span class="sd">    k: int, optional</span>
+<span class="sd">        The :obj:`k`-th smallest eigenvalue of graph Laplacian. If None, :obj:`k = M`.</span>
 <span class="sd">    num_estimation: int</span>
 <span class="sd">        The number of times the estimation of :math:`\lambda_{k}` is going to run</span>
 <span class="sd">    num_rv:    int, None</span>
@@ -327,15 +329,50 @@
 <span class="sd">        Laplacian, separately</span>
 <span class="sd">    verbose: bool</span>
 
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    List, Tensor</span>
+<span class="sd">    sampled_nodes: List, Tensor</span>
+<span class="sd">        The rsbs_recon_compare2matlab set</span>
+<span class="sd">    cum_coh: Tensor</span>
+<span class="sd">        The rsbs_recon_compare2matlab possibilities of all nodes</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lambda_k</span><span class="p">,</span> <span class="n">cum_coh</span> <span class="o">=</span> <span class="n">estimate_lk</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">num_estimation</span><span class="p">,</span> <span class="n">num_rv</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">lmin</span><span class="p">,</span> <span class="n">lmax</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">lap_type</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
     <span class="n">sampled_nodes</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">cum_coh</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">sampled_nodes</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="n">return_list</span> <span class="k">else</span> <span class="n">sampled_nodes</span></div>
+    <span class="n">sampled_nodes</span> <span class="o">=</span> <span class="n">sampled_nodes</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="n">return_list</span> <span class="k">else</span> <span class="n">sampled_nodes</span>
+    <span class="k">return</span> <span class="n">sampled_nodes</span><span class="p">,</span> <span class="n">cum_coh</span></div>
+
+
+<span class="k">def</span> <span class="nf">recon_rsbs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">cum_coh</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">reg_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">M</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">M</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y is expected to have a shape (</span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">,num_signal) or (</span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">,), not </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">dt</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">on_gpu</span> <span class="o">=</span> <span class="n">get_ddd</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">xp</span><span class="p">,</span> <span class="n">xcipy</span><span class="p">,</span> <span class="n">xsplin</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
+
+    <span class="n">yp</span> <span class="o">=</span> <span class="n">to_xp</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">)</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">to_xcipy</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">construct_sampling_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">dv</span><span class="p">)</span>
+    <span class="n">Psinv</span> <span class="o">=</span> <span class="n">construct_dia</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">cum_coh</span><span class="p">,</span> <span class="n">ps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">)</span>
+
+    <span class="n">Bl</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">Psinv</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">Bl</span> <span class="o">*</span> <span class="n">H</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">L</span> <span class="o">**</span> <span class="n">reg_order</span>
+
+    <span class="n">HPy</span> <span class="o">=</span> <span class="n">Bl</span> <span class="o">@</span> <span class="n">yp</span>
+
+    <span class="k">if</span> <span class="n">xp</span> <span class="o">==</span> <span class="n">np</span><span class="p">:</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="n">xsplin</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">HPy</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_sig</span> <span class="o">=</span> <span class="n">yp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_sig</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">yp</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sig</span><span class="p">):</span>
+            <span class="n">x_hat</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">xsplin</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">HPy</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">)</span>
 </pre></div>
 
            </div>

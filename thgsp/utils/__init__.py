@@ -1,6 +1,6 @@
 from .metrics import snr, mse
-from .sparse_utils import img2graph, consecutive_spmv, eye, matrix_power, absv, absv_
-from .sparse_utils import get_ddd
+from .sparse_utils import consecutive_spmv, eye, matrix_power, absv, absv_, multivariate_normal
+from .sparse_utils import img2graph
 
 __all__ = ['snr',
            'mse',
@@ -10,4 +10,4 @@ __all__ = ['snr',
            'matrix_power',
            'absv',
            'absv_',
-           'get_ddd']
+           'multivariate_normal']

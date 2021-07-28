@@ -1,7 +1,8 @@
 import torch
 import pytest
 import numpy as np
-from thgsp.utils.sparse_utils import img2graph, absv, absv_, matrix_power, SparseTensor, get_ddd
+from thgsp.utils.sparse_utils import img2graph, absv, absv_, matrix_power, SparseTensor
+from thgsp.utils.sparse_utils import multivariate_normal
 from ..utils4t import plot, devices, float_dtypes
 
 
@@ -74,17 +75,32 @@ def test_matrix_abs_elementwise(device, dtype):
     #   assert torch.allclose(out, tar)  # use np.linalg.norm() as the target
 
 
-def test_get_ddd():
-    a = torch.rand(3, 3)
-    spa = a.to_sparse()
-    spa2 = SparseTensor.from_dense(a)
-    if torch.cuda.is_available():
-        acu = a.cuda()
-        spacu = spa.cuda()
-        spa2cu = spa2.cuda()
-        print(get_ddd(acu))
-        print(get_ddd(spacu))
-        print(get_ddd(spa2cu))
-    print(get_ddd(a))
-    print(get_ddd(spa))
-    print(get_ddd(spa2))
+@pytest.mark.parametrize("num", [1, 5000000])
+def test_multivariate_normal(num):
+    import scipy
+    from scipy.sparse.linalg import inv
+    n = 4
+    tmp = scipy.sparse.rand(n, n, 0.3, format="lil")
+    tmp.setdiag(1)
+    Cov = tmp @ tmp.T
+    Cov = Cov.tocsc()
+    Pre = inv(Cov).tocsc()
+    z1, z2 = multivariate_normal(mean=1, cov=Cov, precision=Pre, num=num, return_th=False)
+    z0 = np.random.multivariate_normal(np.ones(n), Cov.A, num)
+    m1, v1 = np.mean(z1, 1), np.var(z1, 1)
+    m2, v2 = np.mean(z2, 1), np.var(z2, 1)
+    m0, v0 = np.mean(z0, 0), np.var(z0, 0)
+    print("\n===================================")
+    print(m1, v1)
+    print(m2, v2)
+    print(m0, v0)
+    print("===================================")
+
+    if num > 1e6:
+        assert np.abs(m1 - m0).mean() < 1e-2
+        assert np.abs(m2 - m0).mean() < 1e-2
+        assert np.abs(v1 - v0).mean() < 1e-2
+        assert np.abs(v2 - v0).mean() < 1e-2
+
+    x1, x2 = multivariate_normal(mean=1, cov=Cov, precision=Pre, num=num, delta=1e-5, return_th=True)
+    assert x1.shape == x2.shape

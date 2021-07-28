@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from thgsp.datasets.utils import remove_file_or_dir, get_data_dir_of_thgsp, os
+from thgsp.utils import mse, snr
 
 np.set_printoptions(linewidth=10000, precision=4)
 torch.set_printoptions(linewidth=10000, precision=4)
@@ -12,7 +13,7 @@ grad_dtypes = [torch.float, torch.double]
 float_dtypes = grad_dtypes
 float_np_dts = [np.float32, np.float64]
 int_dtypes = [torch.int, torch.long]
-
+sparse_formats = ("csc", "csr", "coo")
 lap_types = ['comb', 'sym', 'rw', None]
 
 color_strategies = ["harary", "osglm"]
@@ -41,3 +42,9 @@ def plot(plotly_fig=None):
 def remove_downloaded_dataset(name):
     dire = get_data_dir_of_thgsp()
     remove_file_or_dir(os.path.join(dire, name))
+
+
+def snr_and_mse(x, target):
+    s, m = snr(x, target), mse(x, target)
+    print(f"SNR: {s:.4f} | MSE: {m:.4f}")
+    return s, m

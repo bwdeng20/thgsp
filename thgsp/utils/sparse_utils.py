@@ -4,6 +4,8 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from torch_sparse import SparseTensor, coalesce
 from torch_sparse import eye as ts_eye
+from sksparse.cholmod import cholesky
+from thgsp.convert import to_scipy
 
 
 def img2graph(img, threshold: int = None, grid=False):
@@ -166,19 +168,56 @@ def absv_(src: SparseTensor):
     return src.set_value_(val.abs_(), layout="csr")
 
 
-def get_ddd(A):
-    if isinstance(A, SparseTensor):
-        density = A.density()
-        dt = A.dtype()
-        dv = A.device()
-        on_gpu = A.is_cuda()
-    elif isinstance(A, torch.Tensor):
-        num = torch.prod(torch.as_tensor(A.shape))
-        nnz = A._nnz() if A.is_sparse else A.count_nonzero()
-        density = (nnz / num).item()
-        dt = A.dtype
-        dv = A.device
-        on_gpu = A.is_cuda
-    else:
-        raise TypeError(f"Type {type(A)} is not supported")
-    return dt, dv, density, on_gpu
+def multivariate_normal(mean=0, cov=None, precision=None, num=1, delta=0., return_th=True):
+    """
+    Generate signals conforming with multinormal distribution characterized by either
+    covariance matrix or precision matrix.
+
+    Parameters
+    ----------
+    mean:  scalar, array
+         If being a scalar, this is the mean vector of all variables are equal to it;
+         otherwise this array must have the length of :obj:`N`, where :obj:`N` is the number
+         of variables.
+    cov:  spmatrix, None, SparseTensor
+    precision: spmatrix, None, SparseTensor
+    num:    int
+        The number of samples to generate
+    delta: scalar
+    return_th: bool
+        If True, return Tensor instead of np.ndarray
+
+    Returns
+    -------
+    z1:  array, None, Tensor
+        If :arg:`cov` is specified, this consists of samples according to it; otherwise None.
+    z2: array, None, Tensor
+        If :arg:`precision` is specified, this consists of samples according to it; otherwise None.
+    The shape is :obj:`(N,num)`
+
+    """
+    if cov is None and precision is None:
+        raise RuntimeError("One of Cov and Precision matrices is required")
+    if cov is not None:
+        cov = to_scipy(cov, "coo").tocsc()
+    if precision is not None:
+        precision = to_scipy(precision, "coo").tocsc()
+    N = cov.shape[-1] if precision is None else precision.shape[-1]
+    y = np.random.randn(N, num)
+    z1 = None
+    z2 = None
+    if cov is not None:
+        fc = cholesky(cov, beta=delta)
+        p = fc.P()
+        p_inverse = np.empty_like(p)
+        p_inverse[p] = np.arange(N)
+        z1 = mean + (fc.L() @ y)[p_inverse]
+        z1 = torch.as_tensor(z1) if return_th else z1
+    if precision is not None:
+        fc = cholesky(precision, beta=delta)
+        p = fc.P()
+        p_inverse = np.empty_like(p)
+        p_inverse[p] = np.arange(N)
+        z2 = fc.solve_Lt(y, use_LDLt_decomposition=False)[p_inverse] + mean
+        z2 = torch.as_tensor(z2) if return_th else z2
+    return z1, z2

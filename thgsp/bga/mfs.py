@@ -49,7 +49,7 @@ def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, pr
 
     N = A.size(-1)
     # compute_sigma consists of laplace matrix which prefers "coo"
-    A = A.to_scipy(layout='coo')
+    A = A.to_scipy(layout='coo').astype("d")
     if Sigma is None:
         Sigma = compute_sigma(A, delta)
     else:

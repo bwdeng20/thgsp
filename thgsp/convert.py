@@ -80,11 +80,16 @@ def to_cp(mat):
     return dense
 
 
-def to_xcipy(mat: SparseTensor, layout: str = "csr", dtype=None):
-    device = mat.device()
-    if device.type != "cpu":
-        return to_cpx(mat, layout, dtype)
-    return to_scipy(mat, layout, dtype)
+def to_xcipy(mat, layout: str = "csr", dtype=None):
+    if isinstance(mat, SparseTensor):
+        device = mat.device()
+        if device.type != "cpu":
+            return to_cpx(mat, layout, dtype)
+        return to_scipy(mat, layout, dtype)
+    elif isinstance(mat, spmatrix):
+        return to_scipy(mat, layout, dtype)
+    else:
+        raise TypeError(f"{type(mat)} is not supported now or invalid")
 
 
 def to_xp(mat: torch.Tensor):

@@ -1,11 +1,13 @@
 import pytest
+import torch
+
 from thgsp.graphs.generators import rand_bipartite, rand_udg
 from ..utils4t import float_dtypes
 
 from thgsp.bga.mfs import dkl, amfs1level, amfs, compute_sigma
 
 
-@pytest.mark.parametrize('dt', float_dtypes)
+@pytest.mark.parametrize('dt', [torch.double])
 @pytest.mark.parametrize('p', [0.1, 0.8])
 class TestUtils:
     def test_dkl(self, p, dt):
@@ -30,7 +32,7 @@ class TestAmfs:
     def test_amfs1level(self, dt):
         N = 100
         delta = 0.1
-        W = rand_udg(N, dtype=dt).to_scipy('csr').tolil()
+        W = rand_udg(N, dtype=dt).to_scipy('csr').tolil().astype("d")
         Sigma = compute_sigma(W, delta)
         s1, s2 = amfs1level(W, Sigma, delta)
         print("\n|L|: ", s1)

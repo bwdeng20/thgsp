@@ -1,11 +1,7 @@
-import warnings
-
-import scipy.sparse
 import torch
 import numpy as np
-from scipy.sparse import eye as scipy_eye
 from torch_sparse import SparseTensor
-from thgsp.convert import to_cpx, from_cpx, to_scipy, get_array_module
+from thgsp.convert import to_xcipy, from_cpx, get_array_module, get_ddd, spmatrix
 
 
 def normalize_laplace(L: SparseTensor, lam_max: float = 2.):
@@ -70,39 +66,24 @@ def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: flo
     return result
 
 
-def cheby_op_basis(L, coeff, lam_max=2., return_st=False):
+def cheby_op_basis(L, coeff, lam_max=2., return_ts=False):
     assert coeff.ndim == 1
     K = len(coeff)
-
     if isinstance(L, SparseTensor):
-        on_gpu = L.is_cuda()
-        device = L.device()
-        N = L.size(-1)
-    elif isinstance(L, scipy.sparse.spmatrix):
-        on_gpu = False
-        device = torch.device("cpu")
-        N = L.shape[-1]
+        dt, dv, density, on_gpu = get_ddd(L)
+        xp, xcipy, _ = get_array_module(on_gpu)
+    elif isinstance(L, spmatrix):
+        import scipy
+        xcipy = scipy
+        xp = np
     else:
-        on_gpu = True
-        xp, xscipy = get_array_module(on_gpu)
-        if xp == np:  # cupy not installed
-            raise TypeError(f"{type(L)}  is not supported now")
-        device = torch.device("cuda")
-        N = L.shape[-1]
+        raise TypeError
 
-    if on_gpu:
-        try:
-            L = to_cpx(L)
-        except ModuleNotFoundError:
-            warnings.warn("CuPy is not installed")
-            L = to_scipy(L)
-    else:
-        L = to_scipy(L)
-
-    xp, xscipy = get_array_module(on_gpu)
+    L = to_xcipy(L)
+    N = L.shape[-1]
 
     coeff = xp.asarray(coeff)
-    I = xscipy.sparse.eye(N, dtype=L.dtype, format="csr")
+    I = xcipy.sparse.eye(N, dtype=L.dtype, format="csr")
 
     Ln = L * (2 / lam_max) - I
     Tl_old = I
@@ -114,9 +95,8 @@ def cheby_op_basis(L, coeff, lam_max=2., return_st=False):
         Tl_old = Tl_cur
         Tl_cur = Tl_new
 
-    if return_st:
+    if return_ts:
         result = SparseTensor.from_scipy(Hl) if xp == np else from_cpx(Hl)
-        result = result.to(device)
     else:
         result = Hl
     return result

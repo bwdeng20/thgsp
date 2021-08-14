@@ -174,8 +174,7 @@
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sksparse.cholmod</span> <span class="kn">import</span> <span class="n">cholesky</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">to_xcipy</span><span class="p">,</span> <span class="n">SparseTensor</span>
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">construct_sampling_matrix</span><span class="p">,</span> <span class="n">construct_hth</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
 
@@ -205,7 +204,8 @@
     <span class="k">return</span> <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span>
 
 
-<div class="viewcode-block" id="bsgda"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.bsgda.bsgda">[docs]</a><span class="k">def</span> <span class="nf">bsgda</span><span class="p">(</span><span class="n">spm</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="bsgda"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.bsgda.bsgda">[docs]</a><span class="k">def</span> <span class="nf">bsgda</span><span class="p">(</span><span class="n">spm</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+          <span class="n">boost</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.</span>
 
@@ -221,7 +221,7 @@
 <span class="sd">        The numerical precision for binary search (1e-5 by default</span>
 <span class="sd">    p_hops: int</span>
 <span class="sd">        Estimate the coverage subsets(refer to Definition 1 [2]_) within the :obj:`p_hops` neighborhood.</span>
-
+<span class="sd">    boost: bool</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    sampled_nodes: List</span>
@@ -238,12 +238,14 @@
     <span class="k">assert</span> <span class="n">K</span> <span class="o">&gt;=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">spm</span><span class="o">.</span><span class="n">has_value</span><span class="p">():</span>
         <span class="n">spm</span> <span class="o">=</span> <span class="n">spm</span><span class="o">.</span><span class="n">fill_value</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+    <span class="n">adj</span> <span class="o">=</span> <span class="n">spm</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
     <span class="n">left</span> <span class="o">=</span> <span class="mf">0.</span>
     <span class="n">right</span> <span class="o">=</span> <span class="mf">1.</span>
     <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">greedy_func</span> <span class="o">=</span> <span class="n">greedy_gda_sampling</span> <span class="k">if</span> <span class="n">boost</span> <span class="k">else</span> <span class="n">greedy_sampling</span>
     <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">epsilon</span><span class="p">:</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">vf</span> <span class="o">=</span> <span class="n">greedy_gda_sampling</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">vf</span> <span class="o">=</span> <span class="n">greedy_func</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vf</span><span class="p">:</span>
             <span class="n">left</span> <span class="o">=</span> <span class="n">T</span>
             <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="n">right</span> <span class="o">+</span> <span class="n">left</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
@@ -258,7 +260,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;epsilon(the precision of BS) is set too large, sub-optimal lower bound is output.&quot;</span><span class="p">)</span>
 
-    <span class="n">sampled_nodes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">greedy_gda_sampling</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">)</span>
+    <span class="n">sampled_nodes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">greedy_gda_sampling</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sampled_nodes</span><span class="p">,</span> <span class="n">left</span></div>
 
 
@@ -270,20 +272,23 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">M</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y is expected to have a shape (</span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">,num_signal) or (</span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">,), not </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">dv</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">device</span><span class="p">()</span>
-    <span class="n">dt</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">()</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">to_scipy</span><span class="p">(</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
-    <span class="n">Ht</span> <span class="o">=</span> <span class="n">construct_sampling_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">HtH</span> <span class="o">=</span> <span class="n">construct_hth</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">HtH</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">L</span> <span class="o">**</span> <span class="n">reg_order</span>
-    <span class="n">fc</span> <span class="o">=</span> <span class="n">cholesky</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="n">Hty</span> <span class="o">=</span> <span class="n">Ht</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
-    <span class="n">x_hat</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">solve_A</span><span class="p">(</span><span class="n">Hty</span><span class="p">)</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">P</span><span class="p">()</span>
-    <span class="n">p_inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-    <span class="n">p_inverse</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-    <span class="n">x_hat</span> <span class="o">=</span> <span class="n">x_hat</span><span class="p">[</span><span class="n">p_inverse</span><span class="p">]</span>
+    <span class="n">dt</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">on_gpu</span> <span class="o">=</span> <span class="n">get_ddd</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">xp</span><span class="p">,</span> <span class="n">xcipy</span><span class="p">,</span> <span class="n">xsplin</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">to_xcipy</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">Ht</span> <span class="o">=</span> <span class="n">construct_sampling_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">HtH</span> <span class="o">=</span> <span class="n">construct_hth</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">HtH</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">L</span> <span class="o">**</span> <span class="n">reg_order</span>
+    <span class="n">Hty</span> <span class="o">=</span> <span class="n">Ht</span> <span class="o">@</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">xp</span> <span class="o">==</span> <span class="n">np</span><span class="p">:</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="n">xsplin</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">Hty</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_sig</span> <span class="o">=</span> <span class="n">Hty</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_sig</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">Hty</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sig</span><span class="p">):</span>
+            <span class="n">x_hat</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">xsplin</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">Hty</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">)</span>
 </pre></div>
 

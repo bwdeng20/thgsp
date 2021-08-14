@@ -174,8 +174,7 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">th</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">eigsh</span><span class="p">,</span> <span class="n">ArpackNoConvergence</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_scipy</span><span class="p">,</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">get_array_module</span>
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">to_scipy</span>
 <span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">consecutive_spmv</span>
 
 
@@ -184,6 +183,11 @@
 <span class="sd">        This function has the same functionality as :func:`ess` but directly computes the matrix power of specific</span>
 <span class="sd">        variation operator, e.g., normalized Laplacian.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">splin</span>
+    <span class="c1"># add GPU support after cp.setdiff1d is implemented</span>
+    <span class="c1"># dt, dv, density, on_gpu = get_ddd(operator)</span>
+    <span class="c1"># xp, xcipy, xsplin = get_array_module(on_gpu)</span>
+
     <span class="n">L</span> <span class="o">=</span> <span class="n">to_scipy</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">LtL</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span> <span class="o">**</span> <span class="n">k</span> <span class="o">*</span> <span class="n">L</span> <span class="o">**</span> <span class="n">k</span>
@@ -191,16 +195,15 @@
     <span class="n">S</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">M</span><span class="p">:</span>
         <span class="n">Sc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">break</span>
         <span class="n">reduced</span> <span class="o">=</span> <span class="n">LtL</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">Sc</span><span class="p">,</span> <span class="n">Sc</span><span class="p">)]</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">sigma</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">eigsh</span><span class="p">(</span><span class="n">reduced</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;SM&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">ArpackNoConvergence</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">err</span>
+
+        <span class="n">sigma</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">splin</span><span class="o">.</span><span class="n">lobpcg</span><span class="p">(</span><span class="n">reduced</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">largest</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">Sc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">))]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">Sc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
         <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">S</span></div>
 

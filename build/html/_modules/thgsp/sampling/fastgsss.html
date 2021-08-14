@@ -173,7 +173,7 @@
   <h1>Source code for thgsp.sampling.fastgsss</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">get_ddd</span>
 <span class="kn">from</span> <span class="nn">thgsp.graphs.core</span> <span class="kn">import</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">SparseTensor</span>
@@ -182,7 +182,7 @@
 <span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_xcipy</span><span class="p">,</span> <span class="n">get_array_module</span>
 
 
-<div class="viewcode-block" id="fastgsss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.fastgsss">[docs]</a><span class="k">def</span> <span class="nf">fastgsss</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">75.</span><span class="p">,</span> <span class="n">cheby</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<div class="viewcode-block" id="fastgsss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.fastgsss">[docs]</a><span class="k">def</span> <span class="nf">fastgsss</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">75.</span><span class="p">,</span> <span class="n">cheby</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    FastGSSS proposed in [4]_ .</span>
 
@@ -247,14 +247,16 @@
     <span class="n">selected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_g</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Sampling nodes&quot;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">M</span><span class="p">):</span>
-        <span class="n">Ts</span> <span class="o">=</span> <span class="n">T_g_tmp</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">W</span> <span class="o">=</span> <span class="n">Ts</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">Ts</span>
-        <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">relu_</span><span class="p">()</span>
-        <span class="n">T_g</span> <span class="o">=</span> <span class="n">T_g_tmp</span> <span class="o">@</span> <span class="n">W</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">T_g</span><span class="p">[</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">selected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_g</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Ed-free Sampling nodes&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+            <span class="n">Ts</span> <span class="o">=</span> <span class="n">T_g_tmp</span><span class="p">[:,</span> <span class="n">S</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">Ts</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">Ts</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">relu_</span><span class="p">()</span>
+            <span class="n">T_g</span> <span class="o">=</span> <span class="n">T_g_tmp</span> <span class="o">@</span> <span class="n">W</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">T_g</span><span class="p">[</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">T_g</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span></div>
 

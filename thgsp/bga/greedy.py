@@ -2,8 +2,7 @@ from .utils import is_bipartite_fix
 
 
 def greedy_bga(A, iterations=5, verbose=False):
-    A = A.to_scipy(layout='csr')
-    flag, vtx_color = is_bipartite_fix(A, fix_flag=False)
+    flag, vtx_color, _ = is_bipartite_fix(A, fix_flag=False)
     if flag:
         return A, vtx_color
     best_B = None

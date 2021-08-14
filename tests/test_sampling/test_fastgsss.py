@@ -16,7 +16,7 @@ class TestFastGSSS:
         order = 12
         M = 10
         g = random_graph(N, ds, dtype=dtype, device=device)
-        S, T = fastgsss(g, M, order=order, cheby=cheb)
+        S, T = fastgsss(g, M, N // 10, order=order, cheby=cheb)
         print(S)
 
     def test_fastgsss_rec(self, device, dtype, cheb):

@@ -20,7 +20,7 @@ With the official code, the reconstruction SNR is about 30 dB, which is consiste
 
 data = loadmat("rsbs.mat")
 coh1 = data['weight'].ravel()  # distribution of nodes being sampled
-S1 = data['ind_obs'].ravel() - 1  # sampling node set
+S1 = data['ind_obs'].ravel().astype(int) - 1  # sampling node set
 mu1 = data['mu'].item()  # the factor of regularization term
 f = torch.as_tensor(data['x'])  # the original bandlimited signal
 y = torch.as_tensor(data['ynoise_init']).repeat(1, num_sig)  # the contaminated signal

@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from tqdm import trange
+from tqdm import tqdm
 from functools import partial
 from thgsp.convert import get_ddd
 from thgsp.graphs.core import GraphBase, SparseTensor
@@ -9,7 +9,7 @@ from thgsp.utils import matrix_power, absv
 from thgsp.convert import to_xcipy, get_array_module
 
 
-def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
+def fastgsss(G: GraphBase, M, bandwidth, nu=75., cheby=True, order=12, verbose=False):
     """
     FastGSSS proposed in [4]_ .
 
@@ -74,14 +74,16 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
     selected = torch.argmax(T_g).item()
     S.append(selected)
 
-    for _ in trange(1, M, initial=1, desc=f"Sampling nodes", total=M):
-        Ts = T_g_tmp[:, S].sum(1)
-        W = Ts.mean() - Ts
-        W = W.relu_()
-        T_g = T_g_tmp @ W.view(-1, 1)
-        T_g[S] = 0
-        selected = torch.argmax(T_g).item()
-        S.append(selected)
+    with tqdm(total=M, initial=1, desc="Ed-free Sampling nodes", disable=not verbose) as pbar:
+        for _ in range(1, M):
+            Ts = T_g_tmp[:, S].sum(1)
+            W = Ts.mean() - Ts
+            W = W.relu_()
+            T_g = T_g_tmp @ W.view(-1, 1)
+            T_g[S] = 0
+            selected = torch.argmax(T_g).item()
+            S.append(selected)
+            pbar.update(1)
 
     return S, T
 

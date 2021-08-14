@@ -1,8 +1,7 @@
 import numpy as np
 import torch
 import torch as th
-from scipy.sparse.linalg import eigsh, ArpackNoConvergence
-from thgsp.convert import to_scipy, SparseTensor, get_array_module
+from thgsp.convert import SparseTensor, get_array_module, to_scipy
 from thgsp.utils import consecutive_spmv
 
 
@@ -11,6 +10,11 @@ def ess_sampling(operator, M, k=2):
         This function has the same functionality as :func:`ess` but directly computes the matrix power of specific
         variation operator, e.g., normalized Laplacian.
     """
+    import scipy.sparse.linalg as splin
+    # add GPU support after cp.setdiff1d is implemented
+    # dt, dv, density, on_gpu = get_ddd(operator)
+    # xp, xcipy, xsplin = get_array_module(on_gpu)
+
     L = to_scipy(operator)
     N = L.shape[-1]
     LtL = L.T ** k * L ** k
@@ -18,16 +22,15 @@ def ess_sampling(operator, M, k=2):
     S = list()
     while len(S) < M:
         Sc = np.setdiff1d(V, S)
-        if len(Sc) == 1:
+        length = len(Sc)
+        if length == 1:
             S.append(Sc[0])
             break
         reduced = LtL[np.ix_(Sc, Sc)]
-        try:
-            sigma, psi = eigsh(reduced, k=1, which="SM")
-        except ArpackNoConvergence as err:
-            raise err
+
+        sigma, psi = splin.lobpcg(reduced, X=np.random.rand(length, 1), largest=False)
         psi = psi.ravel()
-        v = Sc[np.argmax(np.abs(psi))]
+        v = Sc[np.argmax(np.abs(psi)).item()]
         S.append(v)
     return S
 

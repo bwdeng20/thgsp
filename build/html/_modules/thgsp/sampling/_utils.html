@@ -177,7 +177,7 @@
 
 <div class="viewcode-block" id="construct_sampling_matrix"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling._utils.construct_sampling_matrix">[docs]</a><span class="k">def</span> <span class="nf">construct_sampling_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Construct the rsbs_recon_compare2matlab matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.</span>
+<span class="sd">    Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">       \mathbf{H}_{i j}= \begin{cases}1, &amp; j=\mathcal{S}_{i} \\ 0, &amp; \text { otherwise }\end{cases}</span>

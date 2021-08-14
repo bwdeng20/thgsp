@@ -207,7 +207,7 @@
 
 <div class="viewcode-block" id="ess"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.ess.ess">[docs]</a><span class="k">def</span> <span class="nf">ess</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">5e2</span><span class="p">)):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An efficient rsbs_recon_compare2matlab set selection method for bandlimited graph signals [1]_.</span>
+<span class="sd">    An efficient sampling set selection method for bandlimited graph signals [1]_.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -223,11 +223,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    S:  list</span>
-<span class="sd">        A list containing sampled nodes with the rsbs_recon_compare2matlab order</span>
+<span class="sd">        A list containing sampled nodes with the sampling order</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient rsbs_recon_compare2matlab set selection for bandlimited graph</span>
+<span class="sd">    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient sampling set selection for bandlimited graph</span>
 <span class="sd">            signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -280,14 +280,14 @@
 
 <div class="viewcode-block" id="recon_ess"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.ess.recon_ess">[docs]</a><span class="k">def</span> <span class="nf">recon_ess</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Naive implementation of ESS rsbs_recon_compare2matlab reconstruction.</span>
+<span class="sd">    Naive implementation of ESS sampling reconstruction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y:  Tensor</span>
 <span class="sd">        Dense Shape: :obj:`(N)`</span>
 <span class="sd">    S:  List</span>
-<span class="sd">        The rsbs_recon_compare2matlab set</span>
+<span class="sd">        The sampling set</span>
 <span class="sd">    U:  Tensor</span>
 <span class="sd">        Dense :obj:`(N, bd)`</span>
 <span class="sd">    bd: int</span>

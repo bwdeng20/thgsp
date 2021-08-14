@@ -211,14 +211,14 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free rsbs_recon_compare2matlab set selection</span>
+<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free sampling set selection</span>
 <span class="sd">            for graph signals,&quot; IEEE Transactions on Signal Processing, 202.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">num_edge</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span>
     <span class="n">pe</span> <span class="o">=</span> <span class="n">num_edge</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># edge probability</span>
-    <span class="n">ps</span> <span class="o">=</span> <span class="n">M</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># rsbs_recon_compare2matlab ratio</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">M</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># sampling ratio</span>
     <span class="n">pf</span> <span class="o">=</span> <span class="n">bandwidth</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># normalized bandwidth</span>
 
     <span class="k">assert</span> <span class="n">pe</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -261,12 +261,12 @@
 
 <div class="viewcode-block" id="recon_fastssss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.recon_fastssss">[docs]</a><span class="k">def</span> <span class="nf">recon_fastssss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A primary implementation of reconstruction method associated with &quot;FastSSS&quot; rsbs_recon_compare2matlab algorithm.</span>
+<span class="sd">    A primary implementation of reconstruction method associated with &quot;FastSSS&quot; sampling algorithm.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y:  Tensor</span>
-<span class="sd">        The measurements on rsbs_recon_compare2matlab set :obj:S:. If the localization operator :obj:`T` has a density</span>
+<span class="sd">        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density</span>
 <span class="sd">        greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，</span>
 <span class="sd">        or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.</span>
 <span class="sd">    S:  List</span>

@@ -201,7 +201,7 @@
 <div class="viewcode-block" id="estimate_lk"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.rsbs.estimate_lk">[docs]</a><span class="k">def</span> <span class="nf">estimate_lk</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">num_estimation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">return_coherence</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lap_type</span><span class="o">=</span><span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Estimate the optimal rsbs_recon_compare2matlab distribution according to which the bandlimited graph signals are</span>
+<span class="sd">    Estimate the optimal distribution according to which the bandlimited graph signals are</span>
 <span class="sd">    sampled [3]_ .</span>
 
 <span class="sd">    Parameters</span>
@@ -239,7 +239,7 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random rsbs_recon_compare2matlab of</span>
+<span class="sd">    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random sampling of</span>
 <span class="sd">            bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2018.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -299,7 +299,7 @@
 <div class="viewcode-block" id="rsbs"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.rsbs.rsbs">[docs]</a><span class="k">def</span> <span class="nf">rsbs</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_estimation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lap_type</span><span class="o">=</span><span class="s2">&quot;comb&quot;</span><span class="p">,</span>
          <span class="n">return_list</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Random rsbs_recon_compare2matlab algorithm for bandlimited signals [3]_ .</span>
+<span class="sd">    Random sampling algorithm for bandlimited signals [3]_ .</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -332,9 +332,9 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    sampled_nodes: List, Tensor</span>
-<span class="sd">        The rsbs_recon_compare2matlab set</span>
+<span class="sd">        The sampling set</span>
 <span class="sd">    cum_coh: Tensor</span>
-<span class="sd">        The rsbs_recon_compare2matlab possibilities of all nodes</span>
+<span class="sd">        The sampling possibilities of all nodes</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lambda_k</span><span class="p">,</span> <span class="n">cum_coh</span> <span class="o">=</span> <span class="n">estimate_lk</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">num_estimation</span><span class="p">,</span> <span class="n">num_rv</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">lmin</span><span class="p">,</span> <span class="n">lmax</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">lap_type</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>

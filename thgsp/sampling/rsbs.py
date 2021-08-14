@@ -28,7 +28,7 @@ def cheby_coeff4ideal_band_pass(a, b, lmin, lmax, order):
 def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None,
                 return_coherence=True, order=30, lap_type="comb", verbose=False):
     r"""
-    Estimate the optimal rsbs_recon_compare2matlab distribution according to which the bandlimited graph signals are
+    Estimate the optimal distribution according to which the bandlimited graph signals are
     sampled [3]_ .
 
     Parameters
@@ -66,7 +66,7 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
 
     References
     ----------
-    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random rsbs_recon_compare2matlab of
+    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random sampling of
             bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2018.
     """
     N = G.size(1)
@@ -126,7 +126,7 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
 def rsbs(G, M, k=None, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None, order=30, lap_type="comb",
          return_list=False, verbose=False):
     r"""
-    Random rsbs_recon_compare2matlab algorithm for bandlimited signals [3]_ .
+    Random sampling algorithm for bandlimited signals [3]_ .
 
     Parameters
     ----------
@@ -159,9 +159,9 @@ def rsbs(G, M, k=None, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, l
     Returns
     -------
     sampled_nodes: List, Tensor
-        The rsbs_recon_compare2matlab set
+        The sampling set
     cum_coh: Tensor
-        The rsbs_recon_compare2matlab possibilities of all nodes
+        The sampling possibilities of all nodes
 
     """
     lambda_k, cum_coh = estimate_lk(G, k, num_estimation, num_rv, epsilon, lmin, lmax, True, order, lap_type, verbose)

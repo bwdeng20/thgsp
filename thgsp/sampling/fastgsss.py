@@ -38,14 +38,14 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
 
     References
     ----------
-    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, "Eigendecomposition-free rsbs_recon_compare2matlab set selection
+    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, "Eigendecomposition-free sampling set selection
             for graph signals," IEEE Transactions on Signal Processing, 202.
 
     """
     N = G.size(1)
     num_edge = G.numel() // 2
     pe = num_edge / N  # edge probability
-    ps = M / N  # rsbs_recon_compare2matlab ratio
+    ps = M / N  # sampling ratio
     pf = bandwidth / N  # normalized bandwidth
 
     assert pe > 0
@@ -88,12 +88,12 @@ def fastgsss(G: GraphBase, M, bandwidth=100, nu=75., cheby=True, order=12):
 
 def recon_fastssss(y, S, T, order, sd=0.5):
     """
-    A primary implementation of reconstruction method associated with "FastSSS" rsbs_recon_compare2matlab algorithm.
+    A primary implementation of reconstruction method associated with "FastSSS" sampling algorithm.
 
     Parameters
     ----------
     y:  Tensor
-        The measurements on rsbs_recon_compare2matlab set :obj:S:. If the localization operator :obj:`T` has a density
+        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density
         greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，
         or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.
     S:  List

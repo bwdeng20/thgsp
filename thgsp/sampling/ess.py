@@ -34,7 +34,7 @@ def ess_sampling(operator, M, k=2):
 
 def ess(operator, M, k=2, max_iter=int(5e2)):
     r"""
-    An efficient rsbs_recon_compare2matlab set selection method for bandlimited graph signals [1]_.
+    An efficient sampling set selection method for bandlimited graph signals [1]_.
 
     Parameters
     ----------
@@ -50,11 +50,11 @@ def ess(operator, M, k=2, max_iter=int(5e2)):
     Returns
     -------
     S:  list
-        A list containing sampled nodes with the rsbs_recon_compare2matlab order
+        A list containing sampled nodes with the sampling order
 
     References
     ----------
-    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient rsbs_recon_compare2matlab set selection for bandlimited graph
+    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient sampling set selection for bandlimited graph
             signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.
 
     """
@@ -107,14 +107,14 @@ def power_iteration4min(L: SparseTensor, Sc: iter, k=2, num_iter=50):
 
 def recon_ess(y, S, U, bd, **kwargs):
     """
-    Naive implementation of ESS rsbs_recon_compare2matlab reconstruction.
+    Naive implementation of ESS sampling reconstruction.
 
     Parameters
     ----------
     y:  Tensor
         Dense Shape: :obj:`(N)`
     S:  List
-        The rsbs_recon_compare2matlab set
+        The sampling set
     U:  Tensor
         Dense :obj:`(N, bd)`
     bd: int

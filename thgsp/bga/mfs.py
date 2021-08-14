@@ -43,7 +43,7 @@ def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, pr
     ----------
     .. [3] Jing Zen, et al, "Bipartite Subgraph Decomposition for Critically Sampledwavelet Filterbanks on Arbitrary
             Graphs," IEEE trans on SP, 2016.
-    .. [4] A. Gadde, et al, "A probablistic interpretation of rsbs_recon_compare2matlab theory of graph signals". ICASSP, 2015.
+    .. [4] A. Gadde, et al, "A probablistic interpretation of sampling theory of graph signals". ICASSP, 2015.
 
     """
 

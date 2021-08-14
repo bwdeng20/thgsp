@@ -34,14 +34,14 @@ def greedy_gda_sampling(spm, K, T, mu=0.01, p_hops=12):
 
 def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_hops: int = 12) -> Tuple[List, float]:
     r"""
-    A fast deterministic vertex rsbs_recon_compare2matlab algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.
+    A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.
 
     Parameters
     ----------
     spm: SparseTensor
         The sparse adjacency matrix.
     K:  int
-        The desired number of rsbs_recon_compare2matlab nodes.
+        The desired number of sampling nodes.
     mu: float
         The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7) [2]_ for the details.
     epsilon: float
@@ -59,7 +59,7 @@ def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_
 
     References
     ----------
-    .. [2] Y. Bai, et al., “Fast graph rsbs_recon_compare2matlab set selection using Gershgorin disc alignment,” IEEE TSP, 2020.
+    .. [2] Y. Bai, et al., “Fast graph sampling set selection using Gershgorin disc alignment,” IEEE TSP, 2020.
 
     """
     assert K >= 1

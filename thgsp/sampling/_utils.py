@@ -4,7 +4,7 @@ from thgsp.convert import to_xcipy, SparseTensor
 
 def construct_sampling_matrix(N, S, dtype=None, device=None, layout="csr", return_ts=False):
     r"""
-    Construct the rsbs_recon_compare2matlab matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.
+    Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.
 
     .. math::
        \mathbf{H}_{i j}= \begin{cases}1, & j=\mathcal{S}_{i} \\ 0, & \text { otherwise }\end{cases}

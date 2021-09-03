@@ -41,8 +41,8 @@ class GraphBase(SparseTensor):
 
     def to(self, *args, **kwargs):
         new_spm = super(GraphBase, self).to(*args, **kwargs)
-        new_instance = GraphBase(new_spm, coords=self.coords, cache=self.cache, requires_grad=self.requires_grad(),
-                                 **self.extra)
+        new_instance = self.__class__(new_spm, coords=self.coords, cache=self.cache, requires_grad=self.requires_grad(),
+                                      **self.extra)
         new_instance._lap_type = self._lap_type
         new_instance._L = None if self._L is None else self._L.to(*args, **kwargs)
         new_instance._fs = None if self._fs is None else self._fs.to(*args, **kwargs)
@@ -50,7 +50,13 @@ class GraphBase(SparseTensor):
         return new_instance
 
     def to_spm(self, *args, **kwargs):
-        return super(GraphBase, self).to(*args, **kwargs)
+        row, col, value = self.coo()
+        rowptr = self.storage.rowptr()
+        adj = SparseTensor(row=row.clone(), rowptr=rowptr.clone(), col=col.clone(), value=value.clone(),
+                           sparse_sizes=(self._n_node, self._n_node),
+                           is_sorted=True)
+        adj = adj.to(*args, **kwargs)
+        return adj
 
     @property
     def lap_type(self):
@@ -174,8 +180,11 @@ class GraphBase(SparseTensor):
 class Graph(GraphBase):
     def __init__(self, adjacency,
                  coords: Optional[torch.Tensor] = None,
-                 cache=False, requires_grad=False, **kwargs):
-        adj = to_torch_sparse(adjacency).to_symmetric(reduce='mean')
+                 cache=False, requires_grad=False, copy=True, **kwargs):
+        if isinstance(adjacency, Graph):
+            adj = adjacency.clone().detach_() if copy else adjacency
+        else:
+            adj = to_torch_sparse(adjacency).to_symmetric(reduce='mean')
         super(Graph, self).__init__(adj, coords, cache, requires_grad, **kwargs)
         self._is_directed = False
 
@@ -197,8 +206,9 @@ class Graph(GraphBase):
 class DiGraph(GraphBase):
     def __init__(self, adjacency,
                  coords: Optional[torch.Tensor] = None,
-                 cache=False, requires_grad=False, **kwargs):
-        super(DiGraph, self).__init__(adjacency, coords, cache, requires_grad, **kwargs)
+                 cache=False, requires_grad=False, copy=True, **kwargs):
+        adj = adjacency.clone().detach_() if copy else adjacency
+        super(DiGraph, self).__init__(adj, coords, cache, requires_grad, **kwargs)
         self._is_directed = True
 
     def in_degree(self, bunch=None):

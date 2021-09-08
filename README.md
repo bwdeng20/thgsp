@@ -61,7 +61,7 @@ See the full program [here](./demos/images/bio_cmn.py).
 ```
 @misc{thgsp,
   author = {Bowen Deng},
-  title = {thgsp},
+  title = {ThGSP: A PyTorch-based Graph Signal Processing Library},
   year = {2021},
   publisher = {GitHub},
   journal = {GitHub repository},

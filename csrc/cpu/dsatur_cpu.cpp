@@ -1,81 +1,105 @@
 #include "dsatur_cpu.h"
 
-using namespace torch::indexing;
 using namespace std;
+using namespace torch::indexing;
 
-int pick_color(const unordered_set<int> &used_colors, int &num_node) {
-    int i = 0;
-    for (; i < num_node+1; i++) {
+long pick_color(const unordered_set<long> &used_colors, long num_node) {
+    long i = 0;
+    for (; i < num_node; i++) {
         if (!used_colors.count(i))
             break;
     }
     return i;
 }
 
-int argmax(const unordered_map<int, int> &dict) {
-    int idx_max = dict.begin()->first;
-    int val_max = dict.begin()->second;
+
+long argmax(const unordered_map<long, long> &dict, const long* degree) {
+    long idx_max = dict.begin()->first;
+    long val_max = dict.begin()->second;
+    long deg_max = degree[idx_max];
+    long idx,val;
     for (auto it : dict) {
-        if (it.second > val_max) {
-            idx_max = it.first;
-            val_max = it.second;
+        idx = it.first;
+        val = it.second;
+
+        if (val> val_max)
+        {
+            idx_max = idx;
+            val_max = val;
+        } else if (val==val_max)
+        {
+            if (degree[idx]>deg_max)
+            {
+                idx_max = idx;
+                val_max = val;
+            }
         }
     }
     return idx_max;
 }
 
-torch::Tensor dsatur_cpu(torch::Tensor& rowptr, torch::Tensor& col) {
-    int n = rowptr.size(-1) - 1;
 
-    auto deg = rowptr.index({Slice(1, None)}) - rowptr.index({Slice(None, -1)});
-
-
-    unordered_map<int, unordered_set<int>> distinct_colors;
-    unordered_map<int, int> saturation_level;
-    for (int i = 0; i < n; i++) {
-        distinct_colors[i] = unordered_set<int>{};
-        saturation_level[i] = 0;
+torch::Tensor dsatur_coloring_cpu(const torch::Tensor& rowptr, const torch::Tensor& col) {
+    long u,v,n = rowptr.size(-1) - 1;
+    long nbr_begin, nbr_stop;
+    if(n<2){
+        torch::Tensor tmp= torch::arange(n,torch::dtype(torch::kLong).device(torch::kCPU));
+        return tmp;
     }
 
     torch::Tensor vtx_color = -torch::ones(n, {torch::kLong});
+    auto vtx_color_data=vtx_color.data_ptr<int64_t>();
+    auto rowptr_data=rowptr.data_ptr<int64_t>();
+    auto col_data=col.data_ptr<int64_t>();
 
-    int u = torch::argmax(deg).item().toInt();
-    torch::Tensor nbr = col.index({Slice(rowptr[u].item().toInt(), rowptr[u + 1].item().toInt())});
-    int64_t *raw_nbr = nbr.data_ptr<int64_t>();
-    int num_nbr = nbr.size(0);
-
-    for (int j = 0; j < num_nbr; j++) {
-        int v = *(raw_nbr + j);
-        distinct_colors[v].insert(0);
-        saturation_level[v] += 1;
+    unordered_map<long, unordered_set<long>> distinct_colors;
+    unordered_map<long, long> saturation_level;
+    for (long i = 0; i < n; i++) {
+        distinct_colors[i] = unordered_set<long>{-1};
+        saturation_level[i] = 1; // uncoloured as -1
     }
 
-    vtx_color[u] = 0;
-    saturation_level.erase(u);  // only the saturation of uncolored nodes are in need.
+    auto deg = rowptr.index({Slice(1, None)}) - rowptr.index({Slice(None, -1)});
+    auto deg_data=deg.data_ptr<int64_t>();
 
-    for (int i = 1; i < n; i++) {
-        u = argmax(saturation_level);
-        nbr = col.index({Slice(rowptr[u].item().toInt(), rowptr[u + 1].item().toInt())});
-        num_nbr = nbr.size(0);
-        raw_nbr = nbr.data_ptr<int64_t>();
+    u = torch::argmax(deg).item().toLong();
+    vtx_color_data[u] = 0;
+    saturation_level.erase(u);
+    distinct_colors.erase(u);
 
-        unordered_set<int> nbr_colors = {};
-        for (int j = 0; j < num_nbr; j++) {
-            int v = *(raw_nbr + j);
-            nbr_colors.insert(vtx_color[v].item<int64_t>());
+    nbr_begin=rowptr_data[u];
+    nbr_stop=rowptr_data[u+1];
+    for(long j=nbr_begin;j<nbr_stop;j++){
+        v=col_data[j];
+        distinct_colors[v].insert(vtx_color_data[u]);
+        if (vtx_color_data[v]==-1) {
+            saturation_level[v] +=1;
+        }
+    }
+
+    unordered_set<long> nbr_colors;
+    for (long i = 1; i < n; i++) {
+        u = argmax(saturation_level,deg_data);
+        saturation_level.erase(u);
+        nbr_begin=rowptr_data[u];
+        nbr_stop=rowptr_data[u+1];
+
+        nbr_colors.clear();
+        for(long j=nbr_begin;j<nbr_stop;j++){
+            v=col_data[j];
+            nbr_colors.insert(vtx_color_data[v]);
         }
 
-        int color4u = pick_color(nbr_colors, n);
+        long color4u = pick_color(nbr_colors, n);
+        vtx_color_data[u] = color4u;
 
-        vtx_color[u] = color4u;
-        saturation_level.erase(u);
+        for(long j=nbr_begin;j<nbr_stop;j++) {
+            v = col_data[j];
+            if (vtx_color_data[v] == -1) {
+                distinct_colors[v].insert(vtx_color_data[u]);
+                saturation_level[v] = (long) distinct_colors[v].size();
 
-        for (int j = 0; j < num_nbr; j++) {
-            int v = *(raw_nbr + j);
-            unordered_set<int> &temp = distinct_colors[v];
-            temp.insert(color4u);
-            if (saturation_level.count(v))
-                saturation_level[v] = (int64_t) temp.size();
+            }
         }
     }
     return vtx_color;

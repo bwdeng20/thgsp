@@ -32,8 +32,8 @@ std::tuple<std::vector<int64_t>,bool>greedy_gda_sampling(torch::Tensor &rowptr, 
 }
 
 std::tuple<std::vector<int64_t>, bool>
-solving_set_covering(std::unordered_map<int64_t, std::vector<int64_t>> & sets,
-        std::vector<int64_t> & set_lengths, int64_t K){
+solving_set_covering(const std::unordered_map<int64_t, std::vector<int64_t>> & sets,
+        const std::vector<int64_t> & set_lengths, int64_t K){
         return solving_set_covering_cpu(sets,set_lengths,K);
     }
 

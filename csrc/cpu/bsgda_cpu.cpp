@@ -87,13 +87,12 @@ computing_sets_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt
     return {sets, set_lengths};
 }
 
-
 std::tuple<std::vector<int64_t>, bool>
-solving_set_covering_cpu(std::unordered_map<int64_t, std::vector<int64_t>> &sets,
-                         std::vector<int64_t> &set_lengths, int64_t K) {
+solving_set_covering_cpu(const std::unordered_map<int64_t, std::vector<int64_t>> &sets,
+                         const std::vector<int64_t> &set_lengths, int64_t K) {
 
     assert(K > 0);
-    int n = set_lengths.size();
+    auto n = (int64_t) set_lengths.size();
     int selected_num = 0;
     int64_t idx2sample = -1;
     int64_t temp_idx = -1;
@@ -101,21 +100,22 @@ solving_set_covering_cpu(std::unordered_map<int64_t, std::vector<int64_t>> &sets
 
     std::unordered_map<int64_t, int64_t> sets2choose;
     for (int64_t i = 0; i < n; i++)
-        sets2choose[i] = sets[i].size();
+        sets2choose[i] = (int64_t) sets.at(i).size();
 
     std::vector<int64_t> S;
     S.reserve(K);
     bool vf, uncovered_flag;
 
     torch::Tensor uncovered = torch::ones(n, torch::dtype(torch::kBool).device(torch::kCPU));
-    bool *raw_uncovered = uncovered.data_ptr<bool>();
+    auto* raw_uncovered = uncovered.data_ptr<bool>();
 
     // select the first node
     idx2sample = argmax(sets2choose);
+
     S.push_back(idx2sample);
     sets2choose.erase(idx2sample);
     selected_num += 1;
-    for (auto i:sets[idx2sample]) raw_uncovered[i] = false;
+    for (auto i:sets.at(idx2sample)) raw_uncovered[i] = false;
 
     // select 2->K nodes
     uncovered_flag = torch::any(uncovered).item<bool>();
@@ -123,7 +123,8 @@ solving_set_covering_cpu(std::unordered_map<int64_t, std::vector<int64_t>> &sets
         for (auto it = sets2choose.begin(); it != sets2choose.end();) {
             temp = 0;
             temp_idx = it->first;
-            for (int64_t j:sets[temp_idx]) {
+
+            for (int64_t j:sets.at(temp_idx)) {
                 if (raw_uncovered[j]) temp += 1;
             }
             if (temp == 0) {
@@ -136,7 +137,7 @@ solving_set_covering_cpu(std::unordered_map<int64_t, std::vector<int64_t>> &sets
 
         idx2sample = argmax(sets2choose);
         sets2choose.erase(idx2sample);
-        for (auto i:sets[idx2sample]) raw_uncovered[i] = false;
+        for (auto i:sets.at(idx2sample)) raw_uncovered[i] = false;
         selected_num += 1;
         S.push_back(idx2sample);
         uncovered_flag = torch::any(uncovered).item<bool>();

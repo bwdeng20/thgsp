@@ -9,7 +9,7 @@ torch::Tensor dsatur(torch::Tensor& rowptr, torch::Tensor& col){
          AT_ERROR("Not compiled with CUDA support");
     #endif
     } else{
-        return dsatur_cpu(rowptr,col);
+        return dsatur_coloring_cpu(rowptr,col);
     }
 }
 

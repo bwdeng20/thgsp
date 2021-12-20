@@ -2,4 +2,4 @@
 
 #include <torch/extension.h>
 
-torch::Tensor dsatur_cpu(torch::Tensor& rowptr, torch::Tensor& col);
+torch::Tensor dsatur_coloring_cpu(const torch::Tensor& rowptr, const torch::Tensor& col);

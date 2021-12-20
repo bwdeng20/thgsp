@@ -1,0 +1,32 @@
+name: Linting
+
+on: [ push, pull_request ]
+
+jobs:
+
+  flake8:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ 3.8.12 ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Proxy info
+        run: |
+          python -c "import os; print(os.environ.get('http_proxy'),os.environ.get('https_proxy')) "
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install flake8
+      - name: Run linting
+        run: |
+          flake8 .

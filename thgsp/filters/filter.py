@@ -112,7 +112,7 @@ class Filter:
             out_channels = range(self.out_channels)
 
         mask1 = low <= fs
-        mask2 = fs <= (1 + 1e-5) * high
+        mask2 = fs <= (1 + 5e-4) * high
         ls2eval = fs[mask1 & mask2]
         if len(ls2eval) == 0:
             raise RuntimeError(

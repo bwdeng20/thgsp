@@ -58,3 +58,13 @@ See the full program [here](./demos/images/bio_cmn.py).
 [Aimin Jiang, et al.] [ Admm-based Bipartite Graph Approximation](https://ieeexplore.ieee.org/document/8682548/)
 
 ## Citation
+```
+@misc{thgsp,
+  author = {Bowen Deng},
+  title = {ThGSP: A PyTorch-based Graph Signal Processing Library},
+  year = {2021},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/bwdeng20/thgsp}},
+}
+```

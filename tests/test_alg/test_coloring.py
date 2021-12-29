@@ -30,7 +30,7 @@ def test_dsatur_cpp():
     plot()
 
 
-@pytest.mark.parametrize('device', devices)
+@pytest.mark.parametrize("device", devices)
 def test_dsatur(device):
     N = 10
     G = rand_udg(N, 0.2, device=device)

@@ -9,11 +9,10 @@ on:
 
 jobs:
 
-  build-thgsp-doc:
+  thgsp-doc:
     runs-on: ${{ matrix.os}}
 
     strategy:
-      fail-fast: false
       matrix:
         os: [ ubuntu-18.04 ]
         python-version: [ 3.8 ]
@@ -23,36 +22,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Proxy info
-        run: |
-          python -c "import os; print(os.environ.get('http_proxy'),os.environ.get('https_proxy')) "
-
       - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Set Pip Mirror in CN Mainland
-        run: |
-          pip install pip -U
-          pip install wheel
-          pip config set global.index-url https://pypi.doubanio.com/simple
-
-      - name: Free up disk space
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo rm -rf /usr/share/dotnet
-
-      - name: Install suitsparse
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsuitesparse-dev
-
-      - name: Install CUDA ${{ matrix.cuda-version }}
-        if: ${{ matrix.cuda-version != 'cpu' }}
-        run: |
-          bash .github/workflows/cuda/${{ matrix.cuda-version }}-${{ runner.os }}.sh
 
       - name: Install PyTorch ${{ matrix.torch-version }}+${{ matrix.cuda-version }}
         run: |
@@ -70,6 +43,8 @@ jobs:
       - name: Install main package for CPU
         run: |
           FORCE_ONLY_CPU=1 pip install -e .
+        shell:
+          bash
 
       - name: Build Docs
         run: cd docs && pip install -r requirements.txt && make html && cd ..

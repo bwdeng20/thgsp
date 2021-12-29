@@ -10,9 +10,9 @@ def laplace(adj: SparseTensor, lap_type=None):
     deg = adj.sum(0)
 
     loop_index = torch.arange(N, device=adj.device()).unsqueeze_(0)
-    if lap_type in (None, 'sym'):
+    if lap_type in (None, "sym"):
         deg05 = deg.pow(-0.5)
-        deg05[deg05 == float('inf')] = 0
+        deg05[deg05 == float("inf")] = 0
         wgt = deg05[row] * val * deg05[col]
         wgt = torch.cat([-wgt.unsqueeze_(0), val.new_ones(1, N)], 1).squeeze_()
 

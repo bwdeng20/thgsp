@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from thgsp.visual.plotting import draw_cn, draw_signal
 from thgsp.graphs.generators import rand_udg, rand_dg
 from ..utils4t import plot
+
 N = 10
 density = 0.3
 G1 = rand_udg(N, density=density)

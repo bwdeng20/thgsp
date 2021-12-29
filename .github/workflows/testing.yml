@@ -1,60 +1,47 @@
 name: Testing
 
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
 
   test:
     runs-on: ${{ matrix.os }}
+    env:
+      THGSP_PLT: 0
 
     strategy:
-      max-parallel: 10 # max for free user
       fail-fast: false
       matrix:
-        os: [ ubuntu-18.04 ]
+        os: [ ubuntu-latest, windows-latest ]
         python-version: [ 3.8 ]
         torch-version: [ 1.10.0 ]
-        cuda-version: [ 'cpu','cu113' ]
-        exclude:
-          - torch-version: 1.9.0
-            cuda-version: 'cu113'
-          - torch-version: 1.10.1
-            cuda-version: 'cu111'
+        cuda-version: [ 'cpu' ]
+
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Proxy info
-        run: |
-          python -c "import os; print(os.environ.get('http_proxy'),os.environ.get('https_proxy')) "
-
       - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Set Pip Mirror in Mainland
+      - name: Translate cuXXY to XX.Y.Z, e.g., cu113 to 11.3.1
+        if: ${{ matrix.cuda-version != 'cpu' }}
+        id: translator
         run: |
-          pip install pip -U
-          pip install wheel
-          pip config set global.index-url https://pypi.doubanio.com/simple
-
-      - name: Free up disk space
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo rm -rf /usr/share/dotnet
-
-      - name: Install suitsparse
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsuitesparse-dev
+          echo "::set-output name=full_version:: $(jq -r .${{ matrix.cuda-version }} .github/workflows/mapping.json)"
 
       - name: Install CUDA ${{ matrix.cuda-version }}
         if: ${{ matrix.cuda-version != 'cpu' }}
-        run: |
-          bash .github/workflows/cuda/${{ matrix.cuda-version }}-${{ runner.os }}.sh
+        uses: Jimver/cuda-toolkit@v0.2.5
+        id: cuda-toolkit
+        with:
+          cuda: ${{steps.translator.outputs.full_version}}
 
       - name: Install PyTorch ${{ matrix.torch-version }}+${{ matrix.cuda-version }}
         run: |
@@ -68,12 +55,6 @@ jobs:
           pip install torch-scatter -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
           pip install torch-sparse -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
           pip install torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
-
-      - name: Test Dependencies
-        run: |
-          python -c "import torch; print(torch.__version__)"
-          pip install pytest
-          pip install pytest-cov
 
       - name: Install main package for CPU
         if: ${{ matrix.cuda-version == 'cpu' }}
@@ -90,9 +71,19 @@ jobs:
         shell:
           bash
 
+      - name: Test Dependencies
+        run: |
+          python -c "import torch; print(torch.__version__)"
+          pip install pytest
+          pip install pytest-cov
+
       - name: Test
         run: |
-          pip install -e .
           pytest --cov=./thgsp/
 
+      - name: Codecov via Bash
+        if: success()
+        run: bash <(curl -s https://codecov.io/bash)
+        shell:
+          bash
 

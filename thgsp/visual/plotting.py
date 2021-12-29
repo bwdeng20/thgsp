@@ -25,7 +25,16 @@ def draw(G: GraphBase, pos=None, ax=None, node_size=225, with_labels=True, **kwa
     return nx.draw(G, pos, ax, with_labels=with_labels, node_size=node_size, **kwargs)
 
 
-def draw_cn(G: GraphBase, pos=None, node_color=None, ax=None, cmap=None, node_size=225, with_labels=True, **kwargs):
+def draw_cn(
+    G: GraphBase,
+    pos=None,
+    node_color=None,
+    ax=None,
+    cmap=None,
+    node_size=225,
+    with_labels=True,
+    **kwargs
+):
     if G.n_node > 4000:
         with_labels = False
     if node_color is None:
@@ -34,12 +43,32 @@ def draw_cn(G: GraphBase, pos=None, node_color=None, ax=None, cmap=None, node_si
         node_color = np.asarray(node_color)
     if cmap is None:
         cmap = plt.get_cmap("coolwarm")
-    return draw(G, pos=pos, ax=ax, node_color=node_color, node_size=node_size, cmap=cmap,
-                with_labels=with_labels, **kwargs)
+    return draw(
+        G,
+        pos=pos,
+        ax=ax,
+        node_color=node_color,
+        node_size=node_size,
+        cmap=cmap,
+        with_labels=with_labels,
+        **kwargs
+    )
 
 
-def draw_signal(G: GraphBase, pos=None, signal=None, ax=None, cmap=None, vmin=None, vmax=None, cbar=True,
-                edge_cmap=None, node_size=225, with_labels=True, **kwargs):
+def draw_signal(
+    G: GraphBase,
+    pos=None,
+    signal=None,
+    ax=None,
+    cmap=None,
+    vmin=None,
+    vmax=None,
+    cbar=True,
+    edge_cmap=None,
+    node_size=225,
+    with_labels=True,
+    **kwargs
+):
     """
 
     Parameters
@@ -81,7 +110,7 @@ def draw_signal(G: GraphBase, pos=None, signal=None, ax=None, cmap=None, vmin=No
         weights = np.ones(G.number_of_edges())
         edge_cmap = plt.get_cmap("copper")
     else:
-        _, weights = zip(*nx.get_edge_attributes(G, 'weight').items())
+        _, weights = zip(*nx.get_edge_attributes(G, "weight").items())
 
     if ax is None:
         ax = plt.gca()
@@ -90,10 +119,20 @@ def draw_signal(G: GraphBase, pos=None, signal=None, ax=None, cmap=None, vmin=No
 
     signal_shuffled = [signal[v] for v in G]
 
-    nodes = nx.draw_networkx_nodes(G, pos, ax=ax, node_color=signal_shuffled, node_size=node_size,
-                                   cmap=cmap, vmin=vmin, vmax=vmax, **kwargs)
-    nx.draw_networkx_edges(G, pos, ax=ax, edge_color=weights,
-                           edge_cmap=edge_cmap, **kwargs)
+    nodes = nx.draw_networkx_nodes(
+        G,
+        pos,
+        ax=ax,
+        node_color=signal_shuffled,
+        node_size=node_size,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        **kwargs
+    )
+    nx.draw_networkx_edges(
+        G, pos, ax=ax, edge_color=weights, edge_cmap=edge_cmap, **kwargs
+    )
 
     if with_labels and len(G) <= 1000:
         nx.draw_networkx_labels(G, pos, ax=ax, **kwargs)

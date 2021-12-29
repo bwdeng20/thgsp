@@ -3,7 +3,7 @@ from scipy.sparse import lil_matrix
 from torch_sparse import SparseTensor
 
 from thgsp.alg.coloring import dsatur
-from .utils import new_order, distribute_color, bipartite_mask
+from ._utils import new_order, distribute_color, bipartite_mask
 
 
 def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
@@ -40,9 +40,11 @@ def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
     vtx_color = np.asarray(vtx_color)
     n_color = max(vtx_color) + 1
     if n_color > 256:
-        raise RuntimeError("Too many colors will lead to a too complicated channel division")
+        raise RuntimeError(
+            "Too many colors will lead to a too complicated channel division"
+        )
 
-    A = A.to_scipy(layout='csr').tolil()
+    A = A.to_scipy(layout="csr").tolil()
     M = int(np.ceil(np.log2(n_color)))  # the number of bipartite graphs
     N = A.shape[-1]  # the number of nodes
 

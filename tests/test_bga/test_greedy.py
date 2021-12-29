@@ -22,4 +22,6 @@ def test_greedy_bga():
     assert (C - B).toarray().sum() == 0
 
     # since BFS-bipartite coloring root is chosen at random
-    assert (np.allclose(bset2, vtx_color1) or np.allclose(bset2, 1 - np.asarray(vtx_color1)))
+    assert np.allclose(bset2, vtx_color1) or np.allclose(
+        bset2, 1 - np.asarray(vtx_color1)
+    )

@@ -35,13 +35,15 @@ class Minnesota:
 
     """
     filename = "Graph_Wavelets_Demo.zip"
-    zip_md5 = '83bf2aef1ad7e75badfc6296ca336d44'
-    url = 'http://sipi.usc.edu/~ortega/Software/Graph_Wavelets_Demo.zip'
-    files2keep = ['LICENSE.txt']
+    zip_md5 = "83bf2aef1ad7e75badfc6296ca336d44"
+    url = "http://sipi.usc.edu/~ortega/Software/Graph_Wavelets_Demo.zip"
+    files2keep = ["LICENSE.txt"]
     top_dir = "minnesota-usc"
-    mat_list = [['min_traffic_graph.mat', 'd9b45cd25dca3997c8454da0efa01926'],
-                ['min_coloring.mat', 'a6c75092048f5ab0409c6c951435924e'],
-                ['min_graph_signal.mat', '14efc15373708b63cd7fbaec8ad7284f']]
+    mat_list = [
+        ["min_traffic_graph.mat", "d9b45cd25dca3997c8454da0efa01926"],
+        ["min_coloring.mat", "a6c75092048f5ab0409c6c951435924e"],
+        ["min_graph_signal.mat", "14efc15373708b63cd7fbaec8ad7284f"],
+    ]
 
     def __init__(self, root=None, connected=True, download=False):
         self.root = get_data_dir_of_thgsp() if root is None else root
@@ -50,20 +52,22 @@ class Minnesota:
             self.download()
 
         if not self._check_integrity():
-            raise RuntimeError('Dataset not found or corrupted.' +
-                               ' You can use download=True to download it')
+            raise RuntimeError(
+                "Dataset not found or corrupted."
+                + " You can use download=True to download it"
+            )
         g = loadmat(join(self.root, self.top_dir, self.mat_list[0][0]))
-        A = g['A']
+        A = g["A"]
         self.is_connected = connected
         if connected:
             A[348, 354] = 1
             A[354, 348] = 1
         self.A = coo_matrix(A.astype(np.float64))
-        self.xy = g['xy'].astype(np.float64)
-        F = loadmat(join(self.root, self.top_dir, self.mat_list[1][0]))['F']
+        self.xy = g["xy"].astype(np.float64)
+        F = loadmat(join(self.root, self.top_dir, self.mat_list[1][0]))["F"]
         self.F = np.squeeze(F).astype(int) - 1
 
-        f = loadmat(join(self.root, self.top_dir, self.mat_list[2][0]))['f']
+        f = loadmat(join(self.root, self.top_dir, self.mat_list[2][0]))["f"]
         self.f = torch.from_numpy(f).reshape(-1)
 
     def __getitem__(self, idx):
@@ -80,10 +84,12 @@ class Minnesota:
 
     def download(self):
         if self._check_integrity():
-            print('Files already downloaded and verified')
+            print("Files already downloaded and verified")
             return
         root = self.root
-        download_and_extract_archive(self.url, root, root, self.filename, self.zip_md5, remove_finished=True)
+        download_and_extract_archive(
+            self.url, root, root, self.filename, self.zip_md5, remove_finished=True
+        )
         os.rename(join(root, "Graph Wavelets Demo"), join(root, "minnesota-usc"))
 
         files2keep = self.files2keep

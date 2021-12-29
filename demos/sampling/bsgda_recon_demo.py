@@ -17,17 +17,17 @@ dv = torch.device("cpu")
 dt = torch.float
 
 data = loadmat("bsgda.mat")
-S = data['S'].ravel().astype(int) - 1
+S = data["S"].ravel().astype(int) - 1
 
-bw = data['bw'].item()
-epsilon = data['epsilon'].item()
-mu = data['mu'].item()
+bw = data["bw"].item()
+epsilon = data["epsilon"].item()
+mu = data["mu"].item()
 M = len(S)
 
-f = torch.as_tensor(data['f']).to(dt).to(dv)
-y = torch.as_tensor(data['f_or']).to(dt).to(dv)
-L = Graph(data['L']).to(dv, dt)
-g = Graph(data['A'])
+f = torch.as_tensor(data["f"]).to(dt).to(dv)
+y = torch.as_tensor(data["f_or"]).to(dt).to(dv)
+L = Graph(data["L"]).to(dv, dt)
+g = Graph(data["A"])
 N = g.n_node
 
 

@@ -4,18 +4,20 @@ from torch_sparse import SparseTensor
 from thgsp.convert import to_xcipy, from_cpx, get_array_module, get_ddd, spmatrix
 
 
-def normalize_laplace(L: SparseTensor, lam_max: float = 2.):
+def normalize_laplace(L: SparseTensor, lam_max: float = 2.0):
     Ln = L.clone()
     row, col, val = Ln.coo()
     diag_mask = row == col
-    val[...] = (2. * val) / lam_max
-    val.masked_fill_(val == float('inf'), 0)
+    val[...] = (2.0 * val) / lam_max
+    val.masked_fill_(val == float("inf"), 0)
     val[diag_mask] -= 1
     return Ln
 
 
-def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.):
-    r""" Chebyshev approximation of graph filtering
+def cheby_op(
+    x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.0
+):
+    r"""Chebyshev approximation of graph filtering
 
     Parameters
     ----------
@@ -49,7 +51,8 @@ def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: flo
         assert x.size() == (Co, N, Ci) or (1, N, Ci)
     else:
         raise RuntimeError(
-            "The input signals has mismatched dimensions: {}".format(x.size()))
+            "The input signals has mismatched dimensions: {}".format(x.size())
+        )
 
     K = K - 1
     c = coeff.unsqueeze(1)  # Co x Ci x K --> Co x 1 x Ci x K
@@ -66,7 +69,7 @@ def cheby_op(x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: flo
     return result
 
 
-def cheby_op_basis(L, coeff, lam_max=2., return_ts=False):
+def cheby_op_basis(L, coeff, lam_max=2.0, return_ts=False):
     assert coeff.ndim == 1
     K = len(coeff)
     if isinstance(L, SparseTensor):
@@ -74,6 +77,7 @@ def cheby_op_basis(L, coeff, lam_max=2., return_ts=False):
         xp, xcipy, _ = get_array_module(on_gpu)
     elif isinstance(L, spmatrix):
         import scipy
+
         xcipy = scipy
         xp = np
     else:
@@ -102,7 +106,7 @@ def cheby_op_basis(L, coeff, lam_max=2., return_ts=False):
     return result
 
 
-def cheby_coeff(kernels, K=10, lam_max=2., num_points=None, dtype=None, device=None):
+def cheby_coeff(kernels, K=10, lam_max=2.0, num_points=None, dtype=None, device=None):
     if num_points is None:
         num_points = K + 1
     assert lam_max > 0
@@ -113,8 +117,11 @@ def cheby_coeff(kernels, K=10, lam_max=2., num_points=None, dtype=None, device=N
         kernels = np.array([[[kernels]]])  # 1 x 1 x 1 array
         M = Co = Ci = 1
 
-    points = np.pi * (torch.arange(num_points, dtype=dtype,
-                                   device=device) + 0.5) / num_points
+    points = (
+        np.pi
+        * (torch.arange(num_points, dtype=dtype, device=device) + 0.5)
+        / num_points
+    )
 
     gs = torch.zeros(M, Co, Ci, 1, num_points, dtype=dtype, device=device)
     kernel_cache = dict()
@@ -128,10 +135,11 @@ def cheby_coeff(kernels, K=10, lam_max=2., num_points=None, dtype=None, device=N
                 else:  # kernel_cache stores the reference to a part of memory used by gs.
                     gs[m, j, i] = krn(lam_max / 2 * (torch.cos(points) + 1))
                     kernel_cache[kid] = gs[m, j, i]
-    order_cos = torch.arange(
-        K + 1, dtype=dtype, device=device).reshape(1, -1) * points.reshape(-1, 1)
+    order_cos = torch.arange(K + 1, dtype=dtype, device=device).reshape(
+        1, -1
+    ) * points.reshape(-1, 1)
     order_cos.cos_()  # num x K+1
-    coeff = (gs @ order_cos) * 2. / num_points  # M x Co x Ci x 1 x K+1
+    coeff = (gs @ order_cos) * 2.0 / num_points  # M x Co x Ci x 1 x K+1
     return coeff.squeeze_(-2)  # M x Co x Ci x K+1
 
 
@@ -161,7 +169,7 @@ def polyval(c, x):
     return f
 
 
-def nla(x, frac=0.4, k=None, scheme='abs'):
+def nla(x, frac=0.4, k=None, scheme="abs"):
     Co, N, Ci = x.shape
 
     if k is not None:
@@ -170,10 +178,10 @@ def nla(x, frac=0.4, k=None, scheme='abs'):
         k_largest = int(frac * N)
 
     fuse = x.reshape(-1, Ci)
-    if scheme == 'abs':
+    if scheme == "abs":
         _, idx = fuse.abs().topk(k_largest, dim=0)
         val = fuse.gather(0, idx)
-    elif scheme == 'naive':
+    elif scheme == "naive":
         val, idx = fuse.topk(k_largest, dim=0)
 
     elif scheme == "keeplow":
@@ -186,7 +194,8 @@ def nla(x, frac=0.4, k=None, scheme='abs'):
 
     else:
         raise RuntimeError(
-            "{} is not a valid supported non-linear approximation scheme".format(scheme))
+            "{} is not a valid supported non-linear approximation scheme".format(scheme)
+        )
     res = x.new_zeros(Co * N, Ci)
     res.scatter_(0, idx, val)
     return res.reshape(Co, N, Ci)

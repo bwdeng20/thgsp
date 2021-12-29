@@ -7,7 +7,7 @@ from thgsp.convert import spmatrix, SparseTensor, coo_matrix, get_ddd, get_array
 from .utils4t import sparse_formats, float_dtypes, devices
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def mats():
     N = 4
     th_mat = torch.rand(N, N, dtype=torch.float)
@@ -19,7 +19,17 @@ def mats():
     sp_mat = SparseTensor.from_dense(th_mat)
     sp_mat_gpu = SparseTensor.from_dense(th_mat_gpu)
     bug_mat = "invalid matrix"
-    return ths_mat, ths_mat_gpu, ths_mat, ths_mat_gpu, np_mat, sci_mat, sp_mat, sp_mat_gpu, bug_mat
+    return (
+        ths_mat,
+        ths_mat_gpu,
+        ths_mat,
+        ths_mat_gpu,
+        np_mat,
+        sci_mat,
+        sp_mat,
+        sp_mat_gpu,
+        bug_mat,
+    )
 
 
 def test_to_np(mats):
@@ -84,6 +94,7 @@ def test_get_array_module(on_gpu):
         try:
             import cupy as cp
             import cupyx.scipy as xscipy
+
             assert xp == cp
             assert xscipy == xscipy
         except ImportError:

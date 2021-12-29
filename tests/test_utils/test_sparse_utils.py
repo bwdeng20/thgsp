@@ -1,13 +1,29 @@
 import torch
 import pytest
 import numpy as np
-from thgsp.utils.sparse_utils import img2graph, absv, absv_, matrix_power, SparseTensor
-from thgsp.utils.sparse_utils import multivariate_normal
+from thgsp.utils.sparse_utils import (
+    img2graph,
+    absv,
+    absv_,
+    matrix_power,
+    SparseTensor,
+    multivariate_normal,
+    sparse_xcipy_logdet,
+)
 from ..utils4t import plot, devices, float_dtypes
 
+try:
+    from sksparse.cholmod import cholesky
 
-@pytest.mark.parametrize('threshold', [None, 50])
-@pytest.mark.parametrize('shape', [(32, 32), (256, 256), (300, 246), (512, 512), [1024, 1024]])
+    is_sksparse_installed = True
+except ImportError:
+    is_sksparse_installed = False
+
+
+@pytest.mark.parametrize("threshold", [None, 50])
+@pytest.mark.parametrize(
+    "shape", [(32, 32), (256, 256), (300, 246), (512, 512), [1024, 1024]]
+)
 def test_img2graph(shape, threshold):
     H, W = shape
     N = H * W
@@ -20,13 +36,26 @@ def test_img2graph(shape, threshold):
         from thgsp.visual.plotting import draw_cn
         from thgsp.graphs.core import Graph
         import matplotlib.pyplot as plt
+
         xy = xy * 10
         plt.subplot(121)
-        draw_cn(Graph(Ar), pos=xy, node_color=beta_r,
-                font_size=5, node_size=10, with_labels=False)
+        draw_cn(
+            Graph(Ar),
+            pos=xy,
+            node_color=beta_r,
+            font_size=5,
+            node_size=10,
+            with_labels=False,
+        )
         plt.subplot(122)
-        draw_cn(Graph(Ad), pos=xy, node_color=beta_d,
-                font_size=5, node_size=10, with_labels=False)
+        draw_cn(
+            Graph(Ad),
+            pos=xy,
+            node_color=beta_d,
+            font_size=5,
+            node_size=10,
+            with_labels=False,
+        )
         plot()
 
 
@@ -41,7 +70,9 @@ def test_matrix_power(device, dtype, k):
     tar2 = np.linalg.matrix_power(a.cpu().numpy(), k)
     tar2 = torch.from_numpy(tar2)
     out = matrix_power(SparseTensor.from_dense(a), k).to_dense()
-    if not torch.allclose(tar.cpu(), tar2):  # when numpy and torch differ in the matrix_power
+    if not torch.allclose(
+        tar.cpu(), tar2
+    ):  # when numpy and torch differ in the matrix_power
         print("\n", tar2 - tar.cpu())
         print(out - tar)
         print(out.cpu() - tar2)
@@ -75,17 +106,23 @@ def test_matrix_abs_elementwise(device, dtype):
     #   assert torch.allclose(out, tar)  # use np.linalg.norm() as the target
 
 
+@pytest.mark.skipif(
+    is_sksparse_installed is False, reason="scikit-sparse is not installed"
+)
 @pytest.mark.parametrize("num", [1, 5000000])
 def test_multivariate_normal(num):
     import scipy
     from scipy.sparse.linalg import inv
+
     n = 4
     tmp = scipy.sparse.rand(n, n, 0.3, format="lil")
     tmp.setdiag(1)
     Cov = tmp @ tmp.T
     Cov = Cov.tocsc()
     Pre = inv(Cov).tocsc()
-    z1, z2 = multivariate_normal(mean=1, cov=Cov, precision=Pre, num=num, return_th=False)
+    z1, z2 = multivariate_normal(
+        mean=1, cov=Cov, precision=Pre, num=num, return_th=False
+    )
     z0 = np.random.multivariate_normal(np.ones(n), Cov.A, num)
     m1, v1 = np.mean(z1, 1), np.var(z1, 1)
     m2, v2 = np.mean(z2, 1), np.var(z2, 1)
@@ -102,5 +139,7 @@ def test_multivariate_normal(num):
         assert np.abs(v1 - v0).mean() < 1e-2
         assert np.abs(v2 - v0).mean() < 1e-2
 
-    x1, x2 = multivariate_normal(mean=1, cov=Cov, precision=Pre, num=num, delta=1e-5, return_th=True)
+    x1, x2 = multivariate_normal(
+        mean=1, cov=Cov, precision=Pre, num=num, delta=1e-5, return_th=True
+    )
     assert x1.shape == x2.shape

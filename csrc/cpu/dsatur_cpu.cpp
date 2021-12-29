@@ -46,7 +46,6 @@ torch::Tensor dsatur_coloring_cpu(const torch::Tensor& rowptr, const torch::Tens
         torch::Tensor tmp= torch::arange(n,torch::dtype(torch::kLong).device(torch::kCPU));
         return tmp;
     }
-
     torch::Tensor vtx_color = -torch::ones(n, {torch::kLong});
     auto vtx_color_data=vtx_color.data_ptr<int64_t>();
     auto rowptr_data=rowptr.data_ptr<int64_t>();
@@ -56,7 +55,7 @@ torch::Tensor dsatur_coloring_cpu(const torch::Tensor& rowptr, const torch::Tens
     unordered_map<long, long> saturation_level;
     for (long i = 0; i < n; i++) {
         distinct_colors[i] = unordered_set<long>{-1};
-        saturation_level[i] = 1; // uncoloured as -1
+        saturation_level[i] = 1; /* unclored as -1*/
     }
 
     auto deg = rowptr.index({Slice(1, None)}) - rowptr.index({Slice(None, -1)});
@@ -93,9 +92,9 @@ torch::Tensor dsatur_coloring_cpu(const torch::Tensor& rowptr, const torch::Tens
         long color4u = pick_color(nbr_colors, n);
         vtx_color_data[u] = color4u;
 
-        for(long j=nbr_begin;j<nbr_stop;j++) {
-            v = col_data[j];
-            if (vtx_color_data[v] == -1) {
+        for(long j=nbr_begin;j<nbr_stop;j++){
+            v=col_data[j];
+            if (vtx_color_data[v]==-1) {
                 distinct_colors[v].insert(vtx_color_data[u]);
                 saturation_level[v] = (long) distinct_colors[v].size();
 

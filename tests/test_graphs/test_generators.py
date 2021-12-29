@@ -1,12 +1,19 @@
 import pytest
 import torch
-from thgsp.graphs.generators import rand_udg, rand_dg, rand_bipartite, random_graph, radius, knn
+from thgsp.graphs.generators import (
+    rand_udg,
+    rand_dg,
+    rand_bipartite,
+    random_graph,
+    radius,
+    knn,
+)
 from ..utils4t import devices, float_dtypes
 
 
-@pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('density', [0.1, 0.6])
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("density", [0.1, 0.6])
 class TestRandGraph:
     def test_rand_udg(self, device, dtype, density):
         N = 12
@@ -41,9 +48,9 @@ def test_check_symmetric():
     print("\n", G.to_dense())
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('loop', [True, False])
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("loop", [True, False])
 class TestXy2Graph:
     def test_knn_graph(self, dtype, device, loop):
         N = 10

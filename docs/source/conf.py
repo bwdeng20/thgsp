@@ -17,12 +17,12 @@ import datetime
 import sphinx_rtd_theme
 import thgsp
 
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath("."))
 # -- Project information -----------------------------------------------------
 
-project = 'thgsp'
-author = 'Bowen Deng'
-copyright = '{}, {}'.format(datetime.datetime.now().year, author)
+project = "thgsp"
+author = "Bowen Deng"
+copyright = "{}, {}".format(datetime.datetime.now().year, author)
 # The full version, including alpha/beta/rc tags
 version = thgsp.__version__
 release = thgsp.__version__
@@ -33,18 +33,20 @@ release = thgsp.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 autodoc_mock_imports = ["ray", "scikit-sparse"]
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.viewcode',
-              'recommonmark',
-              # 'sphinx.ext.intersphinx',
-              'sphinx.ext.napoleon',
-              'sphinx.ext.githubpages']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "recommonmark",
+    # 'sphinx.ext.intersphinx',
+    "sphinx.ext.napoleon",
+    "sphinx.ext.githubpages",
+]
 
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.txt': 'markdown',
-    '.md': 'markdown',
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
+    ".md": "markdown",
 }
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -56,17 +58,17 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-html_static_path = ['_static']
-html_context = {'css_files': ['_static/css/custom.css']}
-html_logo = '_static/img/logo.svg'
+html_static_path = ["_static"]
+html_context = {"css_files": ["_static/css/custom.css"]}
+html_logo = "_static/img/logo.svg"
 
-intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/", None)}
 html_theme_options = {
-    'collapse_navigation': True,
-    'display_version': True,
-    'logo_only': True,
+    "collapse_navigation": True,
+    "display_version": True,
+    "logo_only": True,
 }
 
 napoleon_google_docstring = False

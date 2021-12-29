@@ -29,12 +29,15 @@ def test_lil_bfs():
 
     plt.subplot(132)
     plt.title("bfs_nx_tree")
-    nx.draw(tree_gt, pos=pos, node_color=set_color(
-        tree_gt, r, 1), with_labels=True)
+    nx.draw(tree_gt, pos=pos, node_color=set_color(tree_gt, r, 1), with_labels=True)
 
     plt.subplot(133)
     plt.title("bfs_my_tree")
-    nx.draw(nx.from_dict_of_lists(tree, create_using=nx.DiGraph),
-            pos=pos, node_color=set_color(tree_gt, r, 1), with_labels=True)
+    nx.draw(
+        nx.from_dict_of_lists(tree, create_using=nx.DiGraph),
+        pos=pos,
+        node_color=set_color(tree_gt, r, 1),
+        with_labels=True,
+    )
 
     plot()

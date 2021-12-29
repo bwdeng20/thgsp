@@ -4,7 +4,12 @@ import numpy as np
 
 from thgsp.graphs.generators import random_graph
 from ..utils4t import devices, float_dtypes, float_np_dts, sparse_formats, snr_and_mse
-from thgsp.sampling.rsbs import cheby_coeff4ideal_band_pass, estimate_lk, rsbs, recon_rsbs
+from thgsp.sampling.rsbs import (
+    cheby_coeff4ideal_band_pass,
+    estimate_lk,
+    rsbs,
+    recon_rsbs,
+)
 
 
 def test_cheby_coeff4ideal_band_pass():
@@ -23,7 +28,9 @@ class TestRsbs:
         lmax = g.max_frequency(lap_type="comb")
         print(lmax)
         band_limit = 10
-        lambda_k, cum_coh = estimate_lk(g, band_limit, lmax=lmax, lap_type="comb", verbose=False, num_estimation=1)
+        lambda_k, cum_coh = estimate_lk(
+            g, band_limit, lmax=lmax, lap_type="comb", verbose=False, num_estimation=1
+        )
         print(lambda_k)
         print(cum_coh)
 
@@ -52,9 +59,13 @@ class TestRsbs:
             nodes, coh = rsbs(g, M, k, num_rv=appropriate_num_rv, return_list=True)
             f = torch.rand(N, 1, dtype=dtype, device=device)
             f = f / f.norm()
-            f_hat = recon_rsbs(f[nodes], S=nodes, L=g.L("comb"), cum_coh=coh, mu=0.1, reg_order=1)
+            f_hat = recon_rsbs(
+                f[nodes], S=nodes, L=g.L("comb"), cum_coh=coh, mu=0.1, reg_order=1
+            )
             if torch.any(torch.isnan(f_hat)):
-                print("This case leads to numerical instability and thus would be skipped")
+                print(
+                    "This case leads to numerical instability and thus would be skipped"
+                )
             else:
                 s, m = snr_and_mse(f_hat, f)
                 assert m < 1

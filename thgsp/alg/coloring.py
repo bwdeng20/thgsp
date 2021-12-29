@@ -18,20 +18,20 @@ def dsatur_py(spm):
     u = deg.argmax().item()  # choose the node with largest degree
     vtx_color[u] = 0
 
-    nbr = col[ptr[u]: ptr[u + 1]]
+    nbr = col[ptr[u] : ptr[u + 1]]
     for v in nbr:
         distinct_colors[v].add(0)
 
     for i in range(1, n_node):
         saturation = {
-            v: len(c) for v, c in distinct_colors.items() if vtx_color[v] == -1}
+            v: len(c) for v, c in distinct_colors.items() if vtx_color[v] == -1
+        }
         u = max(saturation, key=lambda v: (saturation[v], deg[v]))
 
-        nbr = col[ptr[u]: ptr[u + 1]]
+        nbr = col[ptr[u] : ptr[u + 1]]
         nbr_colors = {vtx_color[v] for v in nbr}
 
-        vtx_color[u] = next(color for color in range(
-            n_node) if color not in nbr_colors)
+        vtx_color[u] = next(color for color in range(n_node) if color not in nbr_colors)
 
         c = vtx_color[u]
         for v in nbr:
@@ -68,7 +68,7 @@ def check_coloring(spm, vtx_color):
             cur_node = q.popleft()
             vtx2reach.remove(cur_node)
             cur_c = vtx_color[cur_node]
-            nbr = col[ptr[cur_node]: ptr[cur_node + 1]]
+            nbr = col[ptr[cur_node] : ptr[cur_node + 1]]
             for i in nbr:
                 if vtx_color[i] == cur_c:
                     return False

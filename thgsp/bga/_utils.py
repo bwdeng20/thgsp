@@ -42,7 +42,7 @@ def new_order(n_color):
     order = np.arange(0, 2 ** M, dtype=np.uint8)  # 0,1,...,2^M-1
     no = np.unpackbits(order.reshape(-1, 1), axis=1)[:, -M:]
     # no need to flip before pack since bitorder='little'
-    no = np.packbits(no, axis=1, bitorder='little')
+    no = np.packbits(no, axis=1, bitorder="little")
     return no[no < n_color]
 
 
@@ -82,7 +82,7 @@ def beta_dist2channel_name(beta_dist, reverse=False):
     array
         An array composed by :obj:`H` and :obj:`L`. Each row corresponds to one channel.
     """
-    channel_name410 = ['L', 'H']  # for 1, 0 respectively in beta_dist
+    channel_name410 = ["L", "H"]  # for 1, 0 respectively in beta_dist
     if reverse:
         channel_name410 = reversed(channel_name410)
     return np.where(beta_dist, *channel_name410)
@@ -111,15 +111,13 @@ def beta2color_group(beta, th=True):
     """
     N, M = beta.shape
     n_channel = 2 ** M  # pseudo channel number
-    beta = beta.numpy().astype('uint8')
-    beta_dist = distribute_color(
-        n_channel, M, th=False)  # n_channel x M np.array
+    beta = beta.numpy().astype("uint8")
+    beta_dist = distribute_color(n_channel, M, th=False)  # n_channel x M np.array
     # n_channel x 1 --> n_channel
-    colors = np.packbits(
-        beta_dist, axis=1, bitorder='little').reshape(-1).tolist()
+    colors = np.packbits(beta_dist, axis=1, bitorder="little").reshape(-1).tolist()
 
     # array(N x 1) --> List(N)
-    node_colors = np.packbits(beta, axis=1, bitorder='little').reshape(-1)
+    node_colors = np.packbits(beta, axis=1, bitorder="little").reshape(-1)
     # some channels may be empty
     color_group = {color: None for color in colors}
     for c in color_group:
@@ -157,14 +155,13 @@ def beta2channel_mask(beta):
     mask = torch.zeros(n_channel, N, dtype=torch.bool)
     if isinstance(beta, torch.Tensor):
         beta = np.asarray(beta.cpu())
-    beta = beta.astype('uint8')
-    beta_dist = distribute_color(
-        n_channel, M, th=False)  # n_channel x M np.array
+    beta = beta.astype("uint8")
+    beta_dist = distribute_color(n_channel, M, th=False)  # n_channel x M np.array
     # n_channel x 1 --> n_channel
-    colors = np.packbits(beta_dist, axis=1, bitorder='little').reshape(-1)
+    colors = np.packbits(beta_dist, axis=1, bitorder="little").reshape(-1)
 
     # array(N x 1) --> List(N)
-    node_colors = np.packbits(beta, axis=1, bitorder='little').reshape(-1)
+    node_colors = np.packbits(beta, axis=1, bitorder="little").reshape(-1)
     for i in range(n_channel):
         index_c = node_colors == colors[i]
         mask[i] = torch.from_numpy(index_c)
@@ -187,8 +184,8 @@ def laplace(adj: spmatrix, lap_type=None, add_loop=False) -> coo_matrix:
     dt = adj.dtype if adj.dtype in (np.float64, np.float32) else np.float32
     m = coo_matrix(adj, dtype=dt, copy=True)
     w = m.sum(0).getA1() - m.diagonal()  # - self_loop weight
-    isolated_node_mask = (w == 0)
-    if lap_type in (None, 'sym'):
+    isolated_node_mask = w == 0
+    if lap_type in (None, "sym"):
         w = np.where(isolated_node_mask, 1, np.sqrt(w))
         m.data /= w[m.row]
         m.data /= w[m.col]
@@ -216,8 +213,7 @@ def laplace(adj: spmatrix, lap_type=None, add_loop=False) -> coo_matrix:
         else:
             m.setdiag(1 - isolated_node_mask)
     else:
-        raise RuntimeError(
-            "{} is not valid type of Laplacian".format(type(lap_type)))
+        raise RuntimeError("{} is not valid type of Laplacian".format(type(lap_type)))
     return m.astype(dt)
 
 
@@ -356,8 +352,7 @@ def graclus_refine_raw(assignments, level: int = 1, verbose=False):
     assert level > 0
     max_level = len(assignments)
     coarest = assignments[-1]  # max_level-1
-    base_cluster = {c: np.where(c == coarest)[0]
-                    for c in range(coarest.max() + 1)}
+    base_cluster = {c: np.where(c == coarest)[0] for c in range(coarest.max() + 1)}
     for i in range(max_level - 2, level - 2, -1):
         cluster = assignments[i]
         for c in base_cluster:
@@ -368,7 +363,6 @@ def graclus_refine_raw(assignments, level: int = 1, verbose=False):
             base_cluster[c] = node
         if verbose:
             print("----->")
-            print("[level: {}],  refined cluster:\n{}".format(
-                level, base_cluster))
+            print("[level: {}],  refined cluster:\n{}".format(level, base_cluster))
             print("-----<")
     return base_cluster

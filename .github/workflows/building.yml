@@ -1,7 +1,12 @@
 name: Building Wheels
 
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 
 jobs:
 
@@ -9,13 +14,13 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      max-parallel: 20 # max for free user
       fail-fast: false
+      max-parallel: 20 # max for free user
       matrix:
-        os: [ ubuntu-18.04 ]
-        python-version: [ 3.8 ]
-        torch-version: [ 1.10.0 ]
-        cuda-version: [ 'cpu','cu111','cu113' ]
+        os: [ ubuntu-18.04, windows-latest ]
+        python-version: [ 3.7, 3.8, 3.9 ]
+        torch-version: [ 1.9.0, 1.10.0, 1.10.1 ]
+        cuda-version: [ 'cu111', 'cu113', 'cpu' ]
         exclude:
           - torch-version: 1.9.0
             cuda-version: 'cu113'
@@ -25,36 +30,28 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Proxy info
-        run: |
-          python -c "import os; print(os.environ.get('http_proxy'),os.environ.get('https_proxy')) "
-
       - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Set Pip Mirror in Mainland
-        run: |
-          pip install pip -U
-          pip install wheel
-          pip config set global.index-url https://pypi.doubanio.com/simple
 
       - name: Free up disk space
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo rm -rf /usr/share/dotnet
 
-      - name: Install suitsparse
-        if: ${{ runner.os == 'Linux' }}
+      - name: Translate cuXXY to XX.Y.Z, e.g., cu113 to 11.3.1
+        id: translator
+        if: ${{ matrix.cuda-version != 'cpu' }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libsuitesparse-dev
+            echo "::set-output name=full_version:: $(jq -r .${{ matrix.cuda-version }} .github/workflows/mapping.json)"
 
       - name: Install CUDA ${{ matrix.cuda-version }}
         if: ${{ matrix.cuda-version != 'cpu' }}
-        run: |
-          bash .github/workflows/cuda/${{ matrix.cuda-version }}-${{ runner.os }}.sh
+        uses: Jimver/cuda-toolkit@v0.2.5
+        id: cuda-toolkit
+        with:
+          cuda: ${{steps.translator.outputs.full_version}}
 
       - name: Install PyTorch ${{ matrix.torch-version }}+${{ matrix.cuda-version }}
         run: |
@@ -78,6 +75,7 @@ jobs:
       - name: Install main package for GPU
         if: ${{ matrix.cuda-version != 'cpu' }}
         run: |
+          python -c "import os;print(f'\033[1;35m CURRENT WORKING DIR: {os.getcwd()}\033[0m')"
           source .github/workflows/cuda/${{ matrix.cuda-version }}-${{ runner.os }}-env.sh
           pip install -e .
         shell:
@@ -87,12 +85,6 @@ jobs:
         run: |
           pip install wheel
           python setup.py bdist_wheel --dist-dir=dist
-
-      - name: Install AWS Cli
-        uses: unfor19/install-aws-cli-action@v1
-        with:
-          version: 2
-          verbose: false
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1

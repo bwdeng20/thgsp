@@ -9,7 +9,9 @@ from typing import Tuple, List
 def computing_sets(spm: SparseTensor, T, mu=0.01, p_hops=12):
     rowptr, col, wgt = spm.csr()
     wgt = col.new_ones(col.size(), dtype=spm.dtype()) if wgt is None else wgt
-    ripples, ripple_size = torch.ops.thgsp.computing_sets(rowptr, col, wgt, T, mu, p_hops)
+    ripples, ripple_size = torch.ops.thgsp.computing_sets(
+        rowptr, col, wgt, T, mu, p_hops
+    )
     return ripples, ripple_size
 
 
@@ -27,12 +29,20 @@ def greedy_sampling(spm, K, T, mu=0.01, p_hops=12):
 def greedy_gda_sampling(spm, K, T, mu=0.01, p_hops=12):
     rowptr, col, wgt = spm.csr()
     wgt = col.new_ones(col.size(), dtype=spm.dtype()) if wgt is None else wgt
-    selected_pebbles, vf = torch.ops.thgsp.greedy_gda_sampling(rowptr, col, wgt, K, T, mu, p_hops)
+    selected_pebbles, vf = torch.ops.thgsp.greedy_gda_sampling(
+        rowptr, col, wgt, K, T, mu, p_hops
+    )
     return selected_pebbles, vf
 
 
-def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_hops: int = 12,
-          boost=True) -> Tuple[List, float]:
+def bsgda(
+    spm: SparseTensor,
+    K: int,
+    mu: float = 0.01,
+    epsilon: float = 1e-5,
+    p_hops: int = 12,
+    boost=True,
+) -> Tuple[List, float]:
     r"""
     A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.
 
@@ -64,28 +74,30 @@ def bsgda(spm: SparseTensor, K: int, mu: float = 0.01, epsilon: float = 1e-5, p_
     """
     assert K >= 1
     if not spm.has_value():
-        spm = spm.fill_value(1.)
+        spm = spm.fill_value(1.0)
     adj = spm.to("cpu")
-    left = 0.
-    right = 1.
-    T = (left + right) / 2.
+    left = 0.0
+    right = 1.0
+    T = (left + right) / 2.0
     flag = False
     greedy_func = greedy_gda_sampling if boost else greedy_sampling
     while abs(right - left) > epsilon:
         _, vf = greedy_func(adj, K, T, mu, p_hops)
         if vf:
             left = T
-            T = (right + left) / 2.
+            T = (right + left) / 2.0
             flag = True
         else:
             right = T
-            T = (right + left) / 2.
+            T = (right + left) / 2.0
 
         if right < left:
             raise RuntimeError("Binary search error")
 
     if not flag:
-        warnings.warn("epsilon(the precision of BS) is set too large, sub-optimal lower bound is output.")
+        warnings.warn(
+            "epsilon(the precision of BS) is set too large, sub-optimal lower bound is output."
+        )
 
     sampled_nodes, _ = greedy_gda_sampling(adj, K, T, mu, p_hops)
     return sampled_nodes, left
@@ -98,7 +110,9 @@ def recon_bsgda(y, S, L: SparseTensor, mu: float = 0.01, reg_order: int = 1, **k
     if y.ndim == 1:
         y = y.view(-1, 1)
     if y.shape[0] != M:
-        raise RuntimeError(f"y is expected to have a shape ({M},num_signal) or ({M},), not {y.shape}")
+        raise RuntimeError(
+            f"y is expected to have a shape ({M},num_signal) or ({M},), not {y.shape}"
+        )
 
     dt, dv, density, on_gpu = get_ddd(L)
     xp, xcipy, xsplin = get_array_module(on_gpu)

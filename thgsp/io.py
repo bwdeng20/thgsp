@@ -19,8 +19,8 @@ def loadmat(path):
         values.
     """
     try:
-        data = pkgutil.get_data('thgsp', 'datasets/data/' + path + '.mat')
+        data = pkgutil.get_data("thgsp", "datasets/data/" + path + ".mat")
     except FileNotFoundError:
-        data = open(path, 'rb').read()
+        data = open(path, "rb").read()
     data = io.BytesIO(data)
     return scipy.io.loadmat(data)

@@ -9,7 +9,7 @@ from thgsp.utils import matrix_power, absv
 from thgsp.convert import to_xcipy, get_array_module
 
 
-def fastgsss(G: GraphBase, M, bandwidth, nu=75., cheby=True, order=12, verbose=False):
+def fastgsss(G: GraphBase, M, bandwidth, nu=75.0, cheby=True, order=12, verbose=False):
     """
     FastGSSS proposed in [4]_ .
 
@@ -63,9 +63,11 @@ def fastgsss(G: GraphBase, M, bandwidth, nu=75., cheby=True, order=12, verbose=F
         T_g_tmp = SparseTensor.from_dense(T_g_tmp.abs_())
 
     else:
-        heat_krn = partial(heat_kernel, tau=nu * pe * ps * pf / 2.)
-        coeff = cheby_coeff(heat_krn, order, dtype=dtype, device=device)  # cpu coefficient
-        T = cheby_op_basis(G.L("sym"), coeff.squeeze_(), lam_max=2., return_ts=True)
+        heat_krn = partial(heat_kernel, tau=nu * pe * ps * pf / 2.0)
+        coeff = cheby_coeff(
+            heat_krn, order, dtype=dtype, device=device
+        )  # cpu coefficient
+        T = cheby_op_basis(G.L("sym"), coeff.squeeze_(), lam_max=2.0, return_ts=True)
         T_g_tmp = absv(T)
 
     S = []
@@ -74,7 +76,9 @@ def fastgsss(G: GraphBase, M, bandwidth, nu=75., cheby=True, order=12, verbose=F
     selected = torch.argmax(T_g).item()
     S.append(selected)
 
-    with tqdm(total=M, initial=1, desc="Ed-free Sampling nodes", disable=not verbose) as pbar:
+    with tqdm(
+        total=M, initial=1, desc="Ed-free Sampling nodes", disable=not verbose
+    ) as pbar:
         for _ in range(1, M):
             Ts = T_g_tmp[:, S].sum(1)
             W = Ts.mean() - Ts

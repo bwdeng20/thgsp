@@ -7,10 +7,11 @@ from thgsp.utils import consecutive_spmv
 
 def ess_sampling(operator, M, k=2):
     r"""
-        This function has the same functionality as :func:`ess` but directly computes the matrix power of specific
-        variation operator, e.g., normalized Laplacian.
+    This function has the same functionality as :func:`ess` but directly computes the matrix power of specific
+    variation operator, e.g., normalized Laplacian.
     """
     import scipy.sparse.linalg as splin
+
     # add GPU support after cp.setdiff1d is implemented
     # dt, dv, density, on_gpu = get_ddd(operator)
     # xp, xcipy, xsplin = get_array_module(on_gpu)

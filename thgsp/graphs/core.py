@@ -9,7 +9,14 @@ from .laplace import laplace
 
 
 class GraphBase(SparseTensor):
-    def __init__(self, adjacency, coords: Optional[torch.Tensor] = None, cache=True, requires_grad=False, **kwargs):
+    def __init__(
+        self,
+        adjacency,
+        coords: Optional[torch.Tensor] = None,
+        cache=True,
+        requires_grad=False,
+        **kwargs
+    ):
 
         try:  # torch.Tensor, np.ndarray, scipy.spmatrix
             M, N = adjacency.shape
@@ -27,8 +34,14 @@ class GraphBase(SparseTensor):
         adj = to_torch_sparse(adjacency)
         row, col, value = adj.coo()
         rowptr, _, _ = adj.csr()
-        super(GraphBase, self).__init__(row=row, rowptr=rowptr, col=col, value=value, sparse_sizes=(N, N),
-                                        is_sorted=True)
+        super(GraphBase, self).__init__(
+            row=row,
+            rowptr=rowptr,
+            col=col,
+            value=value,
+            sparse_sizes=(N, N),
+            is_sorted=True,
+        )
         self.requires_grad_(requires_grad)
 
         self.extra = kwargs
@@ -41,8 +54,13 @@ class GraphBase(SparseTensor):
 
     def to(self, *args, **kwargs):
         new_spm = super(GraphBase, self).to(*args, **kwargs)
-        new_instance = self.__class__(new_spm, coords=self.coords, cache=self.cache, requires_grad=self.requires_grad(),
-                                      **self.extra)
+        new_instance = self.__class__(
+            new_spm,
+            coords=self.coords,
+            cache=self.cache,
+            requires_grad=self.requires_grad(),
+            **self.extra
+        )
         new_instance._lap_type = self._lap_type
         new_instance._L = None if self._L is None else self._L.to(*args, **kwargs)
         new_instance._fs = None if self._fs is None else self._fs.to(*args, **kwargs)
@@ -52,9 +70,14 @@ class GraphBase(SparseTensor):
     def to_spm(self, *args, **kwargs):
         row, col, value = self.coo()
         rowptr = self.storage.rowptr()
-        adj = SparseTensor(row=row.clone(), rowptr=rowptr.clone(), col=col.clone(), value=value.clone(),
-                           sparse_sizes=(self._n_node, self._n_node),
-                           is_sorted=True)
+        adj = SparseTensor(
+            row=row.clone(),
+            rowptr=rowptr.clone(),
+            col=col.clone(),
+            value=value.clone(),
+            sparse_sizes=(self._n_node, self._n_node),
+            is_sorted=True,
+        )
         adj = adj.to(*args, **kwargs)
         return adj
 
@@ -125,7 +148,9 @@ class GraphBase(SparseTensor):
         if self._max_fs is not None:
             max_fs = self._max_fs
         else:
-            max_fs = torch.lobpcg(lap.to_torch_sparse_coo_tensor(), k=1, largest=True)[0].item()
+            max_fs = torch.lobpcg(lap.to_torch_sparse_coo_tensor(), k=1, largest=True)[
+                0
+            ].item()
             if self.cache:
                 self._max_fs = max_fs
         return max_fs
@@ -158,8 +183,7 @@ class GraphBase(SparseTensor):
         elif type(nxg) == nx.Graph:
             tor_type = Graph
         else:
-            raise TypeError(
-                "{} not supported in thgsp at present".format(type(nxg)))
+            raise TypeError("{} not supported in thgsp at present".format(type(nxg)))
 
         n_node = nxg.number_of_nodes()
         # <class 'scipy.sparse.csr.csr_matrix'>
@@ -172,19 +196,25 @@ class GraphBase(SparseTensor):
         else:
             graph_type = nx.Graph
 
-        sci_spm = self.to_scipy(layout='csr')
+        sci_spm = self.to_scipy(layout="csr")
         nxg = nx.from_scipy_sparse_matrix(sci_spm, create_using=graph_type)
         return nxg
 
 
 class Graph(GraphBase):
-    def __init__(self, adjacency,
-                 coords: Optional[torch.Tensor] = None,
-                 cache=False, requires_grad=False, copy=True, **kwargs):
+    def __init__(
+        self,
+        adjacency,
+        coords: Optional[torch.Tensor] = None,
+        cache=False,
+        requires_grad=False,
+        copy=True,
+        **kwargs
+    ):
         if isinstance(adjacency, Graph):
             adj = adjacency.clone().detach_() if copy else adjacency
         else:
-            adj = to_torch_sparse(adjacency).to_symmetric(reduce='mean')
+            adj = to_torch_sparse(adjacency).to_symmetric(reduce="mean")
         super(Graph, self).__init__(adj, coords, cache, requires_grad, **kwargs)
         self._is_directed = False
 
@@ -204,9 +234,15 @@ class Graph(GraphBase):
 
 
 class DiGraph(GraphBase):
-    def __init__(self, adjacency,
-                 coords: Optional[torch.Tensor] = None,
-                 cache=False, requires_grad=False, copy=True, **kwargs):
+    def __init__(
+        self,
+        adjacency,
+        coords: Optional[torch.Tensor] = None,
+        cache=False,
+        requires_grad=False,
+        copy=True,
+        **kwargs
+    ):
         adj = adjacency.clone().detach_() if copy else adjacency
         super(DiGraph, self).__init__(adj, coords, cache, requires_grad, **kwargs)
         self._is_directed = True

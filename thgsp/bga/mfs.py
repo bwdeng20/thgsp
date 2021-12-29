@@ -3,15 +3,22 @@ from typing import List, Tuple
 from scipy.sparse import lil_matrix, eye
 from scipy.sparse.csgraph import structural_rank, breadth_first_order
 from scipy.sparse.linalg import inv
-from sksparse.cholmod import cholesky
 from torch_sparse import SparseTensor
 
 from thgsp.alg import dsatur
-from .utils import laplace, bipartite_mask, np
+from thgsp.utils import sparse_xcipy_logdet
+from ._utils import laplace, bipartite_mask, np
 
 
-def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, priority=True, verbose=False) \
-        -> Tuple[List[lil_matrix], np.ndarray]:
+def amfs(
+    A: SparseTensor,
+    Sigma=None,
+    level=None,
+    delta=0.1,
+    thresh_kld=1e-6,
+    priority=True,
+    verbose=False,
+) -> Tuple[List[lil_matrix], np.ndarray]:
     r"""
     AMFS bipartite approximation for graph  wavelet signal processing [3]_.
 
@@ -49,7 +56,7 @@ def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, pr
 
     N = A.size(-1)
     # compute_sigma consists of laplace matrix which prefers "coo"
-    A = A.to_scipy(layout='coo').astype("d")
+    A = A.to_scipy(layout="coo").astype("d")
     if Sigma is None:
         Sigma = compute_sigma(A, delta)
     else:
@@ -64,7 +71,10 @@ def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, pr
     for i in range(level):
         if verbose:
             print(
-                "\n|----------------------decomposition in level: {:4d} ------------------------|".format(i))
+                "\n|----------------------decomposition in level: {:4d} ------------------------|".format(
+                    i
+                )
+            )
         s1, s2 = amfs1level(A, Sigma, delta, thresh_kld, priority, verbose)
         bt = beta[:, i]
         bt[s1] = 1  # set s1 True
@@ -74,7 +84,14 @@ def amfs(A: SparseTensor, Sigma=None, level=None, delta=0.1, thresh_kld=1e-6, pr
     return bptG, beta
 
 
-def amfs1level(W: lil_matrix, Sigma: lil_matrix = None, delta=0.1, thresh_kld=1e-6, priority=True, verbose=True):
+def amfs1level(
+    W: lil_matrix,
+    Sigma: lil_matrix = None,
+    delta=0.1,
+    thresh_kld=1e-6,
+    priority=True,
+    verbose=True,
+):
     if Sigma is None:
         Sigma = compute_sigma(W, delta)
     N = W.shape[-1]
@@ -88,7 +105,8 @@ def amfs1level(W: lil_matrix, Sigma: lil_matrix = None, delta=0.1, thresh_kld=1e
     while len(not_arrived) > 0:
         new_root = not_arrived[0]
         other_nodes = breadth_first_order(
-            W, i_start=new_root, return_predecessors=False)
+            W, i_start=new_root, return_predecessors=False
+        )
         not_arrived = np.setdiff1d(not_arrived, other_nodes)
         s1.append(new_root)
         nodes = np.append(nodes, other_nodes[1:])
@@ -96,7 +114,7 @@ def amfs1level(W: lil_matrix, Sigma: lil_matrix = None, delta=0.1, thresh_kld=1e
     balance_flag = True
     for i, v in enumerate(nodes):
         if verbose:
-            print("handling {:5d}-th node: {:5d}, ".format(i, v), end='')
+            print("handling {:5d}-th node: {:5d}, ".format(i, v), end="")
         N1 = len(s1)
         s = [*s1, v, *s2]
         W_local = W[np.ix_(s, s)]
@@ -105,8 +123,8 @@ def amfs1level(W: lil_matrix, Sigma: lil_matrix = None, delta=0.1, thresh_kld=1e
         Wb2 = W_local.copy()
         Wb2[:N1, :N1] = 0
         Wb2[N1:, N1:] = 0
-        Wb1[:N1 + 1, :N1 + 1] = 0
-        Wb1[N1 + 1:, N1 + 1:] = 0
+        Wb1[: N1 + 1, : N1 + 1] = 0
+        Wb1[N1 + 1 :, N1 + 1 :] = 0
         if priority:  # KLD holds priority
             S_local = Sigma[np.ix_(s, s)]
             DK1 = dkl(Wb1, S_local, delta)
@@ -159,18 +177,19 @@ def amfs1level(W: lil_matrix, Sigma: lil_matrix = None, delta=0.1, thresh_kld=1e
 def dkl(Wb: lil_matrix, Sigma, delta: float):
     N = Wb.shape[-1]
     Lb = laplace(Wb, lap_type="comb").tocsc()  # coo -> csc
-    temp = Lb + delta * eye(N, dtype=Lb.dtype, format='csc')
+    temp = Lb + delta * eye(N, dtype=Lb.dtype, format="csc")
+    detemp = sparse_xcipy_logdet(temp)
     try:
-        dk = (Lb @ Sigma).diagonal().sum() - \
-            cholesky(temp).logdet()  # cholesky prefers `csc`
+        dk = (Lb @ Sigma).diagonal().sum() - detemp  # cholesky prefers `csc`
     except Exception as err:
         raise err
     return dk
 
 
 def compute_sigma(A, delta, precision_mat=False) -> lil_matrix:
-    Sigma_inv = laplace(A, lap_type="comb").tocsc() + \
-        delta * eye(A.shape[-1], dtype=A.dtype, format='csc')
+    Sigma_inv = laplace(A, lap_type="comb").tocsc() + delta * eye(
+        A.shape[-1], dtype=A.dtype, format="csc"
+    )
     if precision_mat:
         return Sigma_inv
     Sigma = inv(Sigma_inv)  # csc more efficient

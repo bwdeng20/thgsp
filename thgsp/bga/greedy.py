@@ -1,4 +1,4 @@
-from .utils import is_bipartite_fix
+from ._utils import is_bipartite_fix
 
 
 def greedy_bga(A, iterations=5, verbose=False):
@@ -6,7 +6,7 @@ def greedy_bga(A, iterations=5, verbose=False):
     if flag:
         return A, vtx_color
     best_B = None
-    thresh = float('inf')
+    thresh = float("inf")
     for i in range(iterations):
         flag, vtx_color, Br = is_bipartite_fix(A, fix_flag=True)
         err = (A - Br).power(2).sum()

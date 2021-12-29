@@ -19,7 +19,7 @@ def is_bipartite(adj):
             vtx2reach.remove(cur_node)
             if vtx_color[cur_node] == -1:
                 vtx_color[cur_node] = 0
-            nbr = col[ptr[cur_node]: ptr[cur_node + 1]]
+            nbr = col[ptr[cur_node] : ptr[cur_node + 1]]
             for i in nbr:
                 if vtx_color[i] == -1:
                     vtx_color[i] = 1 - vtx_color[cur_node]

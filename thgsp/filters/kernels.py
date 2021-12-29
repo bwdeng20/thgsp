@@ -8,10 +8,13 @@ from scipy.special import comb
 
 # Utils
 def get_kernel_name(kernel_array, identation=False):
-    get_name = np.vectorize(lambda f: '_'.join(f.__name__.split('_')[
-                                               :-1]) if '_' in f.__name__ else f.__name__)
+    get_name = np.vectorize(
+        lambda f: "_".join(f.__name__.split("_")[:-1])
+        if "_" in f.__name__
+        else f.__name__
+    )
     info = get_name(kernel_array)
-    return "\t" + str(info).replace('\n', '\n\t') if identation else str(info)
+    return "\t" + str(info).replace("\n", "\n\t") if identation else str(info)
 
 
 def get_kernel_id(kernel_array):
@@ -59,7 +62,7 @@ def meyer_kernel(x):
 
 
 def meyer_mirror_kernel(x):
-    return meyer_kernel(2. - x)
+    return meyer_kernel(2.0 - x)
 
 
 def design_p(K):
@@ -97,12 +100,12 @@ def design_p(K):
     c1 = comb(Ns, np.arange(K + 1))  # float64 on x86-64
     A = np.zeros((2 * K, K))
     for i in range(K):
-        A[i:i + K + 1, i] = c1
+        A[i : i + K + 1, i] = c1
     # due to the expansion of (1-k)^K which includes (-1)^K for all odd degree terms
     A[:, 1::2] = -A[:, 1::2]
     A_even = A[::2]
     c_p_even = np.zeros(K)
-    c_p_even[0] = 1.
+    c_p_even[0] = 1.0
     r = np.linalg.solve(A_even, c_p_even)  # 0, 1, ..., K-1 order
     zeros_of_Rl = np.roots(np.flip(r))
     idx = np.argsort(abs(zeros_of_Rl.imag))
@@ -178,7 +181,7 @@ def design_biorth_kernel(k):
 
     h0_best = np.zeros(K + 1)  # K, K-1, ..., 3, 2, 1, 0 order
     g0_best = np.zeros(K)  # K-1, ..., 0
-    theta_best = 0.
+    theta_best = 0.0
 
     for one_fac in all_fac:
         idx4h0_pair = np.array(one_fac) * 2
@@ -207,5 +210,5 @@ def design_biorth_kernel(k):
     return h0_c, g0_c, theta_best
 
 
-def heat_kernel(x, tau=10.):
+def heat_kernel(x, tau=10.0):
     return torch.exp(-tau * x)

@@ -10,7 +10,9 @@ import plotly.express as px
 
 def fast_interpolate(x, num_sample=50):
     dx = (x[1:] - x[:-1]) / (num_sample - 1)
-    xall = dx.reshape(-1, 1) * np.arange(num_sample - 1) + x[:-1].reshape(-1, 1)  # len(x)-1 x num_segment
+    xall = dx.reshape(-1, 1) * np.arange(num_sample - 1) + x[:-1].reshape(
+        -1, 1
+    )  # len(x)-1 x num_segment
     xall = np.append(xall.reshape(-1), x[-1])  # the last point
     return xall
 
@@ -18,7 +20,9 @@ def fast_interpolate(x, num_sample=50):
 class Y2:
     def __init__(self, y1points, y2points):
         if len(y1points) != len(y2points):
-            raise RuntimeError("The numbers of calibration points from two y-axes don't equal")
+            raise RuntimeError(
+                "The numbers of calibration points from two y-axes don't equal"
+            )
         length1 = y1points[1] - y1points[0]
         length2 = y2points[1] - y2points[0]
         self.scale_ratio21 = length2 / length1
@@ -68,11 +72,14 @@ def band_index2boundary(band_indices, ylimits, spectral_spacing):
             split_lines.append(None)
             continue
         first_of_this_band = band[0]
-        spectral_split = (spectral_spacing[first_of_this_band] + last_basis_of_previous_band) / 2
+        spectral_split = (
+            spectral_spacing[first_of_this_band] + last_basis_of_previous_band
+        ) / 2
         split_lines.append(spectral_split)  # record the left split line of i-th band
         last_basis_of_previous_band = spectral_spacing[band[-1]]
-    spectral_split = last_basis_of_previous_band + (
-            ylimits[-1] - last_basis_of_previous_band) / 2  # separate the last band and maximum left y
+    spectral_split = (
+        last_basis_of_previous_band + (ylimits[-1] - last_basis_of_previous_band) / 2
+    )  # separate the last band and maximum left y
     split_lines.append(spectral_split)
     return split_lines
 
@@ -83,9 +90,17 @@ def band_bound2y(split_lines, band, axis_translator=None):
     for i in range(len(band)):
         if split_lines[i] is None:
             continue
-        low_split = split_lines[i] if axis_translator is None else axis_translator.y1toy2(split_lines[i])
-        high_split = next((x for x in iter(split_lines[i + 1:]) if x))
-        high_split = high_split if axis_translator is None else axis_translator.y1toy2(high_split)
+        low_split = (
+            split_lines[i]
+            if axis_translator is None
+            else axis_translator.y1toy2(split_lines[i])
+        )
+        high_split = next((x for x in iter(split_lines[i + 1 :]) if x))
+        high_split = (
+            high_split
+            if axis_translator is None
+            else axis_translator.y1toy2(high_split)
+        )
         y_low_split = [low_split, low_split, band[i][0], band[i][0]]
         y_high_split = [high_split, high_split, band[i][1], band[i][1]]
         low_lines.append(y_low_split)
@@ -110,15 +125,34 @@ def plot_basis(x, y, spectral_spacing, num=150, size=None):
         yall = fast_interpolate(basis, num)
         series_color = np.abs(yall)
         max_scale = series_color.max()
-        basis = go.Scatter(x=xall, y=yall + spectral_spacing[el], mode='markers+lines',
-                           marker=dict(color=series_color + max_scale / 4, colorscale='greys', size=size,
-                                       cmax=max_scale, cmin=0),
-                           showlegend=False, line=dict(color="lightgrey"), hoverinfo='skip')
+        basis = go.Scatter(
+            x=xall,
+            y=yall + spectral_spacing[el],
+            mode="markers+lines",
+            marker=dict(
+                color=series_color + max_scale / 4,
+                colorscale="greys",
+                size=size,
+                cmax=max_scale,
+                cmin=0,
+            ),
+            showlegend=False,
+            line=dict(color="lightgrey"),
+            hoverinfo="skip",
+        )
         bases.append(basis)
     return bases
 
 
-def plot_dots(x, all_series, spectral_spacing, threshold, labels=None, highlight_entry=None, size=None):
+def plot_dots(
+    x,
+    all_series,
+    spectral_spacing,
+    threshold,
+    labels=None,
+    highlight_entry=None,
+    size=None,
+):
     if all_series.ndim == 1:
         all_series = all_series[None, ...]  # (N) ->(1,N)
     if labels is None:
@@ -131,33 +165,62 @@ def plot_dots(x, all_series, spectral_spacing, threshold, labels=None, highlight
 
     mask = np.abs(all_series) > threshold
     if np.sum(mask) == 0:
-        raise RuntimeError("Please choose a smaller threshold such that at least one point is shown")
+        raise RuntimeError(
+            "Please choose a smaller threshold such that at least one point is shown"
+        )
     alldots = []
     highlights = []
     for el, series in enumerate(all_series):
         x2show = x[mask[el]]
         y2show = series[mask[el]]
         labels2show = labels[mask[el]]
-        dots = go.Scatter(x=x2show, y=y2show + spectral_spacing[el],
-                          mode='markers', marker=dict(color='black', size=size),
-                          showlegend=False, name=f"{el}-th basis",
-                          text=[f'node {label} [{y2show[i]:.3f}]' for i, label in enumerate(labels2show)],
-                          hovertemplate="%{text}<br>" + "embed: %{x:.2f}<br>")
+        dots = go.Scatter(
+            x=x2show,
+            y=y2show + spectral_spacing[el],
+            mode="markers",
+            marker=dict(color="black", size=size),
+            showlegend=False,
+            name=f"{el}-th basis",
+            text=[
+                f"node {label} [{y2show[i]:.3f}]" for i, label in enumerate(labels2show)
+            ],
+            hovertemplate="%{text}<br>" + "embed: %{x:.2f}<br>",
+        )
         if highlight_entry is not None:
             lth_sampled = highlight_entry[el].nonzero()[1]
-            highlight = go.Scatter(x=x[lth_sampled], y=series[lth_sampled] + spectral_spacing[el],
-                                   mode="markers", marker=dict(color='red', size=size * 1.8, symbol='circle-open'),
-                                   showlegend=False, name=f"{el}-th sampled node",
-                                   text=[f'node {labels[lth_sampled]}', ],
-                                   hovertemplate="%{text}<br>" + "embed: %{x:.2f}<br>")
+            highlight = go.Scatter(
+                x=x[lth_sampled],
+                y=series[lth_sampled] + spectral_spacing[el],
+                mode="markers",
+                marker=dict(color="red", size=size * 1.8, symbol="circle-open"),
+                showlegend=False,
+                name=f"{el}-th sampled node",
+                text=[
+                    f"node {labels[lth_sampled]}",
+                ],
+                hovertemplate="%{text}<br>" + "embed: %{x:.2f}<br>",
+            )
             highlights.append(highlight)
         alldots.append(dots)
     return alldots, highlights
 
 
-def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, cluster=None,
-                   embedding=None, amplitude_scale=1.5, amplitude_norm="max_abs", epsilon_support=0.05,
-                   support_scatter_size=3, bands=None, bands_colors=None, bands_opacity=0.1, verbose=True):
+def show_transform(
+    G: GraphBase,
+    transform_matrix,
+    fs,
+    highlight_entry=None,
+    cluster=None,
+    embedding=None,
+    amplitude_scale=1.5,
+    amplitude_norm="max_abs",
+    epsilon_support=0.05,
+    support_scatter_size=3,
+    bands=None,
+    bands_colors=None,
+    bands_opacity=0.1,
+    verbose=True,
+):
     assert amplitude_norm in ("max_abs", "l2", "overall_max_abs")
     transform_matrix = to_np(transform_matrix)
     M, N = transform_matrix.shape
@@ -166,7 +229,9 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
 
     if highlight_entry is not None:  # highlight entry
         if highlight_entry.shape != (M, N):
-            raise RuntimeError(f" 'highlight_entry' should have the same size with 'transform_matrix'")
+            raise RuntimeError(
+                f" 'highlight_entry' should have the same size with 'transform_matrix'"
+            )
 
     vecs = None
     vals = None
@@ -178,7 +243,9 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
         assert cluster > 1
         num_clusters = cluster
         if verbose:
-            print("Clustering the nodes with applying K-means on many eigenvectors of random walk Laplacian ...")
+            print(
+                "Clustering the nodes with applying K-means on many eigenvectors of random walk Laplacian ..."
+            )
         vals, vecs = compute_eigen_of_rw(G, cluster + 1)
         kmeans = KMeans(n_clusters=cluster).fit(vecs)
         if verbose:
@@ -218,7 +285,9 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
                 len_i = cluster_mask.sum()
 
                 new_order_assigned = np.zeros(len_i, dtype=int)
-                new_order_assigned[np.argsort(raw_order_i)] = np.arange(len_i) + num_processed_nodes
+                new_order_assigned[np.argsort(raw_order_i)] = (
+                    np.arange(len_i) + num_processed_nodes
+                )
 
                 vertex_ordering_wrt_clusters[cluster_mask] = new_order_assigned
                 num_processed_nodes += len_i
@@ -246,7 +315,9 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
         cluster_boundaries = np.zeros(num_clusters + 1)
         cluster_boundaries[[0, -1]] = np.min(embedding), np.max(embedding)
         jump2nodes = jump_nodes + 1
-        split_interval = np.stack((embedding_ordered[jump_nodes], embedding_ordered[jump2nodes + 1]))
+        split_interval = np.stack(
+            (embedding_ordered[jump_nodes], embedding_ordered[jump2nodes + 1])
+        )
         cluster_boundaries[1:-1] = np.mean(split_interval, axis=0)
 
     # Frequencies y axis coordinates
@@ -257,9 +328,13 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
         if bands.ndim == 1:
             bands = np.hstack([bands[:-1, None], bands[1:, None]])
         assert bands.ndim == 2 and bands.shape[-1] == 2  # num_band, 2
-        bands_colors = px.colors.qualitative.Safe if bands_colors is None else bands_colors
+        bands_colors = (
+            px.colors.qualitative.Safe if bands_colors is None else bands_colors
+        )
         if len(bands_colors) < 3:
-            raise RuntimeError(f"`bands_colors({len(bands_colors)})` is not enough !');")
+            raise RuntimeError(
+                f"`bands_colors({len(bands_colors)})` is not enough !');"
+            )
 
     # Modes scaling
     modes = transform_matrix  # each row is a basis vector(different from that in grasp)
@@ -270,45 +345,78 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
     elif amplitude_norm == "overall_max_abs":
         modes = modes / np.abs(modes).max()
     else:
-        raise TypeError(f"amplitude normalization strategy{amplitude_norm} is invalid or not supported at present")
+        raise TypeError(
+            f"amplitude normalization strategy{amplitude_norm} is invalid or not supported at present"
+        )
     modes_ordered = modes[:, emd_order]
 
     # ---> Plot
     fig = go.Figure()
-    cur_amplitude_scale = amplitude_scale * (spectral_spacing[-1] - spectral_spacing[0]) / M
+    cur_amplitude_scale = (
+        amplitude_scale * (spectral_spacing[-1] - spectral_spacing[0]) / M
+    )
     cur_curve_scale = cur_amplitude_scale / 2
     all_series = cur_curve_scale * modes_ordered
 
     xlim = embedding_ordered[[0, -1]]
     xlim = xlim + (xlim[-1] - xlim[0]) / 100 * np.array([-1, 1])
     # Add Horizontals and vericals
-    horizontals = [go.Scatter(x=xlim, y=[i, i], mode="lines",
-                              line=dict(color='lightgrey', width=support_scatter_size / 2), hoverinfo='skip') for i in
-                   spectral_spacing]
+    horizontals = [
+        go.Scatter(
+            x=xlim,
+            y=[i, i],
+            mode="lines",
+            line=dict(color="lightgrey", width=support_scatter_size / 2),
+            hoverinfo="skip",
+        )
+        for i in spectral_spacing
+    ]
     fig.add_traces(horizontals)
 
     yleftlimits = spectral_spacing[[0, -1]] + cur_amplitude_scale * np.array([-1, 1])
-    verticals = [go.Scatter(x=[j, j], y=yleftlimits, mode="lines", hoverinfo='skip',
-                            line=dict(color='lightgrey', width=support_scatter_size / 2)) for j in embedding_ordered]
+    verticals = [
+        go.Scatter(
+            x=[j, j],
+            y=yleftlimits,
+            mode="lines",
+            hoverinfo="skip",
+            line=dict(color="lightgrey", width=support_scatter_size / 2),
+        )
+        for j in embedding_ordered
+    ]
     fig.add_traces(verticals)
 
     # plot basis vectors
-    bases = plot_basis(embedding_ordered, all_series, spectral_spacing, size=support_scatter_size / 2)
+    bases = plot_basis(
+        embedding_ordered, all_series, spectral_spacing, size=support_scatter_size / 2
+    )
     fig.add_traces(bases)
 
     # plot dots and highlight entries
-    dots, highs = plot_dots(embedding_ordered, all_series, spectral_spacing, threshold=epsilon_support,
-                            labels=emd_order,
-                            highlight_entry=highlight_entry[:, emd_order],
-                            size=support_scatter_size * 1.5)
+    dots, highs = plot_dots(
+        embedding_ordered,
+        all_series,
+        spectral_spacing,
+        threshold=epsilon_support,
+        labels=emd_order,
+        highlight_entry=highlight_entry[:, emd_order],
+        size=support_scatter_size * 1.5,
+    )
     fig.add_traces(dots)
     fig.add_traces(highs)
 
     # plot cluster boundaries
     if cluster_boundaries is not None:
-        clusters = [go.Scatter(x=[j, j], y=yleftlimits, mode="lines", hoverinfo='skip',
-                               line=dict(color='black', width=support_scatter_size * 1.5)) for j in
-                    cluster_boundaries[1:-1]]
+        clusters = [
+            go.Scatter(
+                x=[j, j],
+                y=yleftlimits,
+                mode="lines",
+                hoverinfo="skip",
+                line=dict(color="black", width=support_scatter_size * 1.5),
+            )
+            for j in cluster_boundaries[1:-1]
+        ]
         fig.add_traces(clusters)
 
     translator = Y2(spectral_spacing[[0, -1]], fs[[0, -1]])
@@ -328,31 +436,66 @@ def show_transform(G: GraphBase, transform_matrix, fs, highlight_entry=None, clu
             color = "rgba" + color[3:-1] + f",{bands_opacity})"
             if low is None:
                 continue
-            low_line = go.Scatter(x=x_split, y=low, line=dict(color=color, width=0.001), name=f"{i}-th band",
-                                  yaxis="y2", mode='lines')
+            low_line = go.Scatter(
+                x=x_split,
+                y=low,
+                line=dict(color=color, width=0.001),
+                name=f"{i}-th band",
+                yaxis="y2",
+                mode="lines",
+            )
 
-            high_line = go.Scatter(x=x_split, y=high_lines[i], fill='tonexty', fillcolor=color, name=f"{i}-th band",
-                                   yaxis="y2", mode='lines', line=dict(color=color),
-                                   hovertemplate="%{y:.4f}<br>")
+            high_line = go.Scatter(
+                x=x_split,
+                y=high_lines[i],
+                fill="tonexty",
+                fillcolor=color,
+                name=f"{i}-th band",
+                yaxis="y2",
+                mode="lines",
+                line=dict(color=color),
+                hovertemplate="%{y:.4f}<br>",
+            )
 
             fig.add_trace(low_line)
             fig.add_trace(high_line)
 
     # plot frequencies
     spectral_spacing_y_right = translator.y1toy2(spectral_spacing)
-    basis2fs = [go.Scatter(x=x_split[1:], y=[y, fs[i], fs[i]], mode="lines", yaxis='y2',
-                           line=dict(color='lightgrey', width=support_scatter_size / 2),
-                           name=f"{i}-th freq", hovertemplate="%{y}")
-                for i, y in
-                enumerate(spectral_spacing_y_right)]
+    basis2fs = [
+        go.Scatter(
+            x=x_split[1:],
+            y=[y, fs[i], fs[i]],
+            mode="lines",
+            yaxis="y2",
+            line=dict(color="lightgrey", width=support_scatter_size / 2),
+            name=f"{i}-th freq",
+            hovertemplate="%{y}",
+        )
+        for i, y in enumerate(spectral_spacing_y_right)
+    ]
 
     fig.add_traces(basis2fs)
 
-    fig.update_layout(showlegend=False, template="simple_white",
-                      xaxis=dict(mirror=True, ticks="inside", title_text="Vertex embedding", range=new_xlim),
-                      yaxis=dict(title_text=r"$\text{Graph Frequency index  }l$", range=yleftlimits, ticks="inside"),
-                      yaxis2=dict(title_text=r"$\text{Graph Frequency  }\lambda_l$", anchor="x", ticks="inside",
-                                  overlaying="y", range=translator.y1toy2(yleftlimits), side="right"),
-                      )
+    fig.update_layout(
+        showlegend=False,
+        template="simple_white",
+        xaxis=dict(
+            mirror=True, ticks="inside", title_text="Vertex embedding", range=new_xlim
+        ),
+        yaxis=dict(
+            title_text=r"$\text{Graph Frequency index  }l$",
+            range=yleftlimits,
+            ticks="inside",
+        ),
+        yaxis2=dict(
+            title_text=r"$\text{Graph Frequency  }\lambda_l$",
+            anchor="x",
+            ticks="inside",
+            overlaying="y",
+            range=translator.y1toy2(yleftlimits),
+            side="right",
+        ),
+    )
 
     return fig, embedding, cluster

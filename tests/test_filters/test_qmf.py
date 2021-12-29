@@ -2,15 +2,30 @@ import pytest
 import torch
 import numpy as np
 from torch_sparse import SparseTensor
-from ..utils4t import float_dtypes, devices, color_strategies, num_strategies, partition_strategy
-from thgsp.filters.qmf import QmfCore, BiorthCore, QmfOperator, BiorthOperator, NumQmf, ColorQmf, NumBiorth, ColorBiorth
+from ..utils4t import (
+    float_dtypes,
+    devices,
+    color_strategies,
+    num_strategies,
+    partition_strategy,
+)
+from thgsp.filters.qmf import (
+    QmfCore,
+    BiorthCore,
+    QmfOperator,
+    BiorthOperator,
+    NumQmf,
+    ColorQmf,
+    NumBiorth,
+    ColorBiorth,
+)
 from thgsp.filters.qmf import meyer_kernel, meyer_mirror_kernel, harary
 from thgsp.graphs.generators import rand_udg, rand_bipartite
 from thgsp.utils.metrics import snr
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
 class TestQmfCore:
     def test_init(self, device, dtype):
         M, N = 2, 7
@@ -22,8 +37,11 @@ class TestQmfCore:
         assert qmf.coefficient_a.shape == (M, 2 ** M, 1, K + 1)
         assert qmf.coefficient_a.shape == qmf.coefficient_s.shape
 
-        QmfCore(Bs, torch.as_tensor(beta_np), analyze_kernels=(
-            meyer_kernel, meyer_mirror_kernel))
+        QmfCore(
+            Bs,
+            torch.as_tensor(beta_np),
+            analyze_kernels=(meyer_kernel, meyer_mirror_kernel),
+        )
 
         qmf = QmfCore(Bs, beta_np, in_channels=3)
         # 20 is the default order of approximation
@@ -36,15 +54,22 @@ class TestQmfCore:
         beta = []
 
         bpg, bt = rand_bipartite(
-            N // 2, N - N // 2, p=0.2, dtype=dtype, device=device, return_partition=True)
+            N // 2, N - N // 2, p=0.2, dtype=dtype, device=device, return_partition=True
+        )
         Bs.append(bpg)
         beta.append(bt)
-        mask = (Bs[0].to_dense() != 0)
+        mask = Bs[0].to_dense() != 0
         for i in range(M - 1):
             bpg, bt = rand_bipartite(
-                N // 2, N - N // 2, p=0.2, dtype=dtype, device=device, return_partition=True)
+                N // 2,
+                N - N // 2,
+                p=0.2,
+                dtype=dtype,
+                device=device,
+                return_partition=True,
+            )
             dense = bpg.to_dense()
-            temp_mask = (dense != 0)
+            temp_mask = dense != 0
 
             dense[mask] = 0
             mask = temp_mask + mask
@@ -52,7 +77,7 @@ class TestQmfCore:
             if i % 2 == 0:
                 beta.append(bt)
             else:
-                beta.append(~ bt)
+                beta.append(~bt)
 
         beta = torch.stack(beta).T
 
@@ -70,17 +95,25 @@ class TestQmfCore:
         f_hat = z.sum(0)
         dis = (f_hat - x).abs()
         print("\nreconstruction SNR:    ", snr(f_hat, x))
-        print("max distortion among all nodes:  ", dis.max(),
-              " at {}-th node".format(dis.argmax()))
-        print("min distortion among all nodes:  ", dis.min(),
-              " at {}-th node".format(dis.argmin()))
+        print(
+            "max distortion among all nodes:  ",
+            dis.max(),
+            " at {}-th node".format(dis.argmax()),
+        )
+        print(
+            "min distortion among all nodes:  ",
+            dis.min(),
+            " at {}-th node".format(dis.argmin()),
+        )
         print("distortion sum                :  ", dis.sum())
-        print("|---------------------------------------------------------------------------------")
+        print(
+            "|---------------------------------------------------------------------------------"
+        )
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('strategy', color_strategies)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("strategy", color_strategies)
 class TestColorQmf:
     def test_init(self, dtype, device, strategy):
         N = 10
@@ -89,7 +122,7 @@ class TestColorQmf:
         ColorQmf(graph)
         ColorQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
 
-    @pytest.mark.parametrize('Ci', [5])
+    @pytest.mark.parametrize("Ci", [5])
     def test_transform(self, dtype, device, strategy, Ci):
         N = 60
         graph = rand_udg(N, device=device, dtype=dtype)
@@ -102,31 +135,40 @@ class TestColorQmf:
         f_hat = z.sum(0)
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f.squeeze_()).item()
-        print("\n----- Strategy: {:8s}, M={:4d}  Device: {:5s}, Dtype: {:6s} -----------".format(strategy, M,
-                                                                                                 str(
-                                                                                                     device),
-                                                                                                 str(dtype)))
+        print(
+            "\n----- Strategy: {:8s}, M={:4d}  Device: {:5s}, Dtype: {:6s} -----------".format(
+                strategy, M, str(device), str(dtype)
+            )
+        )
         print("|reconstruction SNR:    ", pf)
-        print("|max distortion among all nodes:  ", dis.max().item(),
-              " at {}-th node".format(dis.argmax()))
-        print("|min distortion among all nodes:  ", dis.min().item(),
-              " at {}-th node".format(dis.argmin()))
+        print(
+            "|max distortion among all nodes:  ",
+            dis.max().item(),
+            " at {}-th node".format(dis.argmax()),
+        )
+        print(
+            "|min distortion among all nodes:  ",
+            dis.min().item(),
+            " at {}-th node".format(dis.argmin()),
+        )
         print("|distortion sum                :  ", dis.sum().item())
-        print("---------------------------------------------------------------------------------")
+        print(
+            "---------------------------------------------------------------------------------"
+        )
         assert pf > 20
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('strategy', num_strategies)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("strategy", num_strategies)
 class TestNumQMf:
-    @pytest.mark.parametrize('N', [20, 100])
+    @pytest.mark.parametrize("N", [20, 100])
     def test_init(self, dtype, device, strategy, N):
         graph = rand_udg(N, dtype=dtype, device=device)
         NumQmf(graph)
         NumQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
 
-    @pytest.mark.parametrize('M', [1, 2])
+    @pytest.mark.parametrize("M", [1, 2])
     def test_transform(self, dtype, device, strategy, M):
         N = 32 * 3
         graph = rand_udg(N, device=device, dtype=dtype)
@@ -138,22 +180,31 @@ class TestNumQMf:
         f_hat = z.sum(0)
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f).item()
-        print("\n|------------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----------".format(strategy, M,
-                                                                                                      str(
-                                                                                                          device),
-                                                                                                      str(dtype)))
+        print(
+            "\n|------------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----------".format(
+                strategy, M, str(device), str(dtype)
+            )
+        )
         print("reconstruction SNR:  ", pf)
-        print("max distortion among all nodes:  ", dis.max(),
-              " at {}-th node".format(dis.argmax()))
-        print("min distortion among all nodes:  ", dis.min(),
-              " at {}-th node".format(dis.argmin()))
+        print(
+            "max distortion among all nodes:  ",
+            dis.max(),
+            " at {}-th node".format(dis.argmax()),
+        )
+        print(
+            "min distortion among all nodes:  ",
+            dis.min(),
+            " at {}-th node".format(dis.argmin()),
+        )
         print("distortion sum                :  ", dis.sum())
-        print("|---------------------------------------------------------------------------------")
+        print(
+            "|---------------------------------------------------------------------------------"
+        )
         assert pf > 20
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
 class TestBiorthCore:
     def test_init(self, dtype, device):
         M, N = 3, 7
@@ -166,8 +217,7 @@ class TestBiorthCore:
         assert bio.coefficient_a.shape == (M, 2 ** M, 1, K + 1)
         assert bio.coefficient_a.shape == bio.coefficient_s.shape
 
-        bio = BiorthCore(Bs, torch.as_tensor(beta_np),
-                         in_channels=3, zeroDC=True)
+        bio = BiorthCore(Bs, torch.as_tensor(beta_np), in_channels=3, zeroDC=True)
         # 16 is the default order of approximation
         assert bio.coefficient_a.shape == (M, 2 ** M, 3, 16 + 1)
 
@@ -187,9 +237,9 @@ class TestBiorthCore:
         assert (z.sum(0).squeeze() - x).abs().sum() != 0
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('strategy', color_strategies)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("strategy", color_strategies)
 class TestColorBiorth:
     def test_init(self, dtype, device, strategy):
         N = 12
@@ -211,37 +261,47 @@ class TestColorBiorth:
         f_hat = z.sum(0)
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f).item()
-        print("\n|----- Strategy: {:8s}, M:{:4d}  Device: {:5s}, Dtype: {:6s} -----------".format(strategy, M,
-                                                                                                  str(
-                                                                                                      device),
-                                                                                                  str(dtype)))
+        print(
+            "\n|----- Strategy: {:8s}, M:{:4d}  Device: {:5s}, Dtype: {:6s} -----------".format(
+                strategy, M, str(device), str(dtype)
+            )
+        )
         print("reconstruction SNR:    ", pf, " dB")
-        print("max distortion among all nodes:  ", dis.max(),
-              " at {}-th node".format(dis.argmax()))
-        print("min distortion among all nodes:  ", dis.min(),
-              " at {}-th node".format(dis.argmin()))
+        print(
+            "max distortion among all nodes:  ",
+            dis.max(),
+            " at {}-th node".format(dis.argmax()),
+        )
+        print(
+            "min distortion among all nodes:  ",
+            dis.min(),
+            " at {}-th node".format(dis.argmin()),
+        )
         print("distortion sum                :  ", dis.sum())
-        print("|---------------------------------------------------------------------------------")
+        print(
+            "|---------------------------------------------------------------------------------"
+        )
         assert pf > 20
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
-@pytest.mark.parametrize('strategy', num_strategies)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("strategy", num_strategies)
 class TestNumBiorth:
-    @pytest.mark.parametrize('N', [20, 100])
+    @pytest.mark.parametrize("N", [20, 100])
     def test_init(self, dtype, device, strategy, N):
         graph = rand_udg(N, dtype=dtype, device=device)
         NumBiorth(graph)
         NumBiorth(graph, in_channels=3, zeroDC=True, strategy=strategy)
 
-    @pytest.mark.parametrize('M', [1, 2])
-    @pytest.mark.parametrize('part', partition_strategy)
+    @pytest.mark.parametrize("M", [1, 2])
+    @pytest.mark.parametrize("part", partition_strategy)
     def test_transform(self, dtype, device, strategy, M, part):
-        print("\n|------------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----------".format(strategy, M,
-                                                                                                      str(
-                                                                                                          device),
-                                                                                                      str(dtype)))
+        print(
+            "\n|------------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----------".format(
+                strategy, M, str(device), str(dtype)
+            )
+        )
         kwargs = dict()
         if strategy == "admm":
             print("|admm-lbga part strategy: {}".format(part))
@@ -257,25 +317,33 @@ class TestNumBiorth:
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f).item()
         print("reconstruction SNR:  ", pf, " dB")
-        print("|max distortion among all nodes:  ", dis.max(),
-              " at {}-th node".format(dis.argmax()))
-        print("min distortion among all nodes:  ", dis.min(),
-              " at {}-th node".format(dis.argmin()))
+        print(
+            "|max distortion among all nodes:  ",
+            dis.max(),
+            " at {}-th node".format(dis.argmax()),
+        )
+        print(
+            "min distortion among all nodes:  ",
+            dis.min(),
+            " at {}-th node".format(dis.argmin()),
+        )
         print("distortion sum                :  ", dis.sum())
-        print("|---------------------------------------------------------------------------------")
+        print(
+            "|---------------------------------------------------------------------------------"
+        )
         assert pf > 20
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
 class TestQmfWaveletBasis:
     def test_one_level(self, dtype, device):
         N1 = 6
         N2 = 4
-        bptG, beta = rand_bipartite(
-            N1, N2, 0.5, dtype=dtype, return_partition=True)
-        basis = QmfOperator([bptG.to_scipy("csr")],
-                            beta.view(-1, 1), order=20, device=device)
+        bptG, beta = rand_bipartite(N1, N2, 0.5, dtype=dtype, return_partition=True)
+        basis = QmfOperator(
+            [bptG.to_scipy("csr")], beta.view(-1, 1), order=20, device=device
+        )
 
         x = torch.ones(N1 + N2, 1, dtype=dtype, device=device)
         y = basis.transform(x)
@@ -297,16 +365,16 @@ class TestQmfWaveletBasis:
         print("dis: ", (z - x).abs().sum())
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
-@pytest.mark.parametrize('device', devices)
+@pytest.mark.parametrize("dtype", float_dtypes)
+@pytest.mark.parametrize("device", devices)
 class TestBiorWaveletBasis:
     def test_one_level(self, dtype, device):
         N1 = 60
         N2 = 40
-        bptG, beta = rand_bipartite(
-            N1, N2, 0.2, dtype=dtype, return_partition=True)
-        basis = BiorthOperator([bptG.to_scipy("csr")],
-                               beta.view(-1, 1), k=2, device=device)
+        bptG, beta = rand_bipartite(N1, N2, 0.2, dtype=dtype, return_partition=True)
+        basis = BiorthOperator(
+            [bptG.to_scipy("csr")], beta.view(-1, 1), k=2, device=device
+        )
 
         x = torch.ones(N1 + N2, 1, dtype=dtype, device=device)
         y = basis.transform(x)

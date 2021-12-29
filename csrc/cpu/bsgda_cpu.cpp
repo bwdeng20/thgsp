@@ -10,9 +10,10 @@ inline void clear(std::queue<int64_t> &q) {
 }
 
 
-int64_t argmax(const unordered_map<int64_t, int64_t> &dict) {
+template<typename dtype>
+int64_t argmax(const unordered_map<int64_t, dtype> &dict) {
     int64_t idx_max = dict.begin()->first;
-    int64_t val_max = dict.begin()->second;
+    dtype val_max = dict.begin()->second;
     for (auto it : dict) {
         if (it.second > val_max) {
             idx_max = it.first;
@@ -25,10 +26,14 @@ int64_t argmax(const unordered_map<int64_t, int64_t> &dict) {
 
 std::tuple<std::unordered_map<int64_t, std::vector<int64_t>>, std::vector<int64_t>>
 computing_sets_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt, double_t T,
-                   double_t mu, int64_t p_hops) {
+                   double_t mu, int64_t p_hops){
 
-    int64_t n = rowptr.size(-1) - 1;
+        int64_t n = rowptr.size(-1) - 1;
     auto deg = rowptr.index({Slice(1, None)}) - rowptr.index({Slice(None, -1)});
+    auto deg_data=deg.data_ptr<int64_t>();
+    auto rowptr_data=rowptr.data_ptr<int64_t>();
+    auto col_data=col.data_ptr<int64_t>();
+
 
     std::unordered_map<int64_t, std::vector<int64_t>> sets;
     std::vector<int64_t> set_lengths;
@@ -40,7 +45,7 @@ computing_sets_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt
     auto hops = torch::zeros({n}, {torch::kLong});
     std::queue<int64_t> queue;
 
-    int64_t nbr, num_nbr, nbr_begin, nbr_end, is_sampled, ripple_size, i;
+    int64_t nbr, nbr_begin, nbr_end, is_sampled, ripple_size, i;
     for (int64_t set_idx = 0; set_idx < n; set_idx++) {
         ripple_size = 0;
         clear(queue);
@@ -57,13 +62,12 @@ computing_sets_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt
             scales_tmp.index_put_({"..."}, scales);
             scales_tmp.clamp_(1);
 
-            nbr_begin = rowptr[idx].item<int64_t>();
-            nbr_end = rowptr[idx + 1].item<int64_t>();
+            nbr_begin = rowptr_data[idx];
+            nbr_end = rowptr_data[idx+1];
             torch::Tensor nbrs = col.index({Slice(nbr_begin, nbr_end)});
-            num_nbr = nbrs.size(0);
 
             auto dominator = mu * torch::sum(wgt.index({Slice(nbr_begin, nbr_end)}) / scales_tmp.index({nbrs}));
-            auto s_i = ((is_sampled + mu * deg[idx] - T) / dominator).item<double_t>();
+            auto s_i = ((is_sampled + mu * deg_data[idx] - T) / dominator).item<double_t>();
             scales[idx] = s_i;
             is_sampled = 0;
 
@@ -71,8 +75,8 @@ computing_sets_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt
                 sets[set_idx].push_back(idx);
                 ripple_size++;
 
-                for (i = 0; i < num_nbr; i++) {
-                    nbr = nbrs[i].item<int64_t>();
+                for (i = nbr_begin; i < nbr_end; i++) {
+                    nbr = col_data[i];
                     if (!in_queue[nbr].item<bool>()) {
                         queue.push(nbr);
                         in_queue[nbr] = true;
@@ -86,6 +90,7 @@ computing_sets_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt
     }
     return {sets, set_lengths};
 }
+
 
 std::tuple<std::vector<int64_t>, bool>
 solving_set_covering_cpu(const std::unordered_map<int64_t, std::vector<int64_t>> &sets,
@@ -145,6 +150,7 @@ solving_set_covering_cpu(const std::unordered_map<int64_t, std::vector<int64_t>>
     vf = !uncovered_flag;
     return {S, vf};
 }
+
 
 std::tuple<std::vector<int64_t>, bool>
 greedy_gda_sampling_cpu(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt,

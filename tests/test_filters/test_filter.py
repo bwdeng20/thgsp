@@ -5,24 +5,33 @@ from thgsp.filters import meyer_kernel, ideal_kernel, Filter
 from thgsp.graphs import random_graph
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def filters():
     N = 4
     g = random_graph(N, density=0.7, dtype=torch.float)
     g = g.set_value_(torch.ones(g.nnz(), device=g.device(), dtype=g.dtype()))
     assert g.is_symmetric()
-    krns1 = np.array([[meyer_kernel, ideal_kernel],
-                      [ideal_kernel, meyer_kernel],
-                      [meyer_kernel, ideal_kernel]])  # 3(Cout) x 2(Cin) kernel
+    krns1 = np.array(
+        [
+            [meyer_kernel, ideal_kernel],
+            [ideal_kernel, meyer_kernel],
+            [meyer_kernel, ideal_kernel],
+        ]
+    )  # 3(Cout) x 2(Cin) kernel
 
-    def identity(x): return 1
+    def identity(x):
+        return 1
 
     krns2 = np.tile(np.array([identity]), [3, 2])
     krns2[1][0] = meyer_kernel
     krns2[2][1] = meyer_kernel
-    filters = {"11": Filter(g, meyer_kernel), "23": Filter(g, krns1, order=20), "plain": Filter(g, krns2, order=50),
-               "13": Filter(g, identity, in_channels=1, out_channels=3),
-               "31": Filter(g, identity, in_channels=3, out_channels=1)}
+    filters = {
+        "11": Filter(g, meyer_kernel),
+        "23": Filter(g, krns1, order=20),
+        "plain": Filter(g, krns2, order=50),
+        "13": Filter(g, identity, in_channels=1, out_channels=3),
+        "31": Filter(g, identity, in_channels=3, out_channels=1),
+    }
     return filters
 
 
@@ -32,8 +41,7 @@ class TestFilter:
             flt = filters[k]
             kernel_response_on_spectrum = flt.evaluate()
             num_node = flt.G.n_node
-            assert kernel_response_on_spectrum.shape == (
-                *flt.kernels.shape, num_node)
+            assert kernel_response_on_spectrum.shape == (*flt.kernels.shape, num_node)
 
     def test_check_signal(self, filters):
         flt = filters["23"]

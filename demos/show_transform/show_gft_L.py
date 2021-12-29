@@ -8,7 +8,9 @@ g = Toy(download=True)[0]
 lap_type = "comb"
 fs, U = g.spectral(lap_type=lap_type)
 bands = np.linspace(fs[0], fs[-1], num=9)
-bands2 = np.hstack([bands[:-1, None], bands[1:, None]])  # both two kinds of bands are supported
+bands2 = np.hstack(
+    [bands[:-1, None], bands[1:, None]]
+)  # both two kinds of bands are supported
 N, M = U.shape
 print(bands)
 print(bands2)

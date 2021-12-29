@@ -27,7 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 # enable act (https://github.com/nektos/act) for local github action experiments
-*/my.secrets
+my.secrets
 
 # Installer logs
 pip-log.txt

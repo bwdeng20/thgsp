@@ -29,7 +29,9 @@ class TestFastGSSS:
         nu = 3
         c = torch.rand(bw, dtype=dtype, device=device)
         f_band = U[:, :bw] @ c
-        f_band_noise = f_band + math.sqrt(5e-3) * torch.randn(N, dtype=dtype, device=device)
+        f_band_noise = f_band + math.sqrt(5e-3) * torch.randn(
+            N, dtype=dtype, device=device
+        )
 
         K = 12
         S, T = fastgsss(g, M, bw, nu, cheb, order=K)

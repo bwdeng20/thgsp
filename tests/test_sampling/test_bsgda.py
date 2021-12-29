@@ -4,8 +4,14 @@ import numpy as np
 import torch
 import torch as th
 from ..utils4t import float_dtypes, snr_and_mse
-from thgsp.sampling.bsgda import bsgda, greedy_sampling, computing_sets, solving_set_covering, greedy_gda_sampling, \
-    recon_bsgda
+from thgsp.sampling.bsgda import (
+    bsgda,
+    greedy_sampling,
+    computing_sets,
+    solving_set_covering,
+    greedy_gda_sampling,
+    recon_bsgda,
+)
 from thgsp.graphs import rand_udg
 
 np.set_printoptions(precision=5)
@@ -16,7 +22,7 @@ K = N // 10
 max_hops = 3
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
+@pytest.mark.parametrize("dtype", float_dtypes)
 def test_computing_sets(dtype):
     g = rand_udg(N, 0.1, dtype=dtype)
     sets, lengths = computing_sets(g, T=8e-5, p_hops=3)
@@ -29,11 +35,7 @@ def test_computing_sets(dtype):
 
 
 def test_solving_set_cover():
-    sets = {0: [0, 4, 1, 3],
-            1: [2, 1],
-            2: [1, 4, 4, 2],
-            3: [1, 4, 3, 0],
-            4: [1, 0, 3]}
+    sets = {0: [0, 4, 1, 3], 1: [2, 1], 2: [1, 4, 4, 2], 3: [1, 4, 3, 0], 4: [1, 0, 3]}
 
     lengths = [len(sets[s]) for s in range(5)]
     s = time.time()
@@ -43,7 +45,7 @@ def test_solving_set_cover():
     assert vf
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
+@pytest.mark.parametrize("dtype", float_dtypes)
 def test_consistency_greedy_sampling(dtype):
     g = rand_udg(N, 0.3, dtype=dtype).set_value_(None)
     selected_pebbles, vf = greedy_sampling(g, K, T, p_hops=max_hops)
@@ -67,9 +69,9 @@ def test_consistency_greedy_sampling(dtype):
     assert vf1 == vf2
 
 
-@pytest.mark.parametrize('dtype', float_dtypes)
+@pytest.mark.parametrize("dtype", float_dtypes)
 def test_bsgda(dtype):
-    g = rand_udg(N, 0.1, dtype=dtype).fill_value_(1.)
+    g = rand_udg(N, 0.1, dtype=dtype).fill_value_(1.0)
     sampled_nodes, thresh = bsgda(g, K * 2)
     print("sampled nodes: ", sampled_nodes)
     print("thresh(T):     ", thresh)

@@ -2,7 +2,9 @@ import torch
 from thgsp.convert import to_xcipy, SparseTensor
 
 
-def construct_sampling_matrix(N, S, dtype=None, device=None, layout="csr", return_ts=False):
+def construct_sampling_matrix(
+    N, S, dtype=None, device=None, layout="csr", return_ts=False
+):
     r"""
     Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.
 
@@ -41,7 +43,7 @@ def construct_sampling_matrix(N, S, dtype=None, device=None, layout="csr", retur
 
 
 def construct_hth(N, S, D=None, dtype=None, device=None, layout="csr", return_ts=False):
-    M= len(S)
+    M = len(S)
     row = torch.as_tensor(S, device=device)
     col = row.clone()
     data = torch.ones(M, dtype=dtype, device=device)
@@ -53,7 +55,16 @@ def construct_hth(N, S, D=None, dtype=None, device=None, layout="csr", return_ts
     return HtH
 
 
-def construct_dia(S, diag_data, ps=True, inverse=False, dtype=None, device=None, layout="csr", return_ts=False):
+def construct_dia(
+    S,
+    diag_data,
+    ps=True,
+    inverse=False,
+    dtype=None,
+    device=None,
+    layout="csr",
+    return_ts=False,
+):
     N = len(diag_data)
     M = len(S)
     row = torch.arange(M, device=device) if ps else torch.arange(N, device=device)

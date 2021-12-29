@@ -14,16 +14,16 @@ float_dtypes = grad_dtypes
 float_np_dts = [np.float32, np.float64]
 int_dtypes = [torch.int, torch.long]
 sparse_formats = ("csc", "csr", "coo")
-lap_types = ['comb', 'sym', 'rw', None]
+lap_types = ["comb", "sym", "rw", None]
 
 color_strategies = ["harary", "osglm"]
 num_strategies = ["admm", "amfs"]
 
-devices = [torch.device('cpu')]
+devices = [torch.device("cpu")]
 if torch.cuda.is_available():
-    devices += [torch.device(f'cuda:{torch.cuda.current_device()}')]
+    devices += [torch.device(f"cuda:{torch.cuda.current_device()}")]
 
-partition_strategy = ["graclus", 'metis']
+partition_strategy = ["graclus", "metis"]
 
 
 def to_tensor(x, dtype, device=None):
@@ -31,7 +31,7 @@ def to_tensor(x, dtype, device=None):
 
 
 def plot(plotly_fig=None):
-    show_flag = os.environ.get('THGSP_PLT')
+    show_flag = os.environ.get("THGSP_PLT")
     show_flag = 0 if show_flag is None else int(show_flag)
     if show_flag:
         if plotly_fig is not None:

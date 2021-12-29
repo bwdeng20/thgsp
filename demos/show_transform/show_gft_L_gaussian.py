@@ -11,7 +11,7 @@ lap_type = "comb"
 
 # load data
 g0 = Toy(download=True)[0]
-exponent = -g0.extra['distances'] ** 2 / (2 * sigma ** 2)
+exponent = -g0.extra["distances"] ** 2 / (2 * sigma ** 2)
 W = np.exp(exponent)
 edge_idx, _ = g0.edge_info()
 tmp = W[edge_idx[0], edge_idx[1]]
@@ -22,7 +22,9 @@ g = Graph(W)
 # prepare
 fs, U = g.spectral(lap_type=lap_type)
 bands = np.linspace(fs[0], fs[-1], num=9)
-bands2 = np.hstack([bands[:-1, None], bands[1:, None]])  # both two kinds of bands are supported
+bands2 = np.hstack(
+    [bands[:-1, None], bands[1:, None]]
+)  # both two kinds of bands are supported
 N, M = U.shape
 sampled_nodes = ess_sampling(g.L(lap_type), g.n_node, k=2)
 highlights = lil_matrix((M, N))

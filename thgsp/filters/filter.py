@@ -38,8 +38,17 @@ class Filter:
 
     """
 
-    def __init__(self, G: GraphBase, kernels=None, in_channels=None, out_channels=None, order=20, lam_max=None,
-                 lap_type="sym", weight=None):
+    def __init__(
+        self,
+        G: GraphBase,
+        kernels=None,
+        in_channels=None,
+        out_channels=None,
+        order=20,
+        lam_max=None,
+        lap_type="sym",
+        weight=None,
+    ):
         assert order > 1
         self.G = G
         self.order = order
@@ -47,7 +56,8 @@ class Filter:
         assert self.lam_max > 0
 
         self.kernels, self.in_channels, self.out_channels = self._check_kernels(
-            kernels, in_channels, out_channels)
+            kernels, in_channels, out_channels
+        )
         self.Ci = self.in_channels
         self.Co = self.out_channels
 
@@ -57,8 +67,7 @@ class Filter:
         self.lap_type = lap_type
 
         if weight is None:
-            weight = torch.ones(
-                self.Co, self.Ci, dtype=self.dtype, device=self.device)
+            weight = torch.ones(self.Co, self.Ci, dtype=self.dtype, device=self.device)
         else:
             assert weight.shape == (self.Co, self.Ci)
         self.weight = weight
@@ -77,8 +86,7 @@ class Filter:
         else:  # ideal low pass filter bank by default
             Ci = 1 if Ci is None else Ci
             Co = 1 if Co is None else Co
-            single_krn = np.array(
-                [[meyer_kernel if kernels is None else kernels]])
+            single_krn = np.array([[meyer_kernel if kernels is None else kernels]])
             kernels = np.tile(single_krn, [Co, Ci])
         return kernels, Ci, Co
 
@@ -91,11 +99,13 @@ class Filter:
             x = x
         else:
             raise RuntimeError(
-                "rank-1,2,3 tensor expected, but got rank-{}".format(x.dim()))
+                "rank-1,2,3 tensor expected, but got rank-{}".format(x.dim())
+            )
 
         if x.shape[-2] != self.N:
             raise RuntimeError(
-                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of nodes: {self.N}")
+                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of nodes: {self.N}"
+            )
         return x.to(self.dtype)
 
     def evaluate(self, low=None, high=None, in_channels=None, out_channels=None):
@@ -116,9 +126,15 @@ class Filter:
         ls2eval = fs[mask1 & mask2]
         if len(ls2eval) == 0:
             raise RuntimeError(
-                "No frequency in the interval [ {}, {}]".format(low, high))
-        fre_response = torch.zeros(self.out_channels, self.in_channels, len(ls2eval),
-                                   dtype=self.dtype, device=self.device)
+                "No frequency in the interval [ {}, {}]".format(low, high)
+            )
+        fre_response = torch.zeros(
+            self.out_channels,
+            self.in_channels,
+            len(ls2eval),
+            dtype=self.dtype,
+            device=self.device,
+        )
         kernel_cache = {}
         for i in in_channels:
             for j in out_channels:
@@ -145,8 +161,15 @@ class Filter:
     @property
     def cheby_coefficients(self):
         if self._coeff is None:
-            coeff = cheby_coeff(self.kernels[None, ...], K=self.order, lam_max=self.lam_max,
-                                dtype=self.dtype, device=self.device).squeeze_(0)  # the first dim is pseudo
+            coeff = cheby_coeff(
+                self.kernels[None, ...],
+                K=self.order,
+                lam_max=self.lam_max,
+                dtype=self.dtype,
+                device=self.device,
+            ).squeeze_(
+                0
+            )  # the first dim is pseudo
             self._coeff = coeff
         return self._coeff
 
@@ -155,9 +178,10 @@ class Filter:
             order = self.order
         if order > self.order:
             raise RuntimeError(
-                f"The coefficients of Chebyshev polynomials beyond order {self.order} are not computed")
+                f"The coefficients of Chebyshev polynomials beyond order {self.order} are not computed"
+            )
         x = self._check_signal(x)
-        coeff = self.cheby_coefficients[:, :, :order + 1]  # Co x Ci x K+1
+        coeff = self.cheby_coefficients[:, :, : order + 1]  # Co x Ci x K+1
         out = cheby_op(x, self.G.L(self.lap_type), coeff, self.lam_max)  # Co x N X Ci
         return out
 
@@ -186,7 +210,14 @@ class Filter:
         return out_aggr.permute(1, 0, 2).squeeze_()
 
     def __repr__(self):
-        info = self.__class__.__name__ + "(lap_type={} ,in_channels={}, out_channels={}, N={},\nkernels:\n{})". \
-            format(self.lap_type, self.in_channels, self.out_channels, self.N,
-                   get_kernel_name(self.kernels, True))
+        info = (
+            self.__class__.__name__
+            + "(lap_type={} ,in_channels={}, out_channels={}, N={},\nkernels:\n{})".format(
+                self.lap_type,
+                self.in_channels,
+                self.out_channels,
+                self.N,
+                get_kernel_name(self.kernels, True),
+            )
+        )
         return info

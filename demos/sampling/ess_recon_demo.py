@@ -14,15 +14,15 @@ dv = torch.device("cpu")
 dt = torch.double
 
 data = loadmat("ess-comm.mat")
-S = data['S'].ravel().astype(int) - 1
+S = data["S"].ravel().astype(int) - 1
 
-bw = data['bw'][0, 0].astype(int)
-order = data['K'].astype(int)[0, 0]
+bw = data["bw"][0, 0].astype(int)
+order = data["K"].astype(int)[0, 0]
 print(order)
 
-graph = Graph(data['A']).to(dv).to(dt)
-f = torch.as_tensor(data['f']).to(dt).to(dv)
-y = torch.as_tensor(data['f_or']).to(dt).to(dv)
+graph = Graph(data["A"]).to(dv).to(dt)
+f = torch.as_tensor(data["f"]).to(dt).to(dv)
+y = torch.as_tensor(data["f_or"]).to(dt).to(dv)
 L = graph.L("comb")
 U = graph.U("comb")
 

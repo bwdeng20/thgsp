@@ -13,7 +13,7 @@ def in_degree(adj: SparseTensor, bunch=None):
             ptr, idx, val = adj.csc()
             in_deg = val.new_zeros(len(bunch))
             for i, v in enumerate(bunch):
-                in_deg[i] = val[ptr[v]:ptr[v + 1]].sum()
+                in_deg[i] = val[ptr[v] : ptr[v + 1]].sum()
     return in_deg
 
 
@@ -28,7 +28,7 @@ def out_degree(adj: SparseTensor, bunch=None):
             ptr, idx, val = adj.csr()
             out_deg = val.new_zeros(len(bunch))
             for i, v in enumerate(bunch):
-                out_deg[i] = val[ptr[v]:ptr[v + 1]].sum()
+                out_deg[i] = val[ptr[v] : ptr[v + 1]].sum()
     return out_deg
 
 
@@ -46,4 +46,6 @@ def degree_matrix(adj: SparseTensor, indeg=True):
     deg = adj.sum(0) if indeg else adj.sum(1)
     row = col = torch.arange(N, device=adj.device())
     degs = torch.as_tensor(deg, device=adj.device())
-    return SparseTensor(row=row, col=col, value=degs, sparse_sizes=(N, N), is_sorted=True)
+    return SparseTensor(
+        row=row, col=col, value=degs, sparse_sizes=(N, N), is_sorted=True
+    )

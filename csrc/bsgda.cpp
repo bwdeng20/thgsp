@@ -3,7 +3,7 @@
 
 std::tuple<std::unordered_map<int64_t, std::vector<int64_t>>, std::vector<int64_t>>
 computing_sets(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt, double_t T,
-                   double_t mu = 0.01, int64_t p_hops = 12){
+                   double_t mu, int64_t p_hops){
     if (rowptr.device().is_cuda()){
     #ifdef WITH_CUDA
          AT_ERROR("No CUDA version supported");
@@ -16,10 +16,11 @@ computing_sets(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt, do
 }
 
 
-std::tuple<std::vector<int64_t>,bool>greedy_gda_sampling(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt,
+std::tuple<std::vector<int64_t>,bool>
+greedy_gda_sampling(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt,
                                                      int64_t K,
                                                      double_t T,
-                                                     double_t mu = 0.01, int64_t p_hops = 12){
+                                                     double_t mu, int64_t p_hops){
     if (rowptr.device().is_cuda()){
     #ifdef WITH_CUDA
          AT_ERROR("No CUDA version supported");
@@ -33,9 +34,9 @@ std::tuple<std::vector<int64_t>,bool>greedy_gda_sampling(torch::Tensor &rowptr, 
 
 std::tuple<std::vector<int64_t>, bool>
 solving_set_covering(const std::unordered_map<int64_t, std::vector<int64_t>> & sets,
-        const std::vector<int64_t> & set_lengths, int64_t K){
+                      const std::vector<int64_t> & set_lengths, int64_t K){
         return solving_set_covering_cpu(sets,set_lengths,K);
-    }
+}
 
 static auto registry = torch::RegisterOperators().op("thgsp::computing_sets", &computing_sets)
                                                  .op("thgsp::solving_set_covering", &solving_set_covering)

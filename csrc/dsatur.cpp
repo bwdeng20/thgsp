@@ -1,7 +1,7 @@
 #include <torch/script.h>
 #include "cpu/dsatur_cpu.h"
 
-torch::Tensor dsatur(torch::Tensor& rowptr, torch::Tensor& col){
+torch::Tensor dsatur(const torch::Tensor& rowptr, const torch::Tensor& col){
     if (rowptr.device().is_cuda()){
     #ifdef WITH_CUDA
          AT_ERROR("No CUDA version supported");

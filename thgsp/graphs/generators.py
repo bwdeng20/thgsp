@@ -33,7 +33,7 @@ def rand_bipartite(N1, N2, p=0.2, dtype=None, device=None, return_partition=Fals
     A = SparseTensor.from_scipy(csr_sci_adj).to(device, dtype)
     bpg = Graph(A)
     if return_partition:
-        beta = [1 if d['bipartite'] == 1 else 0 for n, d in G.nodes(data=True)]
+        beta = [1 if d["bipartite"] == 1 else 0 for n, d in G.nodes(data=True)]
         beta = torch.as_tensor(beta, dtype=torch.bool)
         return bpg, beta
     return bpg
@@ -62,7 +62,9 @@ def random_bgraph(N1, N2, p=0.2, dtype=None, device=None, seed=None) -> Graph:
     return Graph(sparse_adj)
 
 
-def random_graph(N, density=0.01, directed=False, dtype=None, device=None, weighted=True, seed=None):
+def random_graph(
+    N, density=0.01, directed=False, dtype=None, device=None, weighted=True, seed=None
+):
     """Generate a sparse matrix of the given shape and density with randomly
     distributed values.
     Parameters
@@ -97,7 +99,8 @@ def random_graph(N, density=0.01, directed=False, dtype=None, device=None, weigh
         k = int(density * n_all_edge)
         if k < 1:
             raise RuntimeError(
-                f"Density {density} is too small to generate 1 edge of {N}-node undirected graph.")
+                f"Density {density} is too small to generate 1 edge of {N}-node undirected graph."
+            )
         ind = random_state.choice(n_all_edge, size=k, replace=False)
         data = random_state.rand(k) if weighted else None
         i, j = tri2square(ind)
@@ -108,20 +111,25 @@ def random_graph(N, density=0.01, directed=False, dtype=None, device=None, weigh
 
         row = torch.as_tensor(row, device=device, dtype=torch.long)
         col = torch.as_tensor(col, device=device, dtype=torch.long)
-        value = None if data is None else torch.as_tensor(data, dtype=dtype, device=device)
+        value = (
+            None if data is None else torch.as_tensor(data, dtype=dtype, device=device)
+        )
 
     else:
         n_all_edge = N * (N - 1)
         k = int(density * n_all_edge)
         if k < 1:
             raise RuntimeError(
-                f"Density {density} is too small to generate 1 edge of {N}-node directed graph.")
+                f"Density {density} is too small to generate 1 edge of {N}-node directed graph."
+            )
         ind = random_state.choice(n_all_edge, size=k, replace=False)
         data = random_state.rand(k) if weighted else None
         i, j = flat2squre(ind, N)
         row = torch.as_tensor(i, device=device, dtype=torch.long)
         col = torch.as_tensor(j, device=device, dtype=torch.long)
-        value = None if data is None else torch.as_tensor(data, dtype=dtype, device=device)
+        value = (
+            None if data is None else torch.as_tensor(data, dtype=dtype, device=device)
+        )
 
     coo_adj = SparseTensor(row=row, col=col, value=value, sparse_sizes=(N, N))
     return DiGraph(coo_adj) if directed else Graph(coo_adj)
@@ -149,7 +157,9 @@ def knn(x, k=2, loop=False, dtype=None, device=None):
     batch = torch.zeros(N, dtype=torch.long)
     edge_index = knn_graph(x, k, batch=batch, loop=loop).to(device)
     edge_val = torch.ones(edge_index.shape[-1], dtype=dtype, device=device)
-    return SparseTensor(row=edge_index[0], col=edge_index[1], value=edge_val, sparse_sizes=(N, N))
+    return SparseTensor(
+        row=edge_index[0], col=edge_index[1], value=edge_val, sparse_sizes=(N, N)
+    )
 
 
 def radius(x, r=0.5, loop=False, dtype=None, device=None):
@@ -157,4 +167,6 @@ def radius(x, r=0.5, loop=False, dtype=None, device=None):
     batch = torch.zeros(N, dtype=torch.long)
     edge_index = radius_graph(x, r, batch=batch, loop=loop).to(device)
     edge_val = torch.ones(edge_index.shape[-1], dtype=dtype, device=device)
-    return SparseTensor(row=edge_index[0], col=edge_index[1], value=edge_val, sparse_sizes=(N, N))
+    return SparseTensor(
+        row=edge_index[0], col=edge_index[1], value=edge_val, sparse_sizes=(N, N)
+    )

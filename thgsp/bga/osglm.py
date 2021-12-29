@@ -1,40 +1,41 @@
 import numpy as np
 from scipy.sparse import lil_matrix, eye
 
-from .utils import bipartite_mask
+from ._utils import bipartite_mask
 
 
 def osglm(A, lc=None, vtx_color=None):
     r"""
-      The oversampled bipartite graph approximation method proposed in [1]_
+    The oversampled bipartite graph approximation method proposed in [1]_
 
-      Parameters
-      ----------
-      A:        SparseTensor
-        The adjacent matrix of graph.
-      lc:       int
-        The ordinal of color marking the boundary such that all nodes with a smaller color ordinal are
-        grouped into the low-pass channel while those with a larger color ordinal are in the high-pass channel.
-      vtx_color:iter
-        The graph coloring result
+    Parameters
+    ----------
+    A:        SparseTensor
+      The adjacent matrix of graph.
+    lc:       int
+      The ordinal of color marking the boundary such that all nodes with a smaller color ordinal are
+      grouped into the low-pass channel while those with a larger color ordinal are in the high-pass channel.
+    vtx_color:iter
+      The graph coloring result
 
-      Returns
-      -------
-      bptG:         lil_matrix
-                The oversampled graph(with additional nodes)
-      beta :        np.ndarray
-      append_nodes: np.ndarray
-                The indices of those appended nodes
-      vtx_color:    np.ndarray
-                The node colors
+    Returns
+    -------
+    bptG:         lil_matrix
+              The oversampled graph(with additional nodes)
+    beta :        np.ndarray
+    append_nodes: np.ndarray
+              The indices of those appended nodes
+    vtx_color:    np.ndarray
+              The node colors
 
-      References
-      ----------
-      .. [1]  Akie Sakiyama, et al, "Oversampled Graph Laplacian Matrix for Graph Filter Banks", IEEE trans on SP, 2016
+    References
+    ----------
+    .. [1]  Akie Sakiyama, et al, "Oversampled Graph Laplacian Matrix for Graph Filter Banks", IEEE trans on SP, 2016
 
-      """
+    """
     if vtx_color is None:
         from thgsp.alg import dsatur
+
         vtx_color = dsatur(A)
     vtx_color = np.asarray(vtx_color)
     n_color = max(vtx_color) + 1
@@ -43,7 +44,7 @@ def osglm(A, lc=None, vtx_color=None):
         lc = n_color // 2
     assert 1 <= lc < n_color
 
-    A = A.to_scipy(layout='csr').tolil()
+    A = A.to_scipy(layout="csr").tolil()
     # the foundation bipartite graph Gb
     Gb = lil_matrix(A.shape, dtype=A.dtype)
     N = A.shape[-1]
@@ -70,6 +71,8 @@ def osglm(A, lc=None, vtx_color=None):
     beta = np.zeros((Nos, 1), dtype=bool)
     beta[idx_s1, 0] = 1
     # appended nodes corresponding to idx_s2 are assigned to the L channel of oversampled graph with idx_s1
-    _, node_ordinal_append, _ = np.intersect1d(append_nodes, idx_s2, return_indices=True)
+    _, node_ordinal_append, _ = np.intersect1d(
+        append_nodes, idx_s2, return_indices=True
+    )
     beta[N + node_ordinal_append, 0] = 1
     return bptG, beta, append_nodes, vtx_color

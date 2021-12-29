@@ -8,7 +8,7 @@ from thgsp.convert import get_ddd, to_xcipy, to_xp, get_array_module
 from ._utils import construct_sampling_matrix, construct_dia
 
 
-@jit('f8[:](f8,f8,f8,f8,i4)', nopython=True)
+@jit("f8[:](f8,f8,f8,f8,i4)", nopython=True)
 def cheby_coeff4ideal_band_pass(a, b, lmin, lmax, order):
     a1 = (lmax - lmin) / 2
     a2 = (lmin + lmax) / 2
@@ -25,8 +25,19 @@ def cheby_coeff4ideal_band_pass(a, b, lmin, lmax, order):
     return coeff
 
 
-def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None,
-                return_coherence=True, order=30, lap_type="comb", verbose=False):
+def estimate_lk(
+    G,
+    k,
+    num_estimation=1,
+    num_rv=None,
+    epsilon=1e-2,
+    lmin=None,
+    lmax=None,
+    return_coherence=True,
+    order=30,
+    lap_type="comb",
+    verbose=False,
+):
     r"""
     Estimate the optimal distribution according to which the bandlimited graph signals are
     sampled [3]_ .
@@ -74,7 +85,9 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
     if num_rv is None:
         num_rv = appropriate_num_rv
     elif num_rv < appropriate_num_rv:
-        warnings.warn(f"Using at least {appropriate_num_rv} random vectors are recommended.")
+        warnings.warn(
+            f"Using at least {appropriate_num_rv} random vectors are recommended."
+        )
         num_rv = appropriate_num_rv
     else:
         if verbose:
@@ -82,7 +95,7 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
 
     L = G.L(lap_type)
     if lmin is None:
-        lmin = 0.
+        lmin = 0.0
     if lmax is None:
         lmax = G.max_frequency(lap_type)
 
@@ -91,7 +104,11 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
 
     x = None
     coeff = torch.zeros(1, num_rv, order + 1, dtype=dtype, device=device)
-    norm_UK = torch.zeros(num_estimation, N, dtype=dtype, device=device) if return_coherence else None
+    norm_UK = (
+        torch.zeros(num_estimation, N, dtype=dtype, device=device)
+        if return_coherence
+        else None
+    )
     estimated_lam_k = np.zeros(num_estimation)
     for i in range(num_estimation):
         sig = torch.randn(N, num_rv, dtype=dtype, device=device) / np.sqrt(num_rv)
@@ -99,7 +116,9 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
         lambda_min, lambda_max = lmin, lmax
         while counts != k or (lambda_max - lambda_min) / lambda_max > epsilon:
             lambda_mid = (lambda_min + lambda_max) / 2
-            coeff[...] = torch.from_numpy(cheby_coeff4ideal_band_pass(0., lambda_mid, 0., lmax, order))
+            coeff[...] = torch.from_numpy(
+                cheby_coeff4ideal_band_pass(0.0, lambda_mid, 0.0, lmax, order)
+            )
             x = cheby_op(sig, L, coeff, lmax).squeeze_()
             counts = torch.round_(torch.sum(x ** 2))
             if counts >= k:
@@ -107,11 +126,14 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
             else:
                 lambda_min = lambda_mid
             if verbose:
-                print(f"[estimating lambda_k]counts: {int(counts):8d}, bottom: {lambda_min:.4f}, top: {lambda_max:.4f}")
+                print(
+                    f"[estimating lambda_k]counts: {int(counts):8d}, bottom: {lambda_min:.4f}, top: {lambda_max:.4f}"
+                )
         estimated_lam_k[i] = (lambda_min + lambda_max) / 2
         if verbose:
             print(
-                f"{i:4d} estimation lambda_k: {estimated_lam_k[i]:8f}, bottom: {lambda_min:.4f}, top: {lambda_max:.4f}")
+                f"{i:4d} estimation lambda_k: {estimated_lam_k[i]:8f}, bottom: {lambda_min:.4f}, top: {lambda_max:.4f}"
+            )
 
         if return_coherence:
             norm_UK[i] = (x ** 2).sum(1)
@@ -123,8 +145,20 @@ def estimate_lk(G, k, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lm
     return lambda_k, cum_coh
 
 
-def rsbs(G, M, k=None, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, lmax=None, order=30, lap_type="comb",
-         return_list=False, verbose=False):
+def rsbs(
+    G,
+    M,
+    k=None,
+    num_estimation=1,
+    num_rv=None,
+    epsilon=1e-2,
+    lmin=None,
+    lmax=None,
+    order=30,
+    lap_type="comb",
+    return_list=False,
+    verbose=False,
+):
     r"""
     Random sampling algorithm for bandlimited signals [3]_ .
 
@@ -164,18 +198,34 @@ def rsbs(G, M, k=None, num_estimation=1, num_rv=None, epsilon=1e-2, lmin=None, l
         The sampling possibilities of all nodes
 
     """
-    lambda_k, cum_coh = estimate_lk(G, k, num_estimation, num_rv, epsilon, lmin, lmax, True, order, lap_type, verbose)
+    lambda_k, cum_coh = estimate_lk(
+        G,
+        k,
+        num_estimation,
+        num_rv,
+        epsilon,
+        lmin,
+        lmax,
+        True,
+        order,
+        lap_type,
+        verbose,
+    )
     sampled_nodes = torch.multinomial(cum_coh, M, replacement=True)
     sampled_nodes = sampled_nodes.cpu().tolist() if return_list else sampled_nodes
     return sampled_nodes, cum_coh
 
 
-def recon_rsbs(y, S, L: SparseTensor, cum_coh, mu: float = 0.01, reg_order: int = 1, **kwargs):
+def recon_rsbs(
+    y, S, L: SparseTensor, cum_coh, mu: float = 0.01, reg_order: int = 1, **kwargs
+):
     N = L.size(-1)
     M = len(S)
     assert M > 0
     if y.shape[0] != M:
-        raise RuntimeError(f"y is expected to have a shape ({M},num_signal) or ({M},), not {y.shape}")
+        raise RuntimeError(
+            f"y is expected to have a shape ({M},num_signal) or ({M},), not {y.shape}"
+        )
 
     dt, dv, density, on_gpu = get_ddd(L)
     xp, xcipy, xsplin = get_array_module(on_gpu)
@@ -184,7 +234,9 @@ def recon_rsbs(y, S, L: SparseTensor, cum_coh, mu: float = 0.01, reg_order: int 
 
     L = to_xcipy(L, layout="csr").astype("d")
     H = construct_sampling_matrix(N, S, torch.double, dv)
-    Psinv = construct_dia(S, cum_coh, ps=True, inverse=True, dtype=torch.double, device=dv)
+    Psinv = construct_dia(
+        S, cum_coh, ps=True, inverse=True, dtype=torch.double, device=dv
+    )
 
     Bl = H.T * Psinv
     B = Bl * H + mu * L ** reg_order

@@ -1,11 +1,9 @@
 import torch
 import warnings
 import numpy as np
-from scipy.sparse import coo_matrix
 from torch_sparse import SparseTensor, coalesce
 from torch_sparse import eye as ts_eye
-from sksparse.cholmod import cholesky
-from thgsp.convert import to_scipy
+from thgsp.convert import to_scipy, get_array_module, coo_matrix
 
 
 def img2graph(img, threshold: int = None, grid=False):
@@ -21,7 +19,10 @@ def img2graph(img, threshold: int = None, grid=False):
         pixels = (weights * pixels).sum(0)
     else:
         raise RuntimeError(
-            "RGB(3-dim) or Gray(2-dim) expected, but got {} array(or tensor)".format(img.shape))
+            "RGB(3-dim) or Gray(2-dim) expected, but got {} array(or tensor)".format(
+                img.shape
+            )
+        )
 
     def filter_edges(r, c):
         if threshold:
@@ -89,8 +90,7 @@ def pool_edge(cluster, edge_index, edge_attr=None):
     edge_index = cluster[edge_index.view(-1)].view(2, -1)
     edge_index, edge_attr = remove_self_loops(edge_index, edge_attr)
     if edge_index.numel() > 0:
-        edge_index, edge_attr = coalesce(edge_index, edge_attr, num_nodes,
-                                         num_nodes)
+        edge_index, edge_attr = coalesce(edge_index, edge_attr, num_nodes, num_nodes)
     return edge_index, edge_attr
 
 
@@ -104,7 +104,9 @@ def consecutive_spmv(A: SparseTensor, v: torch.Tensor, k=2):
 
 def eye(n, dtype=None, device=None):
     index, value = ts_eye(n, dtype, device)
-    return SparseTensor(row=index[0], col=index[1], value=value, sparse_sizes=(n, n), is_sorted=True)
+    return SparseTensor(
+        row=index[0], col=index[1], value=value, sparse_sizes=(n, n), is_sorted=True
+    )
 
 
 def matrix_power(A, k: int):
@@ -122,7 +124,11 @@ def matrix_power(A, k: int):
     if k < 0 or not isinstance(k, int):
         warnings.warn(f"The input power{k} is not a positive integer!")
     if k == 0:
-        return eye(m, dt, dv) if isinstance(A, SparseTensor) else torch.eye(m, dtype=dt, device=dv)
+        return (
+            eye(m, dt, dv)
+            if isinstance(A, SparseTensor)
+            else torch.eye(m, dtype=dt, device=dv)
+        )
 
     z = result = None
     while k > 0:
@@ -168,7 +174,9 @@ def absv_(src: SparseTensor):
     return src.set_value_(val.abs_(), layout="csr")
 
 
-def multivariate_normal(mean=0, cov=None, precision=None, num=1, delta=0., return_th=True):
+def multivariate_normal(
+    mean=0, cov=None, precision=None, num=1, delta=0.0, return_th=True
+):
     """
     Generate signals conforming with multinormal distribution characterized by either
     covariance matrix or precision matrix.
@@ -196,6 +204,13 @@ def multivariate_normal(mean=0, cov=None, precision=None, num=1, delta=0., retur
     The shape is :obj:`(N,num)`
 
     """
+    try:
+        from sksparse.cholmod import cholesky
+    except:
+        raise ImportError(
+            "scikit-sparse (https://github.com/scikit-sparse/scikit-sparse) is required"
+        )
+
     if cov is None and precision is None:
         raise RuntimeError("One of Cov and Precision matrices is required")
     if cov is not None:
@@ -221,3 +236,15 @@ def multivariate_normal(mean=0, cov=None, precision=None, num=1, delta=0., retur
         z2 = fc.solve_Lt(y, use_LDLt_decomposition=False)[p_inverse] + mean
         z2 = torch.as_tensor(z2) if return_th else z2
     return z1, z2
+
+
+def sparse_xcipy_logdet(A, beta=0):
+    xp, xcipy, xsplin = get_array_module(1)
+    if not isinstance(
+        A, (xp.ndarray, xcipy.sparse.spmatrix)
+    ):  # cupy is installed but A is a cpu array
+        xp, xcipy, xsplin = get_array_module(0)
+    betaI = beta * xcipy.sparse.eye(A.shape[-1], dtype=A.dtype)
+    slu = xsplin.splu(A + betaI)
+    ld = xp.log(slu.U.diagonal()).sum()
+    return ld.item()

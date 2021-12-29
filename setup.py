@@ -96,6 +96,7 @@ install_requires = [
     "torch-sparse",
     "torch-cluster",
     "matplotlib",
+    "pandas",
     "plotly",
     "tqdm",
 ]

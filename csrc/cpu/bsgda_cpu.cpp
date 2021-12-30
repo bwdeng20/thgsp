@@ -10,10 +10,9 @@ inline void clear(std::queue<int64_t> &q) {
 }
 
 
-template<typename dtype>
-int64_t argmax(const unordered_map<int64_t, dtype> &dict) {
+int64_t argmax(const unordered_map<int64_t, int64_t> &dict) {
     int64_t idx_max = dict.begin()->first;
-    dtype val_max = dict.begin()->second;
+    int64_t val_max = dict.begin()->second;
     for (auto it : dict) {
         if (it.second > val_max) {
             idx_max = it.first;

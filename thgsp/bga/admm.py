@@ -28,7 +28,7 @@ def admm_simple(A, n_eig=None, min_eig=0.0):
         n_eig = N
 
     # eigenvalue decomposition of A, ascending
-    delta, V = torch.linalg.eigh(A, eigenvectors=True)
+    delta, V = torch.linalg.eigh(A)
 
     # to descending order
     delta = torch.flip(delta, [0])

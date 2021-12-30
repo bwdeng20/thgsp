@@ -1,5 +1,15 @@
+#include <Python.h>
 #include <torch/script.h>
 #include "cpu/bsgda_cpu.h"
+
+#ifdef _WIN32
+#ifdef WITH_CUDA
+PyMODINIT_FUNC PyInit__bsgda_cuda(void) { return NULL; }
+#else
+PyMODINIT_FUNC PyInit__bsgda_cpu(void) { return NULL; }
+#endif
+#endif
+
 
 std::tuple<std::unordered_map<int64_t, std::vector<int64_t>>, std::vector<int64_t>>
 computing_sets(torch::Tensor &rowptr, torch::Tensor &col, torch::Tensor &wgt, double_t T,

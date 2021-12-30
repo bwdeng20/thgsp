@@ -1,7 +1,16 @@
+#include <Python.h>
 #include <torch/script.h>
 
 #ifdef WITH_CUDA
 #include <cuda.h>
+#endif
+
+#ifdef _WIN32
+#ifdef WITH_CUDA
+PyMODINIT_FUNC PyInit__version_cuda(void) { return NULL; }
+#else
+PyMODINIT_FUNC PyInit__version_cpu(void) { return NULL; }
+#endif
 #endif
 
 int64_t cuda_version() {

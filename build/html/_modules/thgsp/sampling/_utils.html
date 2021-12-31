@@ -94,6 +94,7 @@
 <span class="sd">       \mathbf{H}_{i j}= \begin{cases}1, &amp; j=\mathcal{S}_{i} \\ 0, &amp; \text { otherwise }</span>
 <span class="sd">       \end{cases}</span>
 
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    N: int</span>
@@ -105,7 +106,7 @@
 <span class="sd">    layout: str</span>
 <span class="sd">        The memory layout of the generated sparse matrix. One of (&quot;csc&quot;, &quot;csr&quot;, &quot;coo&quot;).</span>
 <span class="sd">    device: torch.device, str, optional</span>
-<span class="sd">        If :py:`True` and  `cupy` is installed, use `cupy`as backend; otherwise `scipy`.</span>
+<span class="sd">        If `True` and `cupy` is installed, use `cupy`as backend; otherwise `scipy`.</span>
 <span class="sd">    return_ts: bool,</span>
 <span class="sd">        If False, return `scipy.sparse.spmatrix` of device is GPU else</span>
 <span class="sd">        &#39;cupyx.scipy.sparse.spmatrix&#39;</span>

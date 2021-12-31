@@ -14,7 +14,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -92,15 +93,15 @@
 <div class="contents local topic" id="contents">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#module-thgsp.sampling.ess" id="id16">Efficient Sampling Set Selection</a></p></li>
-<li><p><a class="reference internal" href="#module-thgsp.sampling.bsgda" id="id17">Fast Graph Sampling Set Selection</a></p></li>
-<li><p><a class="reference internal" href="#module-thgsp.sampling.rsbs" id="id18">Random sampling of bandlimited signals</a></p></li>
-<li><p><a class="reference internal" href="#module-thgsp.sampling.fastgsss" id="id19">Eigen-decomposition free sampling</a></p></li>
-<li><p><a class="reference internal" href="#module-thgsp.sampling._utils" id="id20">Utils</a></p></li>
+<li><p><a class="reference internal" href="#module-thgsp.sampling.ess" id="id14">Efficient Sampling Set Selection</a></p></li>
+<li><p><a class="reference internal" href="#module-thgsp.sampling.bsgda" id="id15">Fast Graph Sampling Set Selection</a></p></li>
+<li><p><a class="reference internal" href="#module-thgsp.sampling.rsbs" id="id16">Random sampling of bandlimited signals</a></p></li>
+<li><p><a class="reference internal" href="#module-thgsp.sampling.fastgsss" id="id17">Eigen-decomposition free sampling</a></p></li>
+<li><p><a class="reference internal" href="#module-thgsp.sampling._utils" id="id18">Utils</a></p></li>
 </ul>
 </div>
 <section id="module-thgsp.sampling.ess">
-<span id="efficient-sampling-set-selection"></span><h2><a class="toc-backref" href="#id16">Efficient Sampling Set Selection</a><a class="headerlink" href="#module-thgsp.sampling.ess" title="Permalink to this headline">¶</a></h2>
+<span id="efficient-sampling-set-selection"></span><h2><a class="toc-backref" href="#id14">Efficient Sampling Set Selection</a><a class="headerlink" href="#module-thgsp.sampling.ess" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.ess.ess">
 <span class="sig-name descname"><span class="pre">ess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/ess.html#ess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.ess.ess" title="Permalink to this definition">¶</a></dt>
@@ -162,7 +163,7 @@ matrix power of specific variation operator, e.g., normalized Laplacian.</p>
 
 </section>
 <section id="module-thgsp.sampling.bsgda">
-<span id="fast-graph-sampling-set-selection"></span><h2><a class="toc-backref" href="#id17">Fast Graph Sampling Set Selection</a><a class="headerlink" href="#module-thgsp.sampling.bsgda" title="Permalink to this headline">¶</a></h2>
+<span id="fast-graph-sampling-set-selection"></span><h2><a class="toc-backref" href="#id15">Fast Graph Sampling Set Selection</a><a class="headerlink" href="#module-thgsp.sampling.bsgda" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.bsgda.bsgda">
 <span class="sig-name descname"><span class="pre">bsgda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch_sparse.tensor.SparseTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_hops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/thgsp/sampling/bsgda.html#bsgda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.bsgda.bsgda" title="Permalink to this definition">¶</a></dt>
@@ -201,7 +202,7 @@ alignment,” IEEE TSP, 2020.</p>
 
 </section>
 <section id="module-thgsp.sampling.rsbs">
-<span id="random-sampling-of-bandlimited-signals"></span><h2><a class="toc-backref" href="#id18">Random sampling of bandlimited signals</a><a class="headerlink" href="#module-thgsp.sampling.rsbs" title="Permalink to this headline">¶</a></h2>
+<span id="random-sampling-of-bandlimited-signals"></span><h2><a class="toc-backref" href="#id16">Random sampling of bandlimited signals</a><a class="headerlink" href="#module-thgsp.sampling.rsbs" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.rsbs.estimate_lk">
 <span class="sig-name descname"><span class="pre">estimate_lk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_coherence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lap_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/rsbs.html#estimate_lk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.rsbs.estimate_lk" title="Permalink to this definition">¶</a></dt>
@@ -278,7 +279,7 @@ normalized, and random-walk normalized Laplacian, separately.</p></li>
 
 </section>
 <section id="module-thgsp.sampling.fastgsss">
-<span id="eigen-decomposition-free-sampling"></span><h2><a class="toc-backref" href="#id19">Eigen-decomposition free sampling</a><a class="headerlink" href="#module-thgsp.sampling.fastgsss" title="Permalink to this headline">¶</a></h2>
+<span id="eigen-decomposition-free-sampling"></span><h2><a class="toc-backref" href="#id17">Eigen-decomposition free sampling</a><a class="headerlink" href="#module-thgsp.sampling.fastgsss" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.fastgsss.fastgsss">
 <span class="sig-name descname"><span class="pre">fastgsss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="graphs.html#thgsp.graphs.GraphBase" title="thgsp.graphs.core.GraphBase"><span class="pre">thgsp.graphs.core.GraphBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cheby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/fastgsss.html#fastgsss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.fastgsss.fastgsss" title="Permalink to this definition">¶</a></dt>
@@ -342,7 +343,7 @@ linear solver.</p></li>
 
 </section>
 <section id="module-thgsp.sampling._utils">
-<span id="utils"></span><h2><a class="toc-backref" href="#id20">Utils</a><a class="headerlink" href="#module-thgsp.sampling._utils" title="Permalink to this headline">¶</a></h2>
+<span id="utils"></span><h2><a class="toc-backref" href="#id18">Utils</a><a class="headerlink" href="#module-thgsp.sampling._utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling._utils.construct_sampling_matrix">
 <span class="sig-name descname"><span class="pre">construct_sampling_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/_utils.html#construct_sampling_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling._utils.construct_sampling_matrix" title="Permalink to this definition">¶</a></dt>
@@ -358,7 +359,7 @@ follows.</p>
 <li><p><strong>S</strong> (<em>list</em><em>, </em><em>array</em><em>, </em><em>torch.Tensor</em>) – The 1-D list of sampled nodes.</p></li>
 <li><p><strong>dtype</strong> (<em>torch.dtype</em><em>, </em><em>optional</em>) – The dtype</p></li>
 <li><p><strong>layout</strong> (<em>str</em>) – The memory layout of the generated sparse matrix. One of (“csc”, “csr”, “coo”).</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If <a href="#id14"><span class="problematic" id="id15">:py:`True`</span></a> and  <cite>cupy</cite> is installed, use <cite>cupy`as backend; otherwise `scipy</cite>.</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If <cite>True</cite> and <cite>cupy</cite> is installed, use <cite>cupy`as backend; otherwise `scipy</cite>.</p></li>
 <li><p><strong>return_ts</strong> (<em>bool</em><em>,</em>) – If False, return <cite>scipy.sparse.spmatrix</cite> of device is GPU else
 ‘cupyx.scipy.sparse.spmatrix’</p></li>
 </ul>

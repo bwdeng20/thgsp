@@ -37,9 +37,11 @@ release = thgsp.__version__
 autodoc_mock_imports = ["ray", "scikit-sparse"]
 extensions = [
     "sphinx.ext.autodoc",
+    'sphinx.ext.autosummary',
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "myst_parser",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.githubpages",
 ]
@@ -65,7 +67,13 @@ html_static_path = ["_static"]
 html_context = {"css_files": ["_static/css/custom.css"]}
 html_logo = "_static/img/logo.svg"
 
-intersphinx_mapping = {"python": ("https://docs.python.org/", None)}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'numpy': ('http://docs.scipy.org/doc/numpy', None),
+    'pandas': ('http://pandas.pydata.org/pandas-docs/dev', None),
+    'torch': ('https://pytorch.org/docs/master', None)
+}
+
 html_theme_options = {
     "collapse_navigation": True,
     "display_version": True,

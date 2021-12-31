@@ -29,7 +29,7 @@ from .kernels import (
 
 
 class QmfCore:
-    r"""The core implementation of GraphQmf [2]_ and GraphBiorth [3]_ filterbanks.
+    """The core implementation of GraphQmf [2]_ and GraphBiorth [3]_ filterbanks.
 
     .. note::
         There is no need to change :attr:`in_channels` when the signals of all input
@@ -74,18 +74,14 @@ class QmfCore:
     zeroDC: bool, optional
          If True, the zeroDC filter bank is employed.
 
-
     References
     ----------
     .. [2]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter
-    Banks for Graph Structured Data",
-            IEEE trans on Signal Processing, 2012.
+            Banks for Graph Structured Data", IEEE TSP, 2012.
     .. [3]  S. Narang and A. Ortega, “Compact support biorthogonal wavelet
-    filterbanks for arbitrary undirected graphs,”
-            IEEE Trans on Signal Processing, 2013.
+            filterbanks for arbitrary undirected graphs,” IEEE TSP, 2013.
 
     """
-
     def __init__(
         self,
         bptG: List[SparseTensor],

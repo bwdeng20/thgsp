@@ -9,18 +9,18 @@ import thgsp.datasets  # noqa
 import thgsp.filters  # noqa
 import thgsp.sampling  # noqa
 import thgsp.utils  # noqa
-from thgsp.graphs import (
-    GraphBase,
-    Graph,
+from thgsp.graphs import (  # noqa
     DiGraph,
+    Graph,
+    GraphBase,
+    knn,
+    radius,
+    rand_bipartite,
     rand_dg,
     rand_udg,
-    rand_bipartite,
-    random_graph,
     random_bgraph,
-    radius,
-    knn,
-)  # noqa
+    random_graph,
+)
 
 from .convert import to_cpx  # noqa
 from .convert import (

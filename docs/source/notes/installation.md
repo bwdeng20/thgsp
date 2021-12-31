@@ -51,7 +51,7 @@ pip install cupy-cuda111
 
 ### From source
 
-You can only install it from source
+You can install it from source
 
 Clone the thgsp repository from  `github`.
 

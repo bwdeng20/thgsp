@@ -20,7 +20,7 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         python-version: [ 3.8 ]
         torch-version: [ 1.10.0 ]
-        tv-version: [ 0.10.0 ]
+        tv-version: [ 0.11.1 ]
         cuda-version: [ 'cpu' ]
 
 

@@ -12,15 +12,15 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     env:
-      THGSP_PLT: 0
+      THGSP_PLT: 0 # disable matplotlib plot
 
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         python-version: [ 3.8 ]
-        torch-version: [ 1.10.0 ]
-        tv-version: [ 0.11.1 ]
+        torch-version: [ 1.10.1 ]
+        tv-version: [ 0.11.2 ]
         cuda-version: [ 'cpu' ]
 
 

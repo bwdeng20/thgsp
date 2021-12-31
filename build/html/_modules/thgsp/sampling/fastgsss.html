@@ -78,20 +78,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for thgsp.sampling.fastgsss</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">get_ddd</span>
+
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">to_xcipy</span>
+<span class="kn">from</span> <span class="nn">thgsp.filters</span> <span class="kn">import</span> <span class="n">cheby_coeff</span><span class="p">,</span> <span class="n">cheby_op_basis</span><span class="p">,</span> <span class="n">heat_kernel</span>
 <span class="kn">from</span> <span class="nn">thgsp.graphs.core</span> <span class="kn">import</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">SparseTensor</span>
-<span class="kn">from</span> <span class="nn">thgsp.filters</span> <span class="kn">import</span> <span class="n">cheby_coeff</span><span class="p">,</span> <span class="n">heat_kernel</span><span class="p">,</span> <span class="n">cheby_op_basis</span>
-<span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">matrix_power</span><span class="p">,</span> <span class="n">absv</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_xcipy</span><span class="p">,</span> <span class="n">get_array_module</span>
+<span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">absv</span><span class="p">,</span> <span class="n">matrix_power</span>
 
 
 <div class="viewcode-block" id="fastgsss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.fastgsss">[docs]</a><span class="k">def</span> <span class="nf">fastgsss</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">GraphBase</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">75.0</span><span class="p">,</span> <span class="n">cheby</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    FastGSSS proposed in [4]_ .</span>
+    <span class="sd">&quot;&quot;&quot;FastGSSS proposed in [4]_ .</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -104,8 +104,8 @@
 <span class="sd">    nu: float</span>
 <span class="sd">        The parameter controlling the width of the heat diffusion filter kernel.</span>
 <span class="sd">    cheby:  bool</span>
-<span class="sd">        If :obj:`True`, compute the localization operator with Chebyshev approximation; otherwise</span>
-<span class="sd">        compute it from a direct expensive EVD.</span>
+<span class="sd">        If :obj:`True`, compute the localization operator with Chebyshev approximation;</span>
+<span class="sd">        otherwise compute it from a direct expensive EVD.</span>
 <span class="sd">    order: int</span>
 <span class="sd">        The order of Chebyshev approximation.</span>
 
@@ -118,9 +118,8 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free sampling set selection</span>
-<span class="sd">            for graph signals,&quot; IEEE Transactions on Signal Processing, 202.</span>
-
+<span class="sd">    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, &quot;Eigendecomposition-free</span>
+<span class="sd">            sampling set selection  for graph signals,&quot; IEEE TSP, 2020.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">num_edge</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span>
@@ -173,22 +172,24 @@
 
 
 <div class="viewcode-block" id="recon_fastssss"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.fastgsss.recon_fastssss">[docs]</a><span class="k">def</span> <span class="nf">recon_fastssss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A primary implementation of reconstruction method associated with &quot;FastSSS&quot; sampling algorithm.</span>
+    <span class="sd">&quot;&quot;&quot;A primary implementation of reconstruction method associated with</span>
+<span class="sd">    &quot;FastSSS&quot; sampling algorithm.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y:  Tensor</span>
-<span class="sd">        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density</span>
-<span class="sd">        greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，</span>
-<span class="sd">        or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.</span>
+<span class="sd">        The measurements on sampling set :obj:S:. If the localization operator :obj:`T`</span>
+<span class="sd">        has a density greater than the threshold :obj:`sd`, :obj:`y` has a shape of</span>
+<span class="sd">        either :obj:`(M,)`，:obj:`(M,1)`，or :obj:`(M,C)`; otherwise :obj:`y` could only</span>
+<span class="sd">        be  either :obj:`(M,)` or :obj:`(M,1)`.</span>
 <span class="sd">    S:  List</span>
 <span class="sd">        A list consisting of all indices of sampled nodes.</span>
 <span class="sd">    T:  Tensor, SparseTensor</span>
 <span class="sd">        The localization operator</span>
 <span class="sd">    order: int</span>
 <span class="sd">    sd: float</span>
-<span class="sd">        The threshold of :obj:`T`&#39;s density that controls when we use a dense or sparse linear solver.</span>
+<span class="sd">        The threshold of :obj:`T`&#39;s density that controls when we use a dense or sparse</span>
+<span class="sd">        linear solver.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

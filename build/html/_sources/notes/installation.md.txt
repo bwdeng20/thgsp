@@ -2,9 +2,9 @@
 
 ## 1. Pip
 
-### 1.1 Install PyTorch
+### Install PyTorch
 
-We recommend users to install pytorch_gsp in an [conda](https://conda.io/docs/user-guide/install/index.html/)
+We recommend users to install thgsp in an [conda](https://conda.io/docs/user-guide/install/index.html/)
 virtual environment. Install PyTorch1.5 or later following [the official instructions](https://pytorch.org/). Type the
 following in the terminal to check if PyTorch is installed successfully.
 
@@ -13,7 +13,7 @@ python -c "import torch; print(torch.__version__)"
 >>> 1.8.0  # here my pytorch version is 1.8.0 
 ```
 
-### 1.2 Install PyTorch Extensions
+### Install PyTorch Extensions
 
 Matthias Fey provides excellent PyTorch extensions for graph-related computations. Please install
 [pytorch_scatter](https://github.com/rusty1s/pytorch_scatter),
@@ -30,13 +30,6 @@ pip install torch-sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 ```
 
-### 1.3 Install SuiteSparse for scikit-sparse
-
-On Debian/Ubuntu systems, the following command should suffice:
-
-```
-sudo apt-get install libsuitesparse-dev
-```
 
 On Arch (Manjaro) Linux, run:
 
@@ -44,7 +37,7 @@ On Arch (Manjaro) Linux, run:
 sudo pacman -S suitesparse
 ```
 
-### 1.4 Install cupy for linear algebra on GPU (Optional)
+### Install cupy for linear algebra on GPU (Optional)
 
 If you do NOT have an Nvidia GPU, please skip this section.
 
@@ -53,12 +46,12 @@ Follow the [official instruction](https://docs.cupy.dev/en/stable/install.html) 
 the following command is suitable.
 
 ```
-conda install -c conda-forge cupy cudatoolkit=11.1
+pip install cupy-cuda111
 ```
 
-### 1.5 From source
+### From source
 
-You can only install it from source at present since it's pre-released.
+You can install it from source
 
 Clone the thgsp repository from  `github`.
 
@@ -72,3 +65,8 @@ Build thgsp from source, and this may take many minutes.
 cd thgsp
 pip install .
 ```
+
+
+### Prebuilt Wheels
+We provide prebuilt pip wheels for your convenience. Please check them on this [website](http://16.162.201.90/whl/).
+You have to check your `cuda`, `torch`, `python` versions and the `OS` to find a wheel matching your case.

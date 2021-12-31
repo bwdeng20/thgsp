@@ -99,9 +99,10 @@
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="thgsp.graphs.GraphBase.L">
 <span class="sig-name descname"><span class="pre">L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lap_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sym'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/graphs/core.html#GraphBase.L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.graphs.GraphBase.L" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute a specific type of Laplacian matrix. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">self._lap_type</span></code> equals to <code class="xref py py-obj docutils literal notranslate"><span class="pre">lap_type</span></code> and
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">self.cache</span></code> is True, then return the cached Laplacian matrix. Note that every time you compute
-Laplacian with a different type from the last, the cached matrix will be overwritten.</p>
+<dd><p>Compute a specific type of Laplacian matrix. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">self._lap_type</span></code> equals
+to <code class="xref py py-obj docutils literal notranslate"><span class="pre">lap_type</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">self.cache</span></code> is True, then return the cached
+Laplacian matrix. Note that every time you compute Laplacian with a different
+type from the last, the cached matrix will be overwritten.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>lap_type</strong> (<em>str</em>) – One of [“sym”, “comb”, “rw”]</p>

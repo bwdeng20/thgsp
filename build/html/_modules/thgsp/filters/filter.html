@@ -82,22 +82,23 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">thgsp.graphs.core</span> <span class="kn">import</span> <span class="n">GraphBase</span>
-<span class="kn">from</span> <span class="nn">.approximation</span> <span class="kn">import</span> <span class="n">cheby_op</span><span class="p">,</span> <span class="n">cheby_coeff</span>
-<span class="kn">from</span> <span class="nn">.kernels</span> <span class="kn">import</span> <span class="n">meyer_kernel</span><span class="p">,</span> <span class="n">get_kernel_name</span>
+
+<span class="kn">from</span> <span class="nn">.approximation</span> <span class="kn">import</span> <span class="n">cheby_coeff</span><span class="p">,</span> <span class="n">cheby_op</span>
+<span class="kn">from</span> <span class="nn">.kernels</span> <span class="kn">import</span> <span class="n">get_kernel_name</span><span class="p">,</span> <span class="n">meyer_kernel</span>
 
 
 <div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../../../modules/filters.html#thgsp.filters.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A graph filter(bank) class.</span>
+    <span class="sd">&quot;&quot;&quot;A graph filter(bank) class.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    G: GraphBase</span>
 <span class="sd">       Any instance of :py:obj:`GraphBase` or its subclass.</span>
 <span class="sd">    kernels: array, callable, None</span>
-<span class="sd">        Case1: The :obj:`(Co,Ci)` array of :obj:`Co*Ci` filters; :obj:`Co` and :obj:`Ci` are the dimensions of input and</span>
-<span class="sd">        output signals, respectively Case2: A callable python object; all :obj:`Co*Ci` filters employ this kernel.</span>
-<span class="sd">        Case3: Set all :obj:`Co*Ci` filters as ideal low-pass ones.</span>
+<span class="sd">        Case1: The :obj:`(Co,Ci)` array of :obj:`Co*Ci` filters; :obj:`Co` and :obj:`Ci`</span>
+<span class="sd">        are the dimensions of input and output signals, respectively Case2: A callable</span>
+<span class="sd">        python object; all :obj:`Co*Ci` filters employ this kernel. Case3: Set all</span>
+<span class="sd">        :obj:`Co*Ci` filters as ideal low-pass ones.</span>
 <span class="sd">    lam_max:    float</span>
 <span class="sd">        The supremum of graph frequencies.</span>
 
@@ -108,14 +109,14 @@
 <span class="sd">    order: int</span>
 <span class="sd">        The degree of Chebyshev approximation.</span>
 <span class="sd">    weight:     Tensor</span>
-<span class="sd">        Shape: :obj:`(Co,Ci)`.  The signal of every output channel is a weighted sum of :obj:`Ci` filtered signals. The</span>
-<span class="sd">        :obj:`i,j`-th entry is the weight of filtered signal from :obj:`j`-th input channel to :obj:`i`-th output</span>
-<span class="sd">        channel. All-one tensor in default.</span>
+<span class="sd">        Shape: :obj:`(Co,Ci)`.  The signal of every output channel is a weighted sum of</span>
+<span class="sd">        :obj:`Ci` filtered signals. The :obj:`i,j`-th entry is the weight of filtered</span>
+<span class="sd">        signal from :obj:`j`-th input channel to :obj:`i`-th output channel. All-one</span>
+<span class="sd">        tensor in default.</span>
 <span class="sd">    dtype:      torch.dtype</span>
 <span class="sd">        The data type of signals and graph adjacency.</span>
 <span class="sd">    device:     torch.device</span>
 <span class="sd">        The device of graph.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -184,7 +185,8 @@
 
         <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The penultimate dimension of signal:</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">!= the number of nodes: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The penultimate dimension of signal:</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;!= the number of nodes: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
@@ -258,7 +260,8 @@
             <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
         <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The coefficients of Chebyshev polynomials beyond order </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="si">}</span><span class="s2"> are not computed&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The coefficients of Chebyshev polynomials beyond &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;order </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="si">}</span><span class="s2"> are not computed&quot;</span>
             <span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_signal</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cheby_coefficients</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Co x Ci x K+1</span>
@@ -266,18 +269,17 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="Filter.__call__"><a class="viewcode-back" href="../../../modules/filters.html#thgsp.filters.Filter.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cheby</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Filter the input signal **x**.</span>
+        <span class="sd">&quot;&quot;&quot;Filter the input signal **x**.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x:  Tensor</span>
-<span class="sd">            The signal to filter. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and :obj:`N` are the numbers of input</span>
-<span class="sd">            channels and graph nodes, separately.</span>
+<span class="sd">            The signal to filter. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and</span>
+<span class="sd">            :obj:`N` are the numbers of input channels and graph nodes, separately.</span>
 <span class="sd">        cheby: bool</span>
-<span class="sd">            If :py:obj:`True`, conduct filtering via Chebyshev approximation. Otherwise signals are filtered in a</span>
-<span class="sd">            brute-force way - do a complete eigenvalue decomposition of Laplacian :math:`L` to get the GFT and IGFT</span>
-<span class="sd">            matrices.</span>
+<span class="sd">            If :py:obj:`True`, conduct filtering via Chebyshev approximation. Otherwise</span>
+<span class="sd">            signals are filtered in a brute-force way - do a complete eigenvalue</span>
+<span class="sd">            decomposition of Laplacian :math:`L` to get the GFT and IGFT matrices.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -291,8 +293,8 @@
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">info</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="o">+</span> <span class="s2">&quot;(lap_type=</span><span class="si">{}</span><span class="s2"> ,in_channels=</span><span class="si">{}</span><span class="s2">, out_channels=</span><span class="si">{}</span><span class="s2">, N=</span><span class="si">{}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">kernels:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;(lap_type=</span><span class="si">{}</span><span class="s2"> ,in_channels=</span><span class="si">{}</span><span class="s2">, out_channels=</span><span class="si">{}</span><span class="s2">, &quot;</span>
+            <span class="s2">&quot;N=</span><span class="si">{}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">kernels:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">lap_type</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">in_channels</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span>

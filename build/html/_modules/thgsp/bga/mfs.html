@@ -80,14 +80,15 @@
   <h1>Source code for thgsp.bga.mfs</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">lil_matrix</span><span class="p">,</span> <span class="n">eye</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">structural_rank</span><span class="p">,</span> <span class="n">breadth_first_order</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">eye</span><span class="p">,</span> <span class="n">lil_matrix</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">breadth_first_order</span><span class="p">,</span> <span class="n">structural_rank</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">inv</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
 
 <span class="kn">from</span> <span class="nn">thgsp.alg</span> <span class="kn">import</span> <span class="n">dsatur</span>
 <span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">sparse_xcipy_logdet</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">laplace</span><span class="p">,</span> <span class="n">bipartite_mask</span><span class="p">,</span> <span class="n">np</span>
+
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">bipartite_mask</span><span class="p">,</span> <span class="n">laplace</span><span class="p">,</span> <span class="n">np</span>
 
 
 <div class="viewcode-block" id="amfs"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga.mfs.amfs">[docs]</a><span class="k">def</span> <span class="nf">amfs</span><span class="p">(</span>
@@ -107,12 +108,15 @@
 <span class="sd">    A:          SparseTensor</span>
 <span class="sd">        The adjacency matrix.</span>
 <span class="sd">    Sigma:      scipy.spmatrix, optional</span>
-<span class="sd">        The covariance matrix specified by the Laplacian matrix L. If None, :math:`\Sigma^{-1}=L+\delta I`</span>
+<span class="sd">        The covariance matrix specified by the Laplacian matrix L. If None,</span>
+<span class="sd">        :math:`\Sigma^{-1}=L+\delta I`</span>
 <span class="sd">    level:      int, optional</span>
 <span class="sd">        The number of bipartite subgraphs, i.e., the decomposition level. If None,</span>
-<span class="sd">        :math:`level=\lceil log_2( \mathcal{X}) \rceil`, where :math:`\mathcal{X}` is the chromatic number of  :obj:`A`.</span>
+<span class="sd">        :math:`level=\lceil log_2( \mathcal{X}) \rceil`, where :math:`\mathcal{X}` is</span>
+<span class="sd">        the chromatic number of  :obj:`A`.</span>
 <span class="sd">    delta:      float, optional</span>
-<span class="sd">        :math:`1/\delta` is interpreted as the variance of the DC compnent. Refer to [4]_ for more details.</span>
+<span class="sd">        :math:`1/\delta` is interpreted as the variance of the DC compnent. Refer to</span>
+<span class="sd">        [4]_ for more details.</span>
 <span class="sd">    thresh_kld: float, optional</span>
 <span class="sd">        Threshold of Kullback-Leibler divergence to perform `AMFS` decomposition.</span>
 <span class="sd">    priority:   bool,optional</span>
@@ -128,9 +132,10 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [3] Jing Zen, et al, &quot;Bipartite Subgraph Decomposition for Critically Sampledwavelet Filterbanks on Arbitrary</span>
-<span class="sd">            Graphs,&quot; IEEE trans on SP, 2016.</span>
-<span class="sd">    .. [4] A. Gadde, et al, &quot;A probablistic interpretation of sampling theory of graph signals&quot;. ICASSP, 2015.</span>
+<span class="sd">    .. [3]  Jing Zen, et al, &quot;Bipartite Subgraph Decomposition for Critically</span>
+<span class="sd">            Sampledwavelet Filterbanks on Arbitrary Graphs,&quot; IEEE trans on SP, 2016.</span>
+<span class="sd">    .. [4]  A. Gadde, et al, &quot;A probablistic interpretation of sampling theory of graph</span>
+<span class="sd">            signals&quot;. ICASSP, 2015.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -150,11 +155,7 @@
     <span class="n">bptG</span> <span class="o">=</span> <span class="p">[</span><span class="n">lil_matrix</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">|----------------------decomposition in level: </span><span class="si">{:4d}</span><span class="s2"> ------------------------|&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">i</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">|----decomposition in level: </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> ----|&quot;</span><span class="p">)</span>
         <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">amfs1level</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">thresh_kld</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">bt</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
         <span class="n">bt</span><span class="p">[</span><span class="n">s1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># set s1 True</span>

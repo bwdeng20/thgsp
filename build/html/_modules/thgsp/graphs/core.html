@@ -80,10 +80,12 @@
   <h1>Source code for thgsp.graphs.core</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_torch_sparse</span><span class="p">,</span> <span class="n">SparseTensor</span>
-<span class="kn">from</span> <span class="nn">.degree</span> <span class="kn">import</span> <span class="n">in_degree</span><span class="p">,</span> <span class="n">out_degree</span><span class="p">,</span> <span class="n">degree_matrix</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">to_torch_sparse</span>
+
+<span class="kn">from</span> <span class="nn">.degree</span> <span class="kn">import</span> <span class="n">degree_matrix</span><span class="p">,</span> <span class="n">in_degree</span><span class="p">,</span> <span class="n">out_degree</span>
 <span class="kn">from</span> <span class="nn">.is_bipartite</span> <span class="kn">import</span> <span class="n">is_bipartite</span>
 <span class="kn">from</span> <span class="nn">.laplace</span> <span class="kn">import</span> <span class="n">laplace</span>
 
@@ -177,9 +179,10 @@
 
 <div class="viewcode-block" id="GraphBase.L"><a class="viewcode-back" href="../../../modules/graphs.html#thgsp.graphs.GraphBase.L">[docs]</a>    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lap_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sym&quot;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute a specific type of Laplacian matrix. If :py:attr:`self._lap_type` equals to :obj:`lap_type` and</span>
-<span class="sd">        :py:attr:`self.cache` is True, then return the cached Laplacian matrix. Note that every time you compute</span>
-<span class="sd">        Laplacian with a different type from the last, the cached matrix will be overwritten.</span>
+<span class="sd">        Compute a specific type of Laplacian matrix. If :py:attr:`self._lap_type` equals</span>
+<span class="sd">        to :obj:`lap_type` and :py:attr:`self.cache` is True, then return the cached</span>
+<span class="sd">        Laplacian matrix. Note that every time you compute Laplacian with a different</span>
+<span class="sd">        type from the last, the cached matrix will be overwritten.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -217,7 +220,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">fs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">symeig</span><span class="p">(</span><span class="n">lap</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(),</span> <span class="n">eigenvectors</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">fs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">lap</span><span class="o">.</span><span class="n">to_dense</span><span class="p">())</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span> <span class="o">=</span> <span class="n">fs</span>
         <span class="n">fs</span><span class="p">[</span><span class="n">fs</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># for stability</span>

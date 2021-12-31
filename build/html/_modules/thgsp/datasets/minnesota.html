@@ -79,28 +79,32 @@
              
   <h1>Source code for thgsp.datasets.minnesota</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">move</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
+<span class="kn">from</span> <span class="nn">torchvision.datasets.utils</span> <span class="kn">import</span> <span class="n">check_integrity</span><span class="p">,</span> <span class="n">download_and_extract_archive</span>
+
 <span class="kn">from</span> <span class="nn">thgsp.graphs</span> <span class="kn">import</span> <span class="n">Graph</span>
 <span class="kn">from</span> <span class="nn">thgsp.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
-<span class="kn">from</span> <span class="nn">torchvision.datasets.utils</span> <span class="kn">import</span> <span class="n">download_and_extract_archive</span><span class="p">,</span> <span class="n">check_integrity</span>
+
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_data_dir_of_thgsp</span><span class="p">,</span> <span class="n">remove_file_or_dir</span>
 
 
 <div class="viewcode-block" id="Minnesota"><a class="viewcode-back" href="../../../modules/datasets.html#thgsp.datasets.minnesota.Minnesota">[docs]</a><span class="k">class</span> <span class="nc">Minnesota</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The Minnesota traffic network shipped with &quot;Wavelet Filterbanks on Graph&quot; [1]_ project(with a license of GPL V3)</span>
-<span class="sd">    by USC-STAC group(see http://biron.usc.edu/wiki/index.php/Graph_Filterbanks). This road network is a part of</span>
-<span class="sd">    &quot;The National Highway Planning Network (NHPN) 2000-Present dataset&quot; [3]_ and also carried by MatlabBGL [2]_</span>
-<span class="sd">    toolbox(released under BSD).</span>
+<span class="sd">    The Minnesota traffic network shipped with &quot;Wavelet Filterbanks on Graph&quot; [1]_</span>
+<span class="sd">    project(with a license of GPL V3) by USC-STAC group [4]_ . This road network is a</span>
+<span class="sd">    part of &quot;The National Highway Planning Network (NHPN) 2000-Present dataset&quot; [3]_ and</span>
+<span class="sd">    also  carried by MatlabBGL [2]_ toolbox(released under BSD).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    root:   str, optional</span>
-<span class="sd">        The root directory to place the downloaded files. If :obj:`None`, set the root dir as &quot;thgsp.datasets.data&quot;.</span>
+<span class="sd">        The root directory to place the downloaded files. If :obj:`None`, set the root</span>
+<span class="sd">        dir as &quot;thgsp.datasets.data&quot;.</span>
 <span class="sd">    connected: bool</span>
 <span class="sd">        If True, connect the traffic network.</span>
 <span class="sd">    download: bool</span>
@@ -108,10 +112,11 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1]  S K. Naran, et al, &quot;Perfect Reconstruction Two-channel Wavelet Filter Banks for Graph Structured Data&quot;,</span>
-<span class="sd">            IEEE trans on Signal Processing, 2012.</span>
+<span class="sd">    .. [1]  S K. Naran, et al, &quot;Perfect Reconstruction Two-channel Wavelet Filter Banks</span>
+<span class="sd">            for Graph Structured Data&quot;, IEEE trans on Signal Processing, 2012.</span>
 <span class="sd">    .. [2] D. Gleich, &quot;https://github.com/dgleich/matlab-bgl&quot;, GitHub, 2011</span>
 <span class="sd">    .. [3] https://www.fhwa.dot.gov/planning/processes/tools/nhpn/</span>
+<span class="sd">    .. [4] http://biron.usc.edu/wiki/index.php/Graph_Filterbanks)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;Graph_Wavelets_Demo.zip&quot;</span>
@@ -134,7 +139,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_integrity</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Dataset not found or corrupted.&quot;</span>
-                <span class="o">+</span> <span class="s2">&quot; You can use download=True to download it&quot;</span>
+                <span class="s2">&quot; You can use download=True to download it&quot;</span>
             <span class="p">)</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">A</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span>

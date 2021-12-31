@@ -79,17 +79,20 @@
              
   <h1>Source code for thgsp.sampling._utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">to_xcipy</span><span class="p">,</span> <span class="n">SparseTensor</span>
+
+<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">to_xcipy</span>
 
 
 <div class="viewcode-block" id="construct_sampling_matrix"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling._utils.construct_sampling_matrix">[docs]</a><span class="k">def</span> <span class="nf">construct_sampling_matrix</span><span class="p">(</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.</span>
+<span class="sd">    Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as</span>
+<span class="sd">    follows.</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">       \mathbf{H}_{i j}= \begin{cases}1, &amp; j=\mathcal{S}_{i} \\ 0, &amp; \text { otherwise }\end{cases}</span>
+<span class="sd">       \mathbf{H}_{i j}= \begin{cases}1, &amp; j=\mathcal{S}_{i} \\ 0, &amp; \text { otherwise }</span>
+<span class="sd">       \end{cases}</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -102,9 +105,10 @@
 <span class="sd">    layout: str</span>
 <span class="sd">        The memory layout of the generated sparse matrix. One of (&quot;csc&quot;, &quot;csr&quot;, &quot;coo&quot;).</span>
 <span class="sd">    device: torch.device, str, optional</span>
-<span class="sd">        If :py:`True` and  `cupy` is installed, use `cupy`as backend; otherwise use `scipy`.</span>
+<span class="sd">        If :py:`True` and  `cupy` is installed, use `cupy`as backend; otherwise `scipy`.</span>
 <span class="sd">    return_ts: bool,</span>
-<span class="sd">        If False, return `scipy.sparse.spmatrix` of device is GPU else &#39;cupyx.scipy.sparse.spmatrix&#39;</span>
+<span class="sd">        If False, return `scipy.sparse.spmatrix` of device is GPU else</span>
+<span class="sd">        &#39;cupyx.scipy.sparse.spmatrix&#39;</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

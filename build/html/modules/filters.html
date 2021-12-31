@@ -101,20 +101,23 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.filters.kernels.design_biorth_kernel">
 <span class="sig-name descname"><span class="pre">design_biorth_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/kernels.html#design_biorth_kernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.kernels.design_biorth_kernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the coefficients of biorthogonal kernels <span class="math notranslate nohighlight">\(h_0\)</span> and <span class="math notranslate nohighlight">\(g_0\)</span>, which are nearly the most orthogonal
-and maximally balanced pair among all possible factorizations of</p>
+<dd><p>Compute the coefficients of biorthogonal kernels <span class="math notranslate nohighlight">\(h_0\)</span> and <span class="math notranslate nohighlight">\(g_0\)</span>, which
+are nearly the most orthogonal and maximally balanced pair among all possible
+factorizations of</p>
 <div class="math notranslate nohighlight">
 \[p(\lambda)      =(2-\lambda)^{K}[1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}],\]</div>
-<p>where <span class="math notranslate nohighlight">\(K=2k\)</span>. The design scheme detailed in <a class="footnote-reference brackets" href="#id2" id="id1">1</a> satisfies <span class="math notranslate nohighlight">\(k_0=k_1=k, K=2k, l_0=2k\)</span>, and
-<span class="math notranslate nohighlight">\(l_1=2k-1\)</span>, implying that the residual polynomial <span class="math notranslate nohighlight">\(R(\lambda)\)</span> is <span class="math notranslate nohighlight">\(2k-1\)</span> degree, with exactly one
-real root and <span class="math notranslate nohighlight">\((k-1)\)</span> complex conjugate pairs of roots.
-If <span class="math notranslate nohighlight">\(k\)</span> is odd, assign the only real root and <span class="math notranslate nohighlight">\((k-1)/2\)</span> complex conjugate  pairs of roots to
-<span class="math notranslate nohighlight">\(h_{0}(\lambda)\)</span>. Thus we have a <span class="math notranslate nohighlight">\(2k\)</span>-degree <span class="math notranslate nohighlight">\(h_{0}(\lambda)\)</span> having <span class="math notranslate nohighlight">\(k\)</span> roots at
-<span class="math notranslate nohighlight">\(\lambda=2\)</span> and other <span class="math notranslate nohighlight">\(k\)</span> roots which are zeros of <span class="math notranslate nohighlight">\(R(\lambda)\)</span>. The <span class="math notranslate nohighlight">\(2k-1\)</span> degree
-<span class="math notranslate nohighlight">\(g_{0}(\lambda)\)</span> has <span class="math notranslate nohighlight">\(k\)</span> roots at <span class="math notranslate nohighlight">\(\lambda=2\)</span> and other <cite>k-1</cite> roots from <span class="math notranslate nohighlight">\(R(\lambda)\)</span>.
-If <span class="math notranslate nohighlight">\(k\)</span> is even, assign <span class="math notranslate nohighlight">\(k/2\)</span> complex conjugate root pairs of <span class="math notranslate nohighlight">\(R(\lambda)\)</span> to
-<span class="math notranslate nohighlight">\(h_{0}(\lambda)\)</span>; the remaining <span class="math notranslate nohighlight">\(k/2-1\)</span> pairs of roots and
-the only real root to <span class="math notranslate nohighlight">\(g_{0}(\lambda)\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(K=2k\)</span>. The design scheme detailed in <a class="footnote-reference brackets" href="#id2" id="id1">1</a> satisfies
+<span class="math notranslate nohighlight">\(k_0=k_1=k, K=2k, l_0=2k\)</span>, and <span class="math notranslate nohighlight">\(l_1=2k-1\)</span>, implying that the residual
+polynomial <span class="math notranslate nohighlight">\(R(\lambda)\)</span> is <span class="math notranslate nohighlight">\(2k-1\)</span> degree, with exactly one real root and
+<span class="math notranslate nohighlight">\((k-1)\)</span> complex conjugate pairs of roots. If <span class="math notranslate nohighlight">\(k\)</span> is odd, assign the only
+real root and <span class="math notranslate nohighlight">\((k-1)/2\)</span> complex conjugate  pairs of roots to
+<span class="math notranslate nohighlight">\(h_{0}(\lambda)\)</span>. Thus we have a <span class="math notranslate nohighlight">\(2k\)</span>-degree <span class="math notranslate nohighlight">\(h_{0}(\lambda)\)</span>
+having <span class="math notranslate nohighlight">\(k\)</span> roots at <span class="math notranslate nohighlight">\(\lambda=2\)</span> and other <span class="math notranslate nohighlight">\(k\)</span> roots which are
+zeros of <span class="math notranslate nohighlight">\(R(\lambda)\)</span>. The <span class="math notranslate nohighlight">\(2k-1\)</span> degree <span class="math notranslate nohighlight">\(g_{0}(\lambda)\)</span> has
+<span class="math notranslate nohighlight">\(k\)</span> roots at <span class="math notranslate nohighlight">\(\lambda=2\)</span> and other <cite>k-1</cite> roots from <span class="math notranslate nohighlight">\(R(\lambda)\)</span>.
+If <span class="math notranslate nohighlight">\(k\)</span> is even, assign <span class="math notranslate nohighlight">\(k/2\)</span> complex conjugate root pairs of
+<span class="math notranslate nohighlight">\(R(\lambda)\)</span> to <span class="math notranslate nohighlight">\(h_{0}(\lambda)\)</span>; the remaining <span class="math notranslate nohighlight">\(k/2-1\)</span> pairs of
+roots and the only real root to <span class="math notranslate nohighlight">\(g_{0}(\lambda)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – This integer determines the degree of all polynomial kernels.</p>
@@ -123,21 +126,21 @@ the only real root to <span class="math notranslate nohighlight">\(g_{0}(\lambda
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>h0_c</strong> (<em>array</em>) – The coefficients of <span class="math notranslate nohighlight">\(h_0\)</span>.</p></li>
 <li><p><strong>g0_c</strong> (<em>array</em>) – The coefficients of <span class="math notranslate nohighlight">\(g_0\)</span>.</p></li>
-<li><p><strong>theta_best</strong> (<em>float</em>) – A float within <span class="math notranslate nohighlight">\([0,1]\)</span>. The closer it is to <span class="math notranslate nohighlight">\(1\)</span> , the more orthogonal the wavelet bases determined
-by <span class="math notranslate nohighlight">\(h_0\)</span> and <span class="math notranslate nohighlight">\(g_0\)</span> are.</p></li>
+<li><p><strong>theta_best</strong> (<em>float</em>) – A float within <span class="math notranslate nohighlight">\([0,1]\)</span>. The closer it is to <span class="math notranslate nohighlight">\(1\)</span> , the more
+orthogonal the wavelet bases determined by <span class="math notranslate nohighlight">\(h_0\)</span> and <span class="math notranslate nohighlight">\(g_0\)</span> are.</p></li>
 </ul>
 </p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Large <span class="math notranslate nohighlight">\(k(k&gt;14)\)</span> may lead to a failed kernel design, possibly due to the accumulated computation
-error arising in the high order power operations. Empirically speaking, a smaller <span class="math notranslate nohighlight">\(k(2&lt;k&lt;12)\)</span> works
-well.</p>
+<p>Large <span class="math notranslate nohighlight">\(k(k&gt;14)\)</span> may lead to a failed kernel design, possibly due to the
+accumulated computation error arising in the high order power operations.
+Empirically speaking, a smaller <span class="math notranslate nohighlight">\(k(2&lt;k&lt;12)\)</span> works well.</p>
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks for arbitrary
-undirected graphs,” IEEE Trans on Signal Processing, 2013.</p>
+<dd><p>S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks
+for arbitrary undirected graphs,” IEEE TSP, 2013.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -150,11 +153,12 @@ and <span class="math notranslate nohighlight">\(g_0(\lambda)\)</span> metioned 
 <div class="math notranslate nohighlight">
 \[p(\lambda)      =(2-\lambda)^{K}[1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}
 =(1-l)^{K}[1+\sum_{m=1}^{K-1}r_{m}l^{m}],\lambda=l+1.\]</div>
-<p>has <span class="math notranslate nohighlight">\(K\)</span> roots at <span class="math notranslate nohighlight">\(\lambda=2\)</span>, and other <span class="math notranslate nohighlight">\(K-1\)</span> roots which are also roots of the residual
-polynomial below.</p>
+<p>has <span class="math notranslate nohighlight">\(K\)</span> roots at <span class="math notranslate nohighlight">\(\lambda=2\)</span>, and other <span class="math notranslate nohighlight">\(K-1\)</span> roots which are also
+roots of the residual polynomial below.</p>
 <div class="math notranslate nohighlight">
 \[R(\lambda)=1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}\]</div>
-<p>This function can figure out the roots of <span class="math notranslate nohighlight">\(R(\lambda)\)</span> by firstly finding the zeros(roots) of <span class="math notranslate nohighlight">\(R(l)\)</span>.</p>
+<p>This function can figure out the roots of <span class="math notranslate nohighlight">\(R(\lambda)\)</span> by firstly finding the
+zeros(roots) of <span class="math notranslate nohighlight">\(R(l)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>K</strong> (<em>int</em>) – The order of <span class="math notranslate nohighlight">\(p(\lambda)\)</span> is <span class="math notranslate nohighlight">\(2K-1\)</span></p>
@@ -176,11 +180,12 @@ polynomial below.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>Tensor</em>) – The input graph signal. It’s shape can be either <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> , <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code>, wherein
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> are the numbers of nodes, input channels, and output channels respectively.</p></li>
+<li><p><strong>x</strong> (<em>Tensor</em>) – The input graph signal. It’s shape can be either <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> , <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code> or
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code>, wherein <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> are the numbers of
+nodes, input channels, and output channels respectively.</p></li>
 <li><p><strong>L</strong> (<em>SparseTensor</em>) – The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,N)</span></code> Laplacian matrix.</p></li>
-<li><p><strong>coeff</strong> (<em>Tensor</em>) – The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci,K+1)</span></code> Chebyshev coefficients for <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci*Co</span></code> kernels, wherein <code class="xref py py-obj docutils literal notranslate"><span class="pre">K</span></code> is the order of
-approximation.</p></li>
+<li><p><strong>coeff</strong> (<em>Tensor</em>) – The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci,K+1)</span></code> Chebyshev coefficients for <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci*Co</span></code> kernels, wherein
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">K</span></code> is the order of approximation.</p></li>
 <li><p><strong>lam_max</strong> (<em>float</em><em>,</em><em>optional</em>) – The maximal graph frequency, i.e., <span class="math notranslate nohighlight">\(\lambda_{max}\)</span></p></li>
 </ul>
 </dd>
@@ -196,13 +201,13 @@ approximation.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.filters.approximation.polyval">
 <span class="sig-name descname"><span class="pre">polyval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/approximation.html#polyval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.approximation.polyval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate <cite>N</cite>-order polynomial at the points <cite>x</cite> with the given <cite>N+1</cite> coefficients
-in descending order.</p>
+<dd><p>Evaluate <cite>N</cite>-order polynomial at the points <cite>x</cite> with the given <cite>N+1</cite>
+coefficients in descending order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>c</strong> (<em>Tensor</em><em>, </em><em>a list of Tensor</em>) – The coefficients can be either a list of  tensors which are broadcastable with the input <cite>x</cite>
-or an concatenated tensor of them.</p></li>
+<li><p><strong>c</strong> (<em>Tensor</em><em>, </em><em>a list of Tensor</em>) – The coefficients can be either a list of  tensors which are broadcastable with
+the input <cite>x</cite> or an concatenated tensor of them.</p></li>
 <li><p><strong>x</strong> (<em>Tensor</em><em>, </em><em>scalar</em>) – Arbitrary rank-D tensor(D=1,2,…) is valid due to the broadcasting semantics.</p></li>
 </ul>
 </dd>
@@ -226,9 +231,10 @@ or an concatenated tensor of them.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<a class="reference internal" href="graphs.html#thgsp.graphs.GraphBase" title="thgsp.graphs.GraphBase"><em>GraphBase</em></a>) – Any instance of <code class="xref py py-obj docutils literal notranslate"><span class="pre">GraphBase</span></code> or its subclass.</p></li>
-<li><p><strong>kernels</strong> (<em>array</em><em>, </em><em>callable</em><em>, </em><em>None</em>) – Case1: The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci)</span></code> array of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters; <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> are the dimensions of input and
-output signals, respectively Case2: A callable python object; all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters employ this kernel.
-Case3: Set all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters as ideal low-pass ones.</p></li>
+<li><p><strong>kernels</strong> (<em>array</em><em>, </em><em>callable</em><em>, </em><em>None</em>) – Case1: The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci)</span></code> array of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters; <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code>
+are the dimensions of input and output signals, respectively Case2: A callable
+python object; all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters employ this kernel. Case3: Set all
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters as ideal low-pass ones.</p></li>
 <li><p><strong>lam_max</strong> (<em>float</em>) – The supremum of graph frequencies.</p></li>
 </ul>
 </dd>
@@ -258,9 +264,10 @@ Case3: Set all <code class="xref py py-obj docutils literal notranslate"><span c
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thgsp.filters.Filter.weight">
 <span class="sig-name descname"><span class="pre">weight</span></span><a class="headerlink" href="#thgsp.filters.Filter.weight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci)</span></code>.  The signal of every output channel is a weighted sum of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> filtered signals. The
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">i,j</span></code>-th entry is the weight of filtered signal from <code class="xref py py-obj docutils literal notranslate"><span class="pre">j</span></code>-th input channel to <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th output
-channel. All-one tensor in default.</p>
+<dd><p>Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci)</span></code>.  The signal of every output channel is a weighted sum of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> filtered signals. The <code class="xref py py-obj docutils literal notranslate"><span class="pre">i,j</span></code>-th entry is the weight of filtered
+signal from <code class="xref py py-obj docutils literal notranslate"><span class="pre">j</span></code>-th input channel to <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th output channel. All-one
+tensor in default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -297,11 +304,11 @@ channel. All-one tensor in default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>Tensor</em>) – The signal to filter. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <a class="reference internal" href="#thgsp.filters.Filter.N" title="thgsp.filters.Filter.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> are the numbers of input
-channels and graph nodes, separately.</p></li>
-<li><p><strong>cheby</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, conduct filtering via Chebyshev approximation. Otherwise signals are filtered in a
-brute-force way - do a complete eigenvalue decomposition of Laplacian <span class="math notranslate nohighlight">\(L\)</span> to get the GFT and IGFT
-matrices.</p></li>
+<li><p><strong>x</strong> (<em>Tensor</em>) – The signal to filter. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and
+<a class="reference internal" href="#thgsp.filters.Filter.N" title="thgsp.filters.Filter.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> are the numbers of input channels and graph nodes, separately.</p></li>
+<li><p><strong>cheby</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, conduct filtering via Chebyshev approximation. Otherwise
+signals are filtered in a brute-force way - do a complete eigenvalue
+decomposition of Laplacian <span class="math notranslate nohighlight">\(L\)</span> to get the GFT and IGFT matrices.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -327,18 +334,19 @@ matrices.</p></li>
 <dd><p>Conduct a wavelet transform on the input signal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Although the returned coefficients are a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code> tensor <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z</span></code>, there are only <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> non-zero
-entries in those coefficients corresponding to one input channel. For instance, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z[...,</span> <span class="pre">0]</span></code> has only
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> non-zero items.</p>
+<p>Although the returned coefficients are a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code> tensor <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z</span></code>,
+there are only <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> non-zero entries in those coefficients corresponding
+to one input channel. For instance, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z[...,</span> <span class="pre">0]</span></code> has only <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code>
+non-zero items.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The signal to transform. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> are the numbers of
-input channels and graph nodes, separately.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The signal to transform. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> are the numbers of input channels and graph nodes, separately.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The wavelet coefficients with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code> or equally <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code>. <code class="xref py py-attr docutils literal notranslate"><span class="pre">M</span></code> is the #
-of output channels.</p>
+<dd class="field-even"><p>The wavelet coefficients with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code> or equally
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code>. <code class="xref py py-attr docutils literal notranslate"><span class="pre">M</span></code> is the # of output channels.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -362,18 +370,19 @@ of output channels.</p>
 <dd><p>Conduct a wavelet transform on the input signal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Although the returned coefficients are a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code> tensor <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z</span></code>, there are only <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> non-zero
-entries in those coefficients corresponding to one input channel. For instance, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z[...,</span> <span class="pre">0]</span></code> has only
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> non-zero items.</p>
+<p>Although the returned coefficients are a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code> tensor <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z</span></code>,
+there are only <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> non-zero entries in those coefficients corresponding
+to one input channel. For instance, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z[...,</span> <span class="pre">0]</span></code> has only <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code>
+non-zero items.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The signal to transform. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> are the numbers of
-input channels and graph nodes, separately.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The signal to transform. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> are the numbers of input channels and graph nodes, separately.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The wavelet coefficients with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code> or equally <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code>. <code class="xref py py-attr docutils literal notranslate"><span class="pre">M</span></code> is the #
-of output channels.</p>
+<dd class="field-even"><p>The wavelet coefficients with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code> or equally
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code>. <code class="xref py py-attr docutils literal notranslate"><span class="pre">M</span></code> is the # of output channels.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
@@ -394,8 +403,9 @@ of output channels.</p>
 <dd><p>The core implementation of GraphQmf <a class="footnote-reference brackets" href="#id6" id="id3">2</a> and GraphBiorth <a class="footnote-reference brackets" href="#id7" id="id4">3</a> filterbanks.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>There is no need to change <a class="reference internal" href="#thgsp.filters.QmfCore.in_channels" title="thgsp.filters.QmfCore.in_channels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">in_channels</span></code></a> when the signals of all input channels share a
-same filterbank since <a class="reference internal" href="#thgsp.filters.QmfCore" title="thgsp.filters.QmfCore"><code class="xref py py-class docutils literal notranslate"><span class="pre">QmfCore</span></code></a> can automatically broadcast one filterbank among all input channels.</p>
+<p>There is no need to change <a class="reference internal" href="#thgsp.filters.QmfCore.in_channels" title="thgsp.filters.QmfCore.in_channels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">in_channels</span></code></a> when the signals of all input
+channels share a same filterbank since <a class="reference internal" href="#thgsp.filters.QmfCore" title="thgsp.filters.QmfCore"><code class="xref py py-class docutils literal notranslate"><span class="pre">QmfCore</span></code></a> can automatically
+broadcast one filterbank among all input channels.</p>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thgsp.filters.QmfCore.N">
@@ -422,8 +432,9 @@ same filterbank since <a class="reference internal" href="#thgsp.filters.QmfCore
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thgsp.filters.QmfCore.beta">
 <span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#thgsp.filters.QmfCore.beta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Each column of <a class="reference internal" href="#thgsp.filters.QmfCore.beta" title="thgsp.filters.QmfCore.beta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">beta</span></code></a> corresponds to one bipartite (sub)graph It has ones at the
-locations of nodes sampled by the lowpass filter, with zeros at that by the highpass filter</p>
+<dd><p>Each column of <a class="reference internal" href="#thgsp.filters.QmfCore.beta" title="thgsp.filters.QmfCore.beta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">beta</span></code></a> corresponds to one bipartite (sub)graph It has ones
+at the locations of nodes sampled by the lowpass filter, with zeros at that by
+the highpass filter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>(Bool)Tensor(N,M)</p>
@@ -436,11 +447,13 @@ locations of nodes sampled by the lowpass filter, with zeros at that by the high
 <span class="sig-name descname"><span class="pre">analyze_kernels</span></span><a class="headerlink" href="#thgsp.filters.QmfCore.analyze_kernels" title="Permalink to this definition">¶</a></dt>
 <dd><ol class="arabic simple">
 <li><p>If None, use meyer kernels, following <a class="footnote-reference brackets" href="#id6" id="id5">2</a>.</p></li>
-<li><p>A tuple or list consisting of two kernel functions designed for low-pass and high-pass filtering, separately.
-Then the other kernels functions for all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co=2^M</span></code> channels are derived.</p></li>
-<li><p>An array of kernel functions with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">Co,</span> <span class="pre">Ci)</span></code>. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> is the #s of
-input channels, i.e., <a class="reference internal" href="#thgsp.filters.QmfCore.in_channels" title="thgsp.filters.QmfCore.in_channels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">in_channels</span></code></a> and output channels, respectively. Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> is
-the channels of wavelet coefficients and hence is actually <code class="xref py py-obj docutils literal notranslate"><span class="pre">2^M</span></code></p></li>
+<li><p>A tuple or list consisting of two kernel functions designed for low-pass and
+high-pass filtering, separately. Then the other kernels functions for all
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Co=2^M</span></code> channels are derived.</p></li>
+<li><p>An array of kernel functions with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">Co,</span> <span class="pre">Ci)</span></code>. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code>
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> is the #s of input channels, i.e., <a class="reference internal" href="#thgsp.filters.QmfCore.in_channels" title="thgsp.filters.QmfCore.in_channels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">in_channels</span></code></a> and
+output channels, respectively. Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> is the channels of
+wavelet coefficients and hence is actually <code class="xref py py-obj docutils literal notranslate"><span class="pre">2^M</span></code> .</p></li>
 </ol>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -452,7 +465,8 @@ the channels of wavelet coefficients and hence is actually <code class="xref py 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thgsp.filters.QmfCore.synthesis_kernels">
 <span class="sig-name descname"><span class="pre">synthesis_kernels</span></span><a class="headerlink" href="#thgsp.filters.QmfCore.synthesis_kernels" title="Permalink to this definition">¶</a></dt>
-<dd><p>This arg is almost the same with <a class="reference internal" href="#thgsp.filters.QmfCore.analyze_kernels" title="thgsp.filters.QmfCore.analyze_kernels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">analyze_kernels</span></code></a> except that this is for synthesis stage.</p>
+<dd><p>This arg is almost the same with <a class="reference internal" href="#thgsp.filters.QmfCore.analyze_kernels" title="thgsp.filters.QmfCore.analyze_kernels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">analyze_kernels</span></code></a> except that this is for
+synthesis stage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>List[function], Tuple[function], np.ndarray[function], optional</p>
@@ -463,8 +477,9 @@ the channels of wavelet coefficients and hence is actually <code class="xref py 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thgsp.filters.QmfCore.in_channels">
 <span class="sig-name descname"><span class="pre">in_channels</span></span><a class="headerlink" href="#thgsp.filters.QmfCore.in_channels" title="Permalink to this definition">¶</a></dt>
-<dd><p>The # of input channels. Default <code class="xref py py-obj docutils literal notranslate"><span class="pre">1</span></code>. Consider this only when you want to process <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code> graph
-signals and for all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> channels you want to build different graphQmf or graphBiorth wavelet filterbanks
+<dd><p>The # of input channels. Default <code class="xref py py-obj docutils literal notranslate"><span class="pre">1</span></code>. Consider this only when you want to
+process <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code> graph signals and for all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> channels you want to
+build different graphQmf or graphBiorth wavelet filterbanks
 (via using different analysis and synthesis kernel functions).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -509,12 +524,12 @@ signals and for all <code class="xref py py-obj docutils literal notranslate"><s
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id6"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>)</span></dt>
-<dd><p>S K. Naran, et al, “Perfect Reconstruction Two-channel Wavelet Filter Banks for Graph Structured Data”,
-IEEE trans on Signal Processing, 2012.</p>
+<dd><p>S K. Naran, et al, “Perfect Reconstruction Two-channel Wavelet Filter
+Banks for Graph Structured Data”, IEEE TSP, 2012.</p>
 </dd>
 <dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
-<dd><p>S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks for arbitrary undirected graphs,”
-IEEE Trans on Signal Processing, 2013.</p>
+<dd><p>S. Narang and A. Ortega, “Compact support biorthogonal wavelet
+filterbanks for arbitrary undirected graphs,” IEEE TSP, 2013.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -523,18 +538,19 @@ IEEE Trans on Signal Processing, 2013.</p>
 <dd><p>Conduct a wavelet transform on the input signal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Although the returned coefficients are a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code> tensor <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z</span></code>, there are only <a class="reference internal" href="#thgsp.filters.QmfCore.N" title="thgsp.filters.QmfCore.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> non-zero
-entries in those coefficients corresponding to one input channel. For instance, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z[...,</span> <span class="pre">0]</span></code> has only
-<a class="reference internal" href="#thgsp.filters.QmfCore.N" title="thgsp.filters.QmfCore.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> non-zero items.</p>
+<p>Although the returned coefficients are a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code> tensor <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z</span></code>,
+there are only <a class="reference internal" href="#thgsp.filters.QmfCore.N" title="thgsp.filters.QmfCore.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> non-zero entries in those coefficients corresponding
+to one input channel. For instance, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Z[...,</span> <span class="pre">0]</span></code> has only <a class="reference internal" href="#thgsp.filters.QmfCore.N" title="thgsp.filters.QmfCore.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a>
+non-zero items.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The signal to transform. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and <a class="reference internal" href="#thgsp.filters.QmfCore.N" title="thgsp.filters.QmfCore.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> are the numbers of
-input channels and graph nodes, separately.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The signal to transform. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and
+<a class="reference internal" href="#thgsp.filters.QmfCore.N" title="thgsp.filters.QmfCore.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> are the numbers of input channels and graph nodes, separately.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The wavelet coefficients with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code> or equally <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code>. <a class="reference internal" href="#thgsp.filters.QmfCore.M" title="thgsp.filters.QmfCore.M"><code class="xref py py-attr docutils literal notranslate"><span class="pre">M</span></code></a> is the #
-of output channels.</p>
+<dd class="field-even"><p>The wavelet coefficients with a shape of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,N,Ci)</span></code> or equally
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,N,Ci)</span></code>. <a class="reference internal" href="#thgsp.filters.QmfCore.M" title="thgsp.filters.QmfCore.M"><code class="xref py py-attr docutils literal notranslate"><span class="pre">M</span></code></a> is the # of output channels.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>

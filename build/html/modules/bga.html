@@ -56,7 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-thgsp.bga.admm">ADMM-based</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-thgsp.bga.mfs">MFS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-thgsp.bga.greedy">Greedy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#bga-utils">bga Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-thgsp.bga._utils">bga Utils</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="filters.html">thgsp.filters</a></li>
@@ -99,7 +99,7 @@
 <li><p><a class="reference internal" href="#module-thgsp.bga.admm" id="id11">ADMM-based</a></p></li>
 <li><p><a class="reference internal" href="#module-thgsp.bga.mfs" id="id12">MFS</a></p></li>
 <li><p><a class="reference internal" href="#module-thgsp.bga.greedy" id="id13">Greedy</a></p></li>
-<li><p><a class="reference internal" href="#bga-utils" id="id14">bga Utils</a></p></li>
+<li><p><a class="reference internal" href="#module-thgsp.bga._utils" id="id14">bga Utils</a></p></li>
 </ul>
 </div>
 <section id="module-thgsp.bga.harary">
@@ -112,18 +112,20 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>A</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SparseTensor</span></code>) – The adjacency matrix</p></li>
-<li><p><strong>vtx_color</strong> (<em>array_like</em><em>, </em><em>optional</em>) – All valid type for <code class="xref py py-func docutils literal notranslate"><span class="pre">np.asarray()</span></code> is acceptable, including <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> on cpu. If None,
-this function will invoke <code class="xref py py-func docutils literal notranslate"><span class="pre">thgsp.alg.dsatur()</span></code> silently.</p></li>
+<li><p><strong>vtx_color</strong> (<em>array_like</em><em>, </em><em>optional</em>) – All valid type for <code class="xref py py-func docutils literal notranslate"><span class="pre">np.asarray()</span></code> is acceptable, including
+<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> on cpu. If None, this function will invoke
+<code class="xref py py-func docutils literal notranslate"><span class="pre">thgsp.alg.dsatur()</span></code> silently.</p></li>
 <li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>bptG</strong> (<em>array</em>) – An array consisting of <code class="xref py py-obj docutils literal notranslate"><span class="pre">M</span></code> bipartite subgraphs formatted as <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.sparse.lil_matrix</span></code>.</p></li>
+<li><p><strong>bptG</strong> (<em>array</em>) – An array consisting of <code class="xref py py-obj docutils literal notranslate"><span class="pre">M</span></code> bipartite subgraphs formatted as
+<code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.sparse.lil_matrix</span></code>.</p></li>
 <li><p><strong>beta</strong> (<em>array</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">beta[:,i]</span></code> is the bipartite set indicator of <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th subgraph.</p></li>
 <li><p><strong>beta_dist</strong> (<em>array</em>) – A table showing the relationship between <code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code> and  <code class="xref py py-obj docutils literal notranslate"><span class="pre">channels</span></code></p></li>
 <li><p><strong>new_vtx_color</strong> (<em>array</em>) – The node colors</p></li>
-<li><p><strong>mapper</strong> (<em>dict</em>) – Map <strong>new_vtx_color</strong> to the original ones. For example mapper={1:2, 2:3, 3:1} will
+<li><p><strong>mapper</strong> (<em>dict</em>) – Map <strong>new_vtx_color</strong> to the original ones. For example mapper={1:2, 2:3, 3:1}
 map 1,2 and 3-th color to 2,3 and 1, respectively.</p></li>
 </ul>
 </p>
@@ -142,8 +144,9 @@ map 1,2 and 3-th color to 2,3 and 1, respectively.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>A</strong> (<em>SparseTensor</em>) – The adjacent matrix of graph.</p></li>
-<li><p><strong>lc</strong> (<em>int</em>) – The ordinal of color marking the boundary such that all nodes with a smaller color ordinal are
-grouped into the low-pass channel while those with a larger color ordinal are in the high-pass channel.</p></li>
+<li><p><strong>lc</strong> (<em>int</em>) – The ordinal of color marking the boundary such that all nodes with a smaller color
+ordinal are grouped into the low-pass channel while those with a larger color
+ordinal are in the high-pass channel.</p></li>
 <li><p><strong>vtx_color</strong> (<em>iter</em>) – The graph coloring result</p></li>
 </ul>
 </dd>
@@ -160,7 +163,8 @@ grouped into the low-pass channel while those with a larger color ordinal are in
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Akie Sakiyama, et al, “Oversampled Graph Laplacian Matrix for Graph Filter Banks”, IEEE trans on SP, 2016</p>
+<dd><p>Akie Sakiyama, et al, “Oversampled Graph Laplacian Matrix for Graph Filter
+Banks”, IEEE trans on SP, 2016.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -171,16 +175,20 @@ grouped into the low-pass channel while those with a larger color ordinal are in
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.bga.admm.admm_bga">
 <span class="sig-name descname"><span class="pre">admm_bga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fro21'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/admm.html#admm_bga"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga.admm.admm_bga" title="Permalink to this definition">¶</a></dt>
-<dd><p>The program is to find the bipartite graph approximation via solving the following optimization problem <a class="footnote-reference brackets" href="#id4" id="id3">2</a> .</p>
+<dd><p>The program is to find the bipartite graph approximation via solving the
+following optimization problem <a class="footnote-reference brackets" href="#id4" id="id3">2</a> .</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{ll}
-\min _{\left\{\mathbf{B}_{i}\right\}} &amp; \sum_{i=1}^{L}\left\|\mathbf{A}-\mathbf{B}_{i}\right\|_{F}^{2}+\alpha
-\sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T} \mathbf{B}_{j}\right\} \\
+\min _{\left\{\mathbf{B}_{i}\right\}} &amp; \sum_{i=1}^{L}\left\|\mathbf{
+A}-\mathbf{B}_{i}\right\|_{F}^{2}+\alpha
+\sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T}
+\mathbf{B}_{j}\right\} \\
 \text { s.t. } &amp; \mathbf{B}_{i} \in \mathcal{B}
 \end{array}\end{split}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This algorithm does NOT guarantee bipartite output graphs in some cases. Nevertheless, the output graphs are
+<p>This algorithm does NOT guarantee bipartite output graphs in some cases.
+Nevertheless, the output graphs are
 almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
 <code class="xref py py-func docutils literal notranslate"><span class="pre">is_bipartite_fix()</span></code> to fix the output under such circumstances.</p>
 </div>
@@ -191,7 +199,8 @@ almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
 <li><p><strong>M</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of bipartite graphs to learn</p></li>
 <li><p><strong>alpha</strong> (<em>float</em><em>,</em><em>optional</em>) – The parameter which controls the orthogonality among learnt bipartite graphs</p></li>
 <li><p><strong>metric</strong> (<em>str</em><em>,</em><em>optional</em>) – The error metric between the learned bipartite graphs and the original graph</p></li>
-<li><p><strong>cut_edge</strong> (<em>bool</em><em>,</em><em>optional</em>) – If True, cut the edges in the learned bipartite graphs that not exist in the original graph</p></li>
+<li><p><strong>cut_edge</strong> (<em>bool</em><em>,</em><em>optional</em>) – If True, cut the edges in the learned bipartite graphs that not exist in the
+original graph</p></li>
 <li><p><strong>init_B</strong> (<em>Tensor</em><em>,</em><em>optional</em>) – The initialization of B</p></li>
 <li><p><strong>convergence_marker</strong> (<em>float</em><em>,</em><em>optional</em>) – the procedure converges if the error between B and A &lt; this value</p></li>
 <li><p><strong>check_step</strong> (<em>int</em><em>,</em><em>optional</em>) – the step interval to display iteration information</p></li>
@@ -230,10 +239,13 @@ almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>A</strong> (<em>SparseTensor</em>) – The adjacency matrix.</p></li>
-<li><p><strong>Sigma</strong> (<em>scipy.spmatrix</em><em>, </em><em>optional</em>) – The covariance matrix specified by the Laplacian matrix L. If None, <span class="math notranslate nohighlight">\(\Sigma^{-1}=L+\delta I\)</span></p></li>
+<li><p><strong>Sigma</strong> (<em>scipy.spmatrix</em><em>, </em><em>optional</em>) – The covariance matrix specified by the Laplacian matrix L. If None,
+<span class="math notranslate nohighlight">\(\Sigma^{-1}=L+\delta I\)</span></p></li>
 <li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of bipartite subgraphs, i.e., the decomposition level. If None,
-<span class="math notranslate nohighlight">\(level=\lceil log_2( \mathcal{X}) \rceil\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{X}\)</span> is the chromatic number of  <code class="xref py py-obj docutils literal notranslate"><span class="pre">A</span></code>.</p></li>
-<li><p><strong>delta</strong> (<em>float</em><em>, </em><em>optional</em>) – <span class="math notranslate nohighlight">\(1/\delta\)</span> is interpreted as the variance of the DC compnent. Refer to <a class="footnote-reference brackets" href="#id8" id="id6">4</a> for more details.</p></li>
+<span class="math notranslate nohighlight">\(level=\lceil log_2( \mathcal{X}) \rceil\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{X}\)</span> is
+the chromatic number of  <code class="xref py py-obj docutils literal notranslate"><span class="pre">A</span></code>.</p></li>
+<li><p><strong>delta</strong> (<em>float</em><em>, </em><em>optional</em>) – <span class="math notranslate nohighlight">\(1/\delta\)</span> is interpreted as the variance of the DC compnent. Refer to
+<a class="footnote-reference brackets" href="#id8" id="id6">4</a> for more details.</p></li>
 <li><p><strong>thresh_kld</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold of Kullback-Leibler divergence to perform <cite>AMFS</cite> decomposition.</p></li>
 <li><p><strong>priority</strong> (<em>bool</em><em>,</em><em>optional</em>) – If True, KLD holds priority.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em><em>,</em><em>optional</em>) – </p></li>
@@ -250,13 +262,12 @@ almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
-<dd><p>Jing Zen, et al, “Bipartite Subgraph Decomposition for Critically Sampledwavelet Filterbanks on Arbitrary
-Graphs,” IEEE trans on SP, 2016.</p>
+<dd><p>Jing Zen, et al, “Bipartite Subgraph Decomposition for Critically
+Sampledwavelet Filterbanks on Arbitrary Graphs,” IEEE trans on SP, 2016.</p>
 </dd>
 <dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id6">4</a></span></dt>
-<dd><ol class="upperalpha simple">
-<li><p>Gadde, et al, “A probablistic interpretation of sampling theory of graph signals”. ICASSP, 2015.</p></li>
-</ol>
+<dd><p>A. Gadde, et al, “A probablistic interpretation of sampling theory of graph
+signals”. ICASSP, 2015.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -265,8 +276,152 @@ Graphs,” IEEE trans on SP, 2016.</p>
 <section id="module-thgsp.bga.greedy">
 <span id="greedy"></span><h2><a class="toc-backref" href="#id13">Greedy</a><a class="headerlink" href="#module-thgsp.bga.greedy" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="bga-utils">
-<h2><a class="toc-backref" href="#id14">bga Utils</a><a class="headerlink" href="#bga-utils" title="Permalink to this headline">¶</a></h2>
+<section id="module-thgsp.bga._utils">
+<span id="bga-utils"></span><h2><a class="toc-backref" href="#id14">bga Utils</a><a class="headerlink" href="#module-thgsp.bga._utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="thgsp.bga._utils.beta2channel_mask">
+<span class="sig-name descname"><span class="pre">beta2channel_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/_utils.html#beta2channel_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga._utils.beta2channel_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a <code class="xref py py-obj docutils literal notranslate"><span class="pre">(2^M,</span> <span class="pre">N)</span></code> bool mask tensor to indicate which
+channel(color group) one node belongs to. All channels have disjoint node
+sets and hence the sum along the channel dimension returns a all-one(True)
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> tensor.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is a common approach to generate channel mask for multi-channel
+wavelet filterbank. Either coloring or numerical based bipartite approximation
+algorithm can employ this function.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>beta</strong> (<em>BoolTensor</em><em>(</em><em>N</em><em>,</em><em>M</em><em>)</em>) – Bipartite partition indicator tensor. <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">M</span></code> are the node and
+bipartite subgraph numbers, respectively.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>mask</strong> (<em>BoolTensor(2**M,N)</em>) – The indices of <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> in <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th row are nodes whose signal will be
+kept in <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th channel.</p></li>
+<li><p><strong>beta_dist</strong> (<em>array(2**M,M))</em>) – An array, see the doc of <a class="reference internal" href="filters.html#thgsp.filters.QmfCore" title="thgsp.filters.QmfCore"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.QmfCore</span></code></a> for the details.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thgsp.bga._utils.beta2color_group">
+<span class="sig-name descname"><span class="pre">beta2color_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/_utils.html#beta2color_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga._utils.beta2color_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actually, beta2channel_group is more exact since “color” here is not
+exact graph coloring. However we can take it as an approximation of graph
+coloring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>BoolTensor</em><em>(</em><em>N</em><em>,</em><em>M</em><em>)</em>) – Bipartite partition indicator tensor. <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">M</span></code> are the node and
+bipartite subgraph numbers, respectively.</p></li>
+<li><p><strong>th</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the value of returned dict is <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> otherwise <code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>color_group</strong> (<em>dict</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">color_group[i]</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">LongTensor</span></code> (or <code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code>) of node indices
+colored with <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th color.</p></li>
+<li><p><strong>beta_dist</strong> (<em>array</em>) – An array, see the doc of <a class="reference internal" href="filters.html#thgsp.filters.QmfCore" title="thgsp.filters.QmfCore"><code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.QmfCore</span></code></a> for the details.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thgsp.bga._utils.beta_dist2channel_name">
+<span class="sig-name descname"><span class="pre">beta_dist2channel_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/_utils.html#beta_dist2channel_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga._utils.beta_dist2channel_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the channel names(<span class="math notranslate nohighlight">\(L\)</span> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">H</span></code>) for each channel according to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">beta_dist</span></code>. By default, <code class="xref py py-obj docutils literal notranslate"><span class="pre">0</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">1</span></code> means <code class="xref py py-obj docutils literal notranslate"><span class="pre">H</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">L</span></code>,
+respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta_dist</strong> (<em>ByteTensor</em><em>(</em><em>2^M</em><em>,</em><em>M</em><em>)</em>) – An array, see the doc of <code class="xref py py-class docutils literal notranslate"><span class="pre">thgsp.filters.Qmf</span></code> for the details.</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em><em>,</em><em>optional</em>) – If True, <code class="xref py py-obj docutils literal notranslate"><span class="pre">0</span></code> means <code class="xref py py-obj docutils literal notranslate"><span class="pre">L</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array composed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">H</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">L</span></code>. Each row corresponds to one channel.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thgsp.bga._utils.bipartite_mask">
+<span class="sig-name descname"><span class="pre">bipartite_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/_utils.html#bipartite_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga._utils.bipartite_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a bool mask matrix which can extract a bipartite subgraph from any graph
+(represented by a matrix) .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bt</strong> (<em>BoolTensor</em><em>, </em><em>array</em>) – The indicator of two bipartite sets. All nodes within a same bipartite set is
+characterized by a same bool value, e.g.,True. Shape: <cite>(N,)</cite>, <cite>N</cite> is the number
+of graph nodes.</p></li>
+<li><p><strong>sparse</strong> (<em>bool</em>) – If True, return lil_matrix.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>lil_matrix,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thgsp.bga._utils.cohere_color_idx">
+<span class="sig-name descname"><span class="pre">cohere_color_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/_utils.html#cohere_color_idx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga._utils.cohere_color_idx" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>colors</strong> (<em>Iterable</em>) – Indices(ordinals) of colors. <code class="xref py py-obj docutils literal notranslate"><span class="pre">np.array([0,2,1])</span></code> means the 0,2,1-th color</p></li>
+<li><p><strong>color_group</strong> (<em>dict</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">color_group[i]</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> of node indices colored with
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code>-th color.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Composed by node ordinals which are colored by any one among the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">colors</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>LongTensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thgsp.bga._utils.is_bipartite_fix_th">
+<span class="sig-name descname"><span class="pre">is_bipartite_fix_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/bga/_utils.html#is_bipartite_fix_th"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.bga._utils.is_bipartite_fix_th" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a graph is bipartite using BFS-based 2-color coloring and
+furthermore can fix a graph to a bipartite one by deleting edges bridging
+two nodes colored with a same color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>Tensor</em>) – The adjacency matrix</p></li>
+<li><p><strong>fix_flag</strong> (<em>bool</em><em>,</em><em>optional</em>) – If True, fix <code class="xref py py-obj docutils literal notranslate"><span class="pre">A</span></code> to a bipartite graph by zeroing some elements in-place.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>flag</strong> (<em>bool</em>) – If True, the returned adjacency matrix represents a bipartite graph</p></li>
+<li><p><strong>vxt_color</strong> (<em>list</em>) – A list recording the vertex colors which are all 1 or 0.</p></li>
+<li><p><strong>A</strong> (<em>Tensor</em>) – The adjacency matrix of returned graph.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 

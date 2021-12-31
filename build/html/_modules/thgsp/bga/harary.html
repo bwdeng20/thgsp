@@ -83,7 +83,8 @@
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
 
 <span class="kn">from</span> <span class="nn">thgsp.alg.coloring</span> <span class="kn">import</span> <span class="n">dsatur</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">new_order</span><span class="p">,</span> <span class="n">distribute_color</span><span class="p">,</span> <span class="n">bipartite_mask</span>
+
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">bipartite_mask</span><span class="p">,</span> <span class="n">distribute_color</span><span class="p">,</span> <span class="n">new_order</span>
 
 
 <div class="viewcode-block" id="harary"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga.harary.harary">[docs]</a><span class="k">def</span> <span class="nf">harary</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">vtx_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.97</span><span class="p">):</span>
@@ -95,15 +96,17 @@
 <span class="sd">    A:      :py:class:`SparseTensor`</span>
 <span class="sd">        The adjacency matrix</span>
 <span class="sd">    vtx_color: array_like, optional</span>
-<span class="sd">        All valid type for :py:func:`np.asarray` is acceptable, including :py:class:`torch.Tensor` on cpu. If None,</span>
-<span class="sd">        this function will invoke :py:func:`thgsp.alg.dsatur` silently.</span>
+<span class="sd">        All valid type for :py:func:`np.asarray` is acceptable, including</span>
+<span class="sd">        :py:class:`torch.Tensor` on cpu. If None, this function will invoke</span>
+<span class="sd">        :py:func:`thgsp.alg.dsatur` silently.</span>
 
 <span class="sd">    threshold: float, optional</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bptG:    array</span>
-<span class="sd">        An array consisting of :obj:`M` bipartite subgraphs formatted as :class:`scipy.sparse.lil_matrix`.</span>
+<span class="sd">        An array consisting of :obj:`M` bipartite subgraphs formatted as</span>
+<span class="sd">        :class:`scipy.sparse.lil_matrix`.</span>
 <span class="sd">    beta:   array</span>
 <span class="sd">        :obj:`beta[:,i]` is the bipartite set indicator of :obj:`i`-th subgraph.</span>
 <span class="sd">    beta_dist:  array</span>
@@ -111,7 +114,7 @@
 <span class="sd">    new_vtx_color:  array</span>
 <span class="sd">        The node colors</span>
 <span class="sd">    mapper:     dict</span>
-<span class="sd">        Map **new_vtx_color** to the original ones. For example mapper={1:2, 2:3, 3:1} will</span>
+<span class="sd">        Map **new_vtx_color** to the original ones. For example mapper={1:2, 2:3, 3:1}</span>
 <span class="sd">        map 1,2 and 3-th color to 2,3 and 1, respectively.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>

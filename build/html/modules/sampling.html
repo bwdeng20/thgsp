@@ -124,8 +124,8 @@
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient sampling set selection for bandlimited graph
-signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.</p>
+<dd><p>Aamir Anis, et al., “Efficient sampling set selection for bandlimited graph
+signals using graph spectral proxies,” IEEE TSP, 2016.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -133,8 +133,8 @@ signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.<
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.ess.ess_sampling">
 <span class="sig-name descname"><span class="pre">ess_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/ess.html#ess_sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.ess.ess_sampling" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function has the same functionality as <a class="reference internal" href="#thgsp.sampling.ess.ess" title="thgsp.sampling.ess.ess"><code class="xref py py-func docutils literal notranslate"><span class="pre">ess()</span></code></a> but directly computes the matrix power of specific
-variation operator, e.g., normalized Laplacian.</p>
+<dd><p>This function has the same functionality as <a class="reference internal" href="#thgsp.sampling.ess.ess" title="thgsp.sampling.ess.ess"><code class="xref py py-func docutils literal notranslate"><span class="pre">ess()</span></code></a> but directly computes the
+matrix power of specific variation operator, e.g., normalized Laplacian.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -166,15 +166,18 @@ variation operator, e.g., normalized Laplacian.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.bsgda.bsgda">
 <span class="sig-name descname"><span class="pre">bsgda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch_sparse.tensor.SparseTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_hops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/thgsp/sampling/bsgda.html#bsgda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.bsgda.bsgda" title="Permalink to this definition">¶</a></dt>
-<dd><p>A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for smooth graph signals <a class="footnote-reference brackets" href="#id6" id="id3">2</a>.</p>
+<dd><p>A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for
+smooth graph signals <a class="footnote-reference brackets" href="#id6" id="id3">2</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spm</strong> (<em>SparseTensor</em>) – The sparse adjacency matrix.</p></li>
 <li><p><strong>K</strong> (<em>int</em>) – The desired number of sampling nodes.</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7) <a class="footnote-reference brackets" href="#id6" id="id4">2</a> for the details.</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7)
+<a class="footnote-reference brackets" href="#id6" id="id4">2</a> for the details.</p></li>
 <li><p><strong>epsilon</strong> (<em>float</em>) – The numerical precision for binary search (1e-5 by default</p></li>
-<li><p><strong>p_hops</strong> (<em>int</em>) – Estimate the coverage subsets(refer to Definition 1 <a class="footnote-reference brackets" href="#id6" id="id5">2</a>) within the <code class="xref py py-obj docutils literal notranslate"><span class="pre">p_hops</span></code> neighborhood.</p></li>
+<li><p><strong>p_hops</strong> (<em>int</em>) – Estimate the coverage subsets(refer to Definition 1 <a class="footnote-reference brackets" href="#id6" id="id5">2</a>) within the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">p_hops</span></code> neighborhood.</p></li>
 <li><p><strong>boost</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
@@ -190,9 +193,8 @@ variation operator, e.g., normalized Laplacian.</p>
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id6"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id4">2</a>,<a href="#id5">3</a>)</span></dt>
-<dd><ol class="upperalpha simple" start="25">
-<li><p>Bai, et al., “Fast graph sampling set selection using Gershgorin disc alignment,” IEEE TSP, 2020.</p></li>
-</ol>
+<dd><p>Y. Bai, et al., “Fast graph sampling set selection using Gershgorin disc
+alignment,” IEEE TSP, 2020.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -203,8 +205,8 @@ variation operator, e.g., normalized Laplacian.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.rsbs.estimate_lk">
 <span class="sig-name descname"><span class="pre">estimate_lk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_coherence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lap_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/rsbs.html#estimate_lk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.rsbs.estimate_lk" title="Permalink to this definition">¶</a></dt>
-<dd><p>Estimate the optimal distribution according to which the bandlimited graph signals are
-sampled <a class="footnote-reference brackets" href="#id10" id="id7">3</a> .</p>
+<dd><p>Estimate the optimal distribution according to which the bandlimited graph signals
+are sampled <a class="footnote-reference brackets" href="#id10" id="id7">3</a> .</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -215,18 +217,19 @@ sampled <a class="footnote-reference brackets" href="#id10" id="id7">3</a> .</p>
 <li><p><strong>epsilon</strong> (<em>float</em>) – The tolerance of binary search to find approximated <span class="math notranslate nohighlight">\(\lambda_{k}\)</span></p></li>
 <li><p><strong>lmin</strong> (<em>float</em>) – The smallest frequency of graph Laplacian</p></li>
 <li><p><strong>lmax</strong> (<em>float</em>) – The largest frequency of graph Laplacian</p></li>
-<li><p><strong>return_coherence</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, return the estimated square of graph local cumulative coherence <a class="footnote-reference brackets" href="#id10" id="id8">3</a> of all nodes</p></li>
+<li><p><strong>return_coherence</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, return the estimated square of graph local cumulative coherence
+<a class="footnote-reference brackets" href="#id10" id="id8">3</a> of all nodes</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – The order of the Chebyshev approximation</p></li>
-<li><p><strong>lap_type</strong> (<em>str</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">comb</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sym</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">rw</span></code> represent combinatorial, symmetric normalized, and random-walk normalized
-Laplacian, separately</p></li>
+<li><p><strong>lap_type</strong> (<em>str</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">comb</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sym</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">rw</span></code> represent combinatorial, symmetric
+normalized, and random-walk normalized Laplacian, separately</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>lambda_k</strong> (<em>float</em>) – The eventual estimated <code class="xref py py-obj docutils literal notranslate"><span class="pre">k</span></code>-th smallest graph frequency</p></li>
-<li><p><strong>cum_coh</strong> (<em>Tensor or(None)</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">return_coherence</span></code> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> , return the estimated graph local cumulative coherence <a class="footnote-reference brackets" href="#id10" id="id9">3</a> of
-every node, otherwise <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>cum_coh</strong> (<em>Tensor or(None)</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">return_coherence</span></code> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code> , return the estimated graph local
+cumulative coherence <a class="footnote-reference brackets" href="#id10" id="id9">3</a> of every node, otherwise <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p></li>
 </ul>
 </p>
 </dd>
@@ -234,15 +237,15 @@ every node, otherwise <code class="xref py py-obj docutils literal notranslate">
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id10"><span class="brackets">3</span><span class="fn-backref">(<a href="#id7">1</a>,<a href="#id8">2</a>,<a href="#id9">3</a>,<a href="#id11">4</a>)</span></dt>
-<dd><p>G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random sampling of
-bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2018.</p>
+<dd><p>G. Puy, et al., “Random sampling of bandlimited signals on graphs,”
+Applied and Computational Harmonic Analysis, 2018.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.rsbs.rsbs">
-<span class="sig-name descname"><span class="pre">rsbs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lap_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/rsbs.html#rsbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.rsbs.rsbs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">rsbs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="graphs.html#thgsp.graphs.GraphBase" title="thgsp.graphs.core.GraphBase"><span class="pre">thgsp.graphs.core.GraphBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lap_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/rsbs.html#rsbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.rsbs.rsbs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Random sampling algorithm for bandlimited signals <a class="footnote-reference brackets" href="#id10" id="id11">3</a> .</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -255,11 +258,11 @@ bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2
 <li><p><strong>epsilon</strong> (<em>float</em>) – The tolerance of binary search to find approximated <span class="math notranslate nohighlight">\(\lambda_{k}\)</span></p></li>
 <li><p><strong>lmin</strong> (<em>float</em>) – The smallest frequency of graph Laplacian</p></li>
 <li><p><strong>lmax</strong> (<em>float</em>) – The largest frequency of graph Laplacian</p></li>
-<li><p><strong>return_list</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, return <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code> otherwise a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Tensor</span></code> having the same <code class="xref py py-obj docutils literal notranslate"><span class="pre">dtype</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code> as
-the input graph <code class="xref py py-obj docutils literal notranslate"><span class="pre">G</span></code> .</p></li>
+<li><p><strong>return_list</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, return <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code> otherwise a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Tensor</span></code> having the same
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">dtype</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code> as the input graph <code class="xref py py-obj docutils literal notranslate"><span class="pre">G</span></code> .</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – The order of the Chebyshev approximation</p></li>
-<li><p><strong>lap_type</strong> (<em>str</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">comb</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sym</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">rw</span></code> represent combinatorial, symmetric normalized, and random-walk normalized
-Laplacian, separately</p></li>
+<li><p><strong>lap_type</strong> (<em>str</em>) – <code class="xref py py-obj docutils literal notranslate"><span class="pre">comb</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sym</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">rw</span></code> represent combinatorial, symmetric
+normalized, and random-walk normalized Laplacian, separately.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
@@ -287,8 +290,8 @@ Laplacian, separately</p></li>
 <li><p><strong>M</strong> (<em>int</em>) – The desired number of sampled nodes</p></li>
 <li><p><strong>bandwidth</strong> (<em>int</em>) – The estimated bandwidth of original signals</p></li>
 <li><p><strong>nu</strong> (<em>float</em>) – The parameter controlling the width of the heat diffusion filter kernel.</p></li>
-<li><p><strong>cheby</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, compute the localization operator with Chebyshev approximation; otherwise
-compute it from a direct expensive EVD.</p></li>
+<li><p><strong>cheby</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, compute the localization operator with Chebyshev approximation;
+otherwise compute it from a direct expensive EVD.</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – The order of Chebyshev approximation.</p></li>
 </ul>
 </dd>
@@ -303,8 +306,8 @@ compute it from a direct expensive EVD.</p></li>
 <p class="rubric">References</p>
 <dl class="footnote brackets">
 <dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id12">4</a></span></dt>
-<dd><p>A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, “Eigendecomposition-free sampling set selection
-for graph signals,” IEEE Transactions on Signal Processing, 202.</p>
+<dd><p>A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, “Eigendecomposition-free
+sampling set selection  for graph signals,” IEEE TSP, 2020.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -312,17 +315,20 @@ for graph signals,” IEEE Transactions on Signal Processing, 202.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling.fastgsss.recon_fastssss">
 <span class="sig-name descname"><span class="pre">recon_fastssss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/fastgsss.html#recon_fastssss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling.fastgsss.recon_fastssss" title="Permalink to this definition">¶</a></dt>
-<dd><p>A primary implementation of reconstruction method associated with “FastSSS” sampling algorithm.</p>
+<dd><p>A primary implementation of reconstruction method associated with
+“FastSSS” sampling algorithm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y</strong> (<em>Tensor</em>) – The measurements on sampling set :obj:S:. If the localization operator <code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code> has a density
-greater than the threshold <code class="xref py py-obj docutils literal notranslate"><span class="pre">sd</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> has a shape of either <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,)</span></code>，<code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,1)</span></code>，
-or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,C)</span></code>; otherwise <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> could only be  either <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,1)</span></code>.</p></li>
+<li><p><strong>y</strong> (<em>Tensor</em>) – The measurements on sampling set :obj:S:. If the localization operator <code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>
+has a density greater than the threshold <code class="xref py py-obj docutils literal notranslate"><span class="pre">sd</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> has a shape of
+either <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,)</span></code>，<code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,1)</span></code>，or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,C)</span></code>; otherwise <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code> could only
+be  either <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(M,1)</span></code>.</p></li>
 <li><p><strong>S</strong> (<em>List</em>) – A list consisting of all indices of sampled nodes.</p></li>
 <li><p><strong>T</strong> (<em>Tensor</em><em>, </em><em>SparseTensor</em>) – The localization operator</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – </p></li>
-<li><p><strong>sd</strong> (<em>float</em>) – The threshold of <code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>’s density that controls when we use a dense or sparse linear solver.</p></li>
+<li><p><strong>sd</strong> (<em>float</em>) – The threshold of <code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>’s density that controls when we use a dense or sparse
+linear solver.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -340,9 +346,11 @@ or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(
 <dl class="py function">
 <dt class="sig sig-object py" id="thgsp.sampling._utils.construct_sampling_matrix">
 <span class="sig-name descname"><span class="pre">construct_sampling_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/sampling/_utils.html#construct_sampling_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.sampling._utils.construct_sampling_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct the sampling matrix <span class="math notranslate nohighlight">\(\mathbf{H} \in\{0,1\}^{M \times N}\)</span> defined as follows.</p>
+<dd><p>Construct the sampling matrix <span class="math notranslate nohighlight">\(\mathbf{H} \in\{0,1\}^{M \times N}\)</span> defined as
+follows.</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\mathbf{H}_{i j}= \begin{cases}1, &amp; j=\mathcal{S}_{i} \\ 0, &amp; \text { otherwise }\end{cases}\end{split}\]</div>
+\[\begin{split}\mathbf{H}_{i j}= \begin{cases}1, &amp; j=\mathcal{S}_{i} \\ 0, &amp; \text { otherwise }
+\end{cases}\end{split}\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -350,8 +358,9 @@ or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(
 <li><p><strong>S</strong> (<em>list</em><em>, </em><em>array</em><em>, </em><em>torch.Tensor</em>) – The 1-D list of sampled nodes.</p></li>
 <li><p><strong>dtype</strong> (<em>torch.dtype</em><em>, </em><em>optional</em>) – The dtype</p></li>
 <li><p><strong>layout</strong> (<em>str</em>) – The memory layout of the generated sparse matrix. One of (“csc”, “csr”, “coo”).</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If <a href="#id14"><span class="problematic" id="id15">:py:`True`</span></a> and  <cite>cupy</cite> is installed, use <cite>cupy`as backend; otherwise use `scipy</cite>.</p></li>
-<li><p><strong>return_ts</strong> (<em>bool</em><em>,</em>) – If False, return <cite>scipy.sparse.spmatrix</cite> of device is GPU else ‘cupyx.scipy.sparse.spmatrix’</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If <a href="#id14"><span class="problematic" id="id15">:py:`True`</span></a> and  <cite>cupy</cite> is installed, use <cite>cupy`as backend; otherwise `scipy</cite>.</p></li>
+<li><p><strong>return_ts</strong> (<em>bool</em><em>,</em>) – If False, return <cite>scipy.sparse.spmatrix</cite> of device is GPU else
+‘cupyx.scipy.sparse.spmatrix’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

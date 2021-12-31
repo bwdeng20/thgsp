@@ -79,7 +79,7 @@
              
   <h1>Source code for thgsp.bga.osglm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">lil_matrix</span><span class="p">,</span> <span class="n">eye</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">eye</span><span class="p">,</span> <span class="n">lil_matrix</span>
 
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">bipartite_mask</span>
 
@@ -93,8 +93,9 @@
 <span class="sd">    A:        SparseTensor</span>
 <span class="sd">      The adjacent matrix of graph.</span>
 <span class="sd">    lc:       int</span>
-<span class="sd">      The ordinal of color marking the boundary such that all nodes with a smaller color ordinal are</span>
-<span class="sd">      grouped into the low-pass channel while those with a larger color ordinal are in the high-pass channel.</span>
+<span class="sd">      The ordinal of color marking the boundary such that all nodes with a smaller color</span>
+<span class="sd">      ordinal are grouped into the low-pass channel while those with a larger color</span>
+<span class="sd">      ordinal are in the high-pass channel.</span>
 <span class="sd">    vtx_color:iter</span>
 <span class="sd">      The graph coloring result</span>
 
@@ -110,7 +111,8 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1]  Akie Sakiyama, et al, &quot;Oversampled Graph Laplacian Matrix for Graph Filter Banks&quot;, IEEE trans on SP, 2016</span>
+<span class="sd">    .. [1]  Akie Sakiyama, et al, &quot;Oversampled Graph Laplacian Matrix for Graph Filter</span>
+<span class="sd">            Banks&quot;, IEEE trans on SP, 2016.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">vtx_color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -150,7 +152,8 @@
 
     <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nos</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="n">beta</span><span class="p">[</span><span class="n">idx_s1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="c1"># appended nodes corresponding to idx_s2 are assigned to the L channel of oversampled graph with idx_s1</span>
+    <span class="c1"># appended nodes corresponding to idx_s2 are assigned to</span>
+    <span class="c1"># the L channel of oversampled graph with idx_s1</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">node_ordinal_append</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span>
         <span class="n">append_nodes</span><span class="p">,</span> <span class="n">idx_s2</span><span class="p">,</span> <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>

@@ -43,6 +43,6 @@ Greedy
 bga Utils
 --------------
 
-.. automodule:: thgsp.bga.utils
+.. automodule:: thgsp.bga._utils
    :members:
  

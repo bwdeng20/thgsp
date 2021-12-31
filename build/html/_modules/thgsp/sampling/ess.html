@@ -80,15 +80,15 @@
   <h1>Source code for thgsp.sampling.ess</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">th</span>
+
 <span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">to_scipy</span>
 <span class="kn">from</span> <span class="nn">thgsp.utils</span> <span class="kn">import</span> <span class="n">consecutive_spmv</span>
 
 
 <div class="viewcode-block" id="ess_sampling"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.ess.ess_sampling">[docs]</a><span class="k">def</span> <span class="nf">ess_sampling</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function has the same functionality as :func:`ess` but directly computes the matrix power of specific</span>
-<span class="sd">    variation operator, e.g., normalized Laplacian.</span>
+<span class="sd">    This function has the same functionality as :func:`ess` but directly computes the</span>
+<span class="sd">    matrix power of specific variation operator, e.g., normalized Laplacian.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">splin</span>
 
@@ -138,8 +138,8 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient sampling set selection for bandlimited graph</span>
-<span class="sd">            signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.</span>
+<span class="sd">    .. [1]  Aamir Anis, et al., “Efficient sampling set selection for bandlimited graph</span>
+<span class="sd">            signals using graph spectral proxies,” IEEE TSP, 2016.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -151,18 +151,18 @@
             <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">break</span>
         <span class="n">sigma</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">power_iteration4min</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">Sc</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">Sc</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">abs</span><span class="p">())]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">Sc</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">abs</span><span class="p">())]</span>
         <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">S</span></div>
 
 
 <span class="k">def</span> <span class="nf">power_iteration</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">Sc</span><span class="p">:</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
-    <span class="n">Sc</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Sc</span><span class="p">)</span>
+    <span class="n">Sc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Sc</span><span class="p">)</span>
     <span class="n">Lt</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
-    <span class="n">I</span> <span class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">(),</span> <span class="n">device</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">device</span><span class="p">())</span>
-    <span class="n">Isv</span> <span class="o">=</span> <span class="n">I</span><span class="p">[</span><span class="n">Sc</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="n">Ivs</span> <span class="o">=</span> <span class="n">I</span><span class="p">[:,</span> <span class="n">Sc</span><span class="p">]</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Sc</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">device</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">())</span>
+    <span class="n">Im</span> <span class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">(),</span> <span class="n">device</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">device</span><span class="p">())</span>
+    <span class="n">Isv</span> <span class="o">=</span> <span class="n">Im</span><span class="p">[</span><span class="n">Sc</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">Ivs</span> <span class="o">=</span> <span class="n">Im</span><span class="p">[:,</span> <span class="n">Sc</span><span class="p">]</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Sc</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">device</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">dtype</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iter</span><span class="p">):</span>
         <span class="n">x1</span> <span class="o">=</span> <span class="n">Ivs</span> <span class="o">@</span> <span class="n">x0</span>
         <span class="n">x1</span> <span class="o">=</span> <span class="n">consecutive_spmv</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
@@ -190,8 +190,7 @@
 
 
 <div class="viewcode-block" id="recon_ess"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.ess.recon_ess">[docs]</a><span class="k">def</span> <span class="nf">recon_ess</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Naive implementation of ESS sampling reconstruction.</span>
+    <span class="sd">&quot;&quot;&quot;Naive implementation of ESS sampling reconstruction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

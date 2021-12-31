@@ -140,7 +140,7 @@ class GraphBase(SparseTensor):
         if self._fs is not None:
             fs = self._fs
         else:
-            fs, _ = torch.linalg.eigvalsh(lap.to_dense())
+            fs = torch.linalg.eigvalsh(lap.to_dense())
             if self.cache:
                 self._fs = fs
         fs[fs.abs() < 1e-6] = 0  # for stability

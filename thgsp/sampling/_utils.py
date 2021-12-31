@@ -14,6 +14,7 @@ def construct_sampling_matrix(
        \mathbf{H}_{i j}= \begin{cases}1, & j=\mathcal{S}_{i} \\ 0, & \text { otherwise }
        \end{cases}
 
+
     Parameters
     ----------
     N: int
@@ -25,7 +26,7 @@ def construct_sampling_matrix(
     layout: str
         The memory layout of the generated sparse matrix. One of ("csc", "csr", "coo").
     device: torch.device, str, optional
-        If :py:`True` and  `cupy` is installed, use `cupy`as backend; otherwise `scipy`.
+        If `True` and `cupy` is installed, use `cupy`as backend; otherwise `scipy`.
     return_ts: bool,
         If False, return `scipy.sparse.spmatrix` of device is GPU else
         'cupyx.scipy.sparse.spmatrix'

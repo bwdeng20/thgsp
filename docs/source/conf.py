@@ -39,8 +39,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
-    "recommonmark",
-    # 'sphinx.ext.intersphinx',
+    "myst_parser",
     "sphinx.ext.napoleon",
     "sphinx.ext.githubpages",
 ]

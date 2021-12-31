@@ -14,8 +14,8 @@ The repository now mainly includes:
    `general graph sampling <https://github.com/benedekrozemberczki/littleballoffur>`_ ) and reconstruction algorithms.
 
 As this package is built on `PyTorch <https://pytorch.org/>`_  and
-`pytorch_sparse <https://github.com/rusty1s/pytorch_sparse>`_, you can easily integrate functionalities here into a
-PyTorch pipeline.
+`pytorch_sparse <https://github.com/rusty1s/pytorch_sparse>`_, you can easily integrate functionalities available in
+thgsp into a PyTorch pipeline.
 
 .. toctree::
    :glob:

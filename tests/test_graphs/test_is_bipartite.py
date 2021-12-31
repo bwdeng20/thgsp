@@ -1,6 +1,8 @@
 import pytest
-from thgsp.graphs.is_bipartite import is_bipartite
+
 from thgsp.graphs.generators import rand_bipartite, rand_udg
+from thgsp.graphs.is_bipartite import is_bipartite
+
 from ..utils4t import devices
 
 

@@ -2,9 +2,9 @@ import warnings
 
 import numpy as np
 import torch
-from scipy.sparse import spmatrix, coo_matrix, csr_matrix, csc_matrix
-from torch_sparse import SparseTensor
+from scipy.sparse import coo_matrix, csc_matrix, csr_matrix, spmatrix
 from torch.utils.dlpack import from_dlpack
+from torch_sparse import SparseTensor
 
 SparseLayouts = ("csc", "coo", "csr")
 numpy_torch_dtype_dict = {

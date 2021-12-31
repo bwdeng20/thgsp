@@ -1,13 +1,14 @@
 from typing import List, Tuple
 
-from scipy.sparse import lil_matrix, eye
-from scipy.sparse.csgraph import structural_rank, breadth_first_order
+from scipy.sparse import eye, lil_matrix
+from scipy.sparse.csgraph import breadth_first_order, structural_rank
 from scipy.sparse.linalg import inv
 from torch_sparse import SparseTensor
 
 from thgsp.alg import dsatur
 from thgsp.utils import sparse_xcipy_logdet
-from ._utils import laplace, bipartite_mask, np
+
+from ._utils import bipartite_mask, laplace, np
 
 
 def amfs(
@@ -27,12 +28,15 @@ def amfs(
     A:          SparseTensor
         The adjacency matrix.
     Sigma:      scipy.spmatrix, optional
-        The covariance matrix specified by the Laplacian matrix L. If None, :math:`\Sigma^{-1}=L+\delta I`
+        The covariance matrix specified by the Laplacian matrix L. If None,
+        :math:`\Sigma^{-1}=L+\delta I`
     level:      int, optional
         The number of bipartite subgraphs, i.e., the decomposition level. If None,
-        :math:`level=\lceil log_2( \mathcal{X}) \rceil`, where :math:`\mathcal{X}` is the chromatic number of  :obj:`A`.
+        :math:`level=\lceil log_2( \mathcal{X}) \rceil`, where :math:`\mathcal{X}` is
+        the chromatic number of  :obj:`A`.
     delta:      float, optional
-        :math:`1/\delta` is interpreted as the variance of the DC compnent. Refer to [4]_ for more details.
+        :math:`1/\delta` is interpreted as the variance of the DC compnent. Refer to
+        [4]_ for more details.
     thresh_kld: float, optional
         Threshold of Kullback-Leibler divergence to perform `AMFS` decomposition.
     priority:   bool,optional
@@ -48,9 +52,10 @@ def amfs(
 
     References
     ----------
-    .. [3] Jing Zen, et al, "Bipartite Subgraph Decomposition for Critically Sampledwavelet Filterbanks on Arbitrary
-            Graphs," IEEE trans on SP, 2016.
-    .. [4] A. Gadde, et al, "A probablistic interpretation of sampling theory of graph signals". ICASSP, 2015.
+    .. [3]  Jing Zen, et al, "Bipartite Subgraph Decomposition for Critically
+            Sampledwavelet Filterbanks on Arbitrary Graphs," IEEE trans on SP, 2016.
+    .. [4]  A. Gadde, et al, "A probablistic interpretation of sampling theory of graph
+            signals". ICASSP, 2015.
 
     """
 
@@ -70,11 +75,7 @@ def amfs(
     bptG = [lil_matrix((N, N), dtype=A.dtype) for _ in range(level)]
     for i in range(level):
         if verbose:
-            print(
-                "\n|----------------------decomposition in level: {:4d} ------------------------|".format(
-                    i
-                )
-            )
+            print(f"\n|----decomposition in level: {i:4d} ----|")
         s1, s2 = amfs1level(A, Sigma, delta, thresh_kld, priority, verbose)
         bt = beta[:, i]
         bt[s1] = 1  # set s1 True

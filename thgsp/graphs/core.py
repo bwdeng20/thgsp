@@ -1,9 +1,11 @@
 from typing import Optional
 
-import torch
 import networkx as nx
-from thgsp.convert import to_torch_sparse, SparseTensor
-from .degree import in_degree, out_degree, degree_matrix
+import torch
+
+from thgsp.convert import SparseTensor, to_torch_sparse
+
+from .degree import degree_matrix, in_degree, out_degree
 from .is_bipartite import is_bipartite
 from .laplace import laplace
 
@@ -97,9 +99,10 @@ class GraphBase(SparseTensor):
 
     def L(self, lap_type: str = "sym"):
         r"""
-        Compute a specific type of Laplacian matrix. If :py:attr:`self._lap_type` equals to :obj:`lap_type` and
-        :py:attr:`self.cache` is True, then return the cached Laplacian matrix. Note that every time you compute
-        Laplacian with a different type from the last, the cached matrix will be overwritten.
+        Compute a specific type of Laplacian matrix. If :py:attr:`self._lap_type` equals
+        to :obj:`lap_type` and :py:attr:`self.cache` is True, then return the cached
+        Laplacian matrix. Note that every time you compute Laplacian with a different
+        type from the last, the cached matrix will be overwritten.
 
         Parameters
         ----------
@@ -137,7 +140,7 @@ class GraphBase(SparseTensor):
         if self._fs is not None:
             fs = self._fs
         else:
-            fs, _ = torch.symeig(lap.to_dense(), eigenvectors=False)
+            fs, _ = torch.linalg.eigvalsh(lap.to_dense())
             if self.cache:
                 self._fs = fs
         fs[fs.abs() < 1e-6] = 0  # for stability

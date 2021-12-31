@@ -1,5 +1,6 @@
 import torch
 from torch_sparse import SparseTensor
+
 from thgsp import loadmat
 from thgsp.sampling.rsbs import recon_rsbs
 from thgsp.utils import mse, snr
@@ -13,10 +14,12 @@ def snr_and_mse(x, target):
 
 num_sig = 10  # repeat the signal for num_sig times
 
-"""
-Load Data captured from one trial of official Matlab code available at http://grsamplingbox.gforge.inria.fr
-With the official code, the reconstruction SNR is about 30 dB, which is consistent with `rsbs` reconstruction in thgsp.
-"""
+
+# Load Data captured from one trial of official code
+# http://grsamplingbox.gforge.inria.fr.
+# with the official code, the reconstruction SNR is about 30 dB, which is consistent
+# with `rsbs` reconstruction in thgsp.
+
 
 data = loadmat("rsbs.mat")
 coh1 = data["weight"].ravel()  # distribution of nodes being sampled

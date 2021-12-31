@@ -7,19 +7,24 @@ from scipy.sparse import diags
 from torch_sparse import SparseTensor
 
 from thgsp.bga import (
+    admm_bga,
+    admm_lbga_ray,
+    amfs,
     beta2channel_mask,
     beta_dist2channel_name,
+    harary,
     is_bipartite_fix,
     laplace,
+    osglm,
 )
-from thgsp.bga import harary, osglm, amfs, admm_bga, admm_lbga_ray
 from thgsp.graphs import Graph
-from .approximation import cheby_coeff, cheby_op, polyval, cheby_op_basis
+
+from .approximation import cheby_coeff, cheby_op, cheby_op_basis, polyval
 from .kernels import (
+    design_biorth_kernel,
+    get_kernel_name,
     meyer_kernel,
     meyer_mirror_kernel,
-    get_kernel_name,
-    design_biorth_kernel,
 )
 
 
@@ -27,8 +32,9 @@ class QmfCore:
     r"""The core implementation of GraphQmf [2]_ and GraphBiorth [3]_ filterbanks.
 
     .. note::
-        There is no need to change :attr:`in_channels` when the signals of all input channels share a
-        same filterbank since :class:`QmfCore` can automatically broadcast one filterbank among all input channels.
+        There is no need to change :attr:`in_channels` when the signals of all input
+        channels share a same filterbank since :class:`QmfCore` can automatically
+        broadcast one filterbank among all input channels.
 
     Attributes
     ----------
@@ -37,24 +43,29 @@ class QmfCore:
     M: int
         The number of bipartite (sub)graphs.
     beta: (Bool)Tensor(N,M)
-        Each column of :attr:`beta` corresponds to one bipartite (sub)graph It has ones at the
-        locations of nodes sampled by the lowpass filter, with zeros at that by the highpass filter
+        Each column of :attr:`beta` corresponds to one bipartite (sub)graph It has ones
+        at the locations of nodes sampled by the lowpass filter, with zeros at that by
+        the highpass filter.
     analyze_kernels:    List[function], Tuple[function], np.ndarray[function], optional
 
-        1. If None, use meyer kernels, following [2]_.
+        1.  If None, use meyer kernels, following [2]_.
 
-        2. A tuple or list consisting of two kernel functions designed for low-pass and high-pass filtering, separately.
-           Then the other kernels functions for all :obj:`Co=2^M` channels are derived.
+        2.  A tuple or list consisting of two kernel functions designed for low-pass and
+            high-pass filtering, separately. Then the other kernels functions for all
+            :obj:`Co=2^M` channels are derived.
 
-        3. An array of kernel functions with a shape of :obj:`(M, Co, Ci)`. :obj:`Ci` and :obj:`Co` is the #s of
-           input channels, i.e., :attr:`in_channels` and output channels, respectively. Note that :obj:`Co` is
-           the channels of wavelet coefficients and hence is actually :obj:`2^M`
+        3.  An array of kernel functions with a shape of :obj:`(M, Co, Ci)`. :obj:`Ci`
+            and :obj:`Co` is the #s of input channels, i.e., :attr:`in_channels` and
+            output channels, respectively. Note that :obj:`Co` is the channels of
+            wavelet coefficients and hence is actually :obj:`2^M` .
 
     synthesis_kernels:  List[function], Tuple[function], np.ndarray[function], optional
-        This arg is almost the same with :attr:`analyze_kernels` except that this is for synthesis stage.
+        This arg is almost the same with :attr:`analyze_kernels` except that this is for
+        synthesis stage.
     in_channels: int, optional
-        The # of input channels. Default :obj:`1`. Consider this only when you want to process :obj:`(N,Ci)` graph
-        signals and for all :obj:`Ci` channels you want to build different graphQmf or graphBiorth wavelet filterbanks
+        The # of input channels. Default :obj:`1`. Consider this only when you want to
+        process :obj:`(N,Ci)` graph signals and for all :obj:`Ci` channels you want to
+        build different graphQmf or graphBiorth wavelet filterbanks
         (via using different analysis and synthesis kernel functions).
     order: int, optional
         The order of Chebyshev approximation.
@@ -66,9 +77,11 @@ class QmfCore:
 
     References
     ----------
-    .. [2]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter Banks for Graph Structured Data",
+    .. [2]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter
+    Banks for Graph Structured Data",
             IEEE trans on Signal Processing, 2012.
-    .. [3]  S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks for arbitrary undirected graphs,”
+    .. [3]  S. Narang and A. Ortega, “Compact support biorthogonal wavelet
+    filterbanks for arbitrary undirected graphs,”
             IEEE Trans on Signal Processing, 2013.
 
     """
@@ -219,7 +232,8 @@ class QmfCore:
 
         if x.shape[-2] != self.N:
             raise RuntimeError(
-                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of nodes: {self.N}"
+                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of "
+                f"nodes: {self.N}"
             )
 
         return x.to(self.dtype)
@@ -235,25 +249,25 @@ class QmfCore:
         return y
 
     def analyze(self, x):
-        """
-        Conduct a wavelet transform on the input signal.
+        """Conduct a wavelet transform on the input signal.
 
         .. note::
-            Although the returned coefficients are a :obj:`(2^M,N,Ci)` tensor :obj:`Z`, there are only :obj:`N` non-zero
-            entries in those coefficients corresponding to one input channel. For instance, :obj:`Z[..., 0]` has only
-            :obj:`N` non-zero items.
+            Although the returned coefficients are a :obj:`(2^M,N,Ci)` tensor :obj:`Z`,
+            there are only :obj:`N` non-zero entries in those coefficients corresponding
+            to one input channel. For instance, :obj:`Z[..., 0]` has only :obj:`N`
+            non-zero items.
 
         Parameters
         ----------
         x: Tensor
-            The signal to transform. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and :obj:`N` are the numbers of
-            input channels and graph nodes, separately.
+            The signal to transform. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and
+            :obj:`N` are the numbers of input channels and graph nodes, separately.
 
         Returns
         -------
         Tensor
-            The wavelet coefficients with a shape of :obj:`(Co,N,Ci)` or equally :obj:`(2^M,N,Ci)`. :attr:`M` is the #
-            of output channels.
+            The wavelet coefficients with a shape of :obj:`(Co,N,Ci)` or equally
+            :obj:`(2^M,N,Ci)`. :attr:`M` is the # of output channels.
         """
         x = self._check_signal(x)
         return self._analyze(x)
@@ -471,9 +485,8 @@ class NumQmf(QmfCore):
 
         else:
             raise RuntimeError(
-                "{} is not a valid numerical decomposition algorithm supported at present.".format(
-                    str(strategy)
-                )
+                f"{str(strategy)} is not a valid numerical decomposition algorithm "
+                f"supported at present."
             )
 
         super(NumQmf, self).__init__(
@@ -620,7 +633,8 @@ class NumBiorth(BiorthCore):
 
         else:
             raise RuntimeError(
-                f"{strategy} is not a valid numerical decomposition algorithm supported at present."
+                f"{strategy} is not a valid numerical decomposition "
+                f"algorithm supported at present."
             )
 
         super(NumBiorth, self).__init__(

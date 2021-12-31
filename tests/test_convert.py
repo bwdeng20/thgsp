@@ -1,10 +1,23 @@
-import torch
+import numpy as np
 import pytest
 import scipy
-import numpy as np
-from thgsp.convert import to_np, to_scipy, to_torch_sparse, to_cpx, from_cpx, to_xcipy
-from thgsp.convert import spmatrix, SparseTensor, coo_matrix, get_ddd, get_array_module
-from .utils4t import sparse_formats, float_dtypes, devices
+import torch
+
+from thgsp.convert import (
+    SparseTensor,
+    coo_matrix,
+    from_cpx,
+    get_array_module,
+    get_ddd,
+    spmatrix,
+    to_cpx,
+    to_np,
+    to_scipy,
+    to_torch_sparse,
+    to_xcipy,
+)
+
+from .utils4t import devices, float_dtypes, sparse_formats
 
 
 @pytest.fixture(scope="module")
@@ -64,6 +77,8 @@ def test_to_scipy(mats):
 def test_cp(layout, dt):
     try:
         import cupy as cp
+
+        print(cp.__version__)
     except ImportError:
         pytest.skip("cupy is not installed, skip the test")
     Ad = torch.rand(3, 3, dtype=dt)

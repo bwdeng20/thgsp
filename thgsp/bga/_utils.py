@@ -4,10 +4,11 @@ import random
 
 import numpy as np
 import torch
-from scipy.sparse import lil_matrix, spmatrix, coo_matrix
+from scipy.sparse import coo_matrix, lil_matrix, spmatrix
 from torch_cluster import graclus_cluster
-from thgsp.utils.sparse_utils import pool_edge
 from torch_sparse import SparseTensor
+
+from thgsp.utils.sparse_utils import pool_edge
 
 
 def kernel_array_from_beta_dist(beta_dist, kernel1, kernel2, in_channels=1):
@@ -24,12 +25,14 @@ def cohere_color_idx(colors, color_group):
     colors:     Iterable
         Indices(ordinals) of colors. :obj:`np.array([0,2,1])` means the 0,2,1-th color
     color_group: dict
-        :obj:`color_group[i]` is a :class:`np.ndarray` of node indices colored with :obj:`i`-th color.
+        :obj:`color_group[i]` is a :class:`np.ndarray` of node indices colored with
+        :obj:`i`-th color.
 
     Returns
     -------
     LongTensor
-                A Composed by node ordinals which are colored by any one among the :obj:`colors`.
+                A Composed by node ordinals which are colored by any one among the
+                :obj:`colors`.
     """
     if isinstance(colors, np.ndarray):
         colors = colors.tolist()
@@ -67,8 +70,9 @@ def distribute_color(n_color, M, th=False):
 
 def beta_dist2channel_name(beta_dist, reverse=False):
     """
-    Generate the channel names(:math:`L` or :obj:`H`) for each channel according to :obj:`beta_dist`. By default,
-    :obj:`0` and :obj:`1` means :obj:`H` and :obj:`L`, respectively.
+    Generate the channel names(:math:`L` or :obj:`H`) for each channel according to
+    :obj:`beta_dist`. By default, :obj:`0` and :obj:`1` means :obj:`H` and :obj:`L`,
+    respectively.
 
     Parameters
     ----------
@@ -89,25 +93,25 @@ def beta_dist2channel_name(beta_dist, reverse=False):
 
 
 def beta2color_group(beta, th=True):
-    """
-    Actually, beta2channel_group is more exact since "color" here is not exact graph coloring.
-    However we can take it as an approximation of graph coloring.
+    """Actually, beta2channel_group is more exact since "color" here is not
+    exact graph coloring. However we can take it as an approximation of graph
+    coloring.
 
     Parameters
     ----------
     beta:   BoolTensor(N,M)
-        Bipartite partition indicator tensor. :obj:`N` and :obj:`M` are the node and bipartite subgraph numbers,
-        respectively.
+        Bipartite partition indicator tensor. :obj:`N` and :obj:`M` are the node and
+        bipartite subgraph numbers, respectively.
     th: bool, optional
         If True, the value of returned dict is :class:`Tensor` otherwise :class:`array`.
 
     Returns
     -------
     color_group:    dict
-        :obj:`color_group[i]` is a :class:`LongTensor` (or :obj:`array`) of node indices colored with :obj:`i`-th color.
+        :obj:`color_group[i]` is a :class:`LongTensor` (or :obj:`array`) of node indices
+        colored with :obj:`i`-th color.
     beta_dist:      array
         An array, see the doc of :class:`thgsp.filters.QmfCore` for the details.
-
     """
     N, M = beta.shape
     n_channel = 2 ** M  # pseudo channel number
@@ -129,24 +133,27 @@ def beta2color_group(beta, th=True):
 
 
 def beta2channel_mask(beta):
-    """
-    Generate a :obj:`(2^M, N)` bool mask tensor to indicate which channel(color group) one node belongs to. All channels
-    have disjoint node sets and hence the sum along the channel dimension returns a all-one(True) :obj:`(N,)` tensor.
+    """Generate a :obj:`(2^M, N)` bool mask tensor to indicate which
+    channel(color group) one node belongs to. All channels have disjoint node
+    sets and hence the sum along the channel dimension returns a all-one(True)
+    :obj:`(N,)` tensor.
 
     .. note::
-       This function is a common approach to generate channel mask for multi-channel wavelet filterbank. Either
-       coloring or numerical based bipartite approximation algorithm can employ this function.
+       This function is a common approach to generate channel mask for multi-channel
+       wavelet filterbank. Either coloring or numerical based bipartite approximation
+       algorithm can employ this function.
 
     Parameters
     ----------
     beta:   BoolTensor(N,M)
-        Bipartite partition indicator tensor. :obj:`N` and :obj:`M` are the node and bipartite subgraph numbers,
-        respectively.
+        Bipartite partition indicator tensor. :obj:`N` and :obj:`M` are the node and
+        bipartite subgraph numbers, respectively.
 
     Returns
     -------
     mask:   BoolTensor(2**M,N)
-        The indices of :obj:`True` in :obj:`i`-th row are nodes whose signal will be kept in :obj:`i`-th channel.
+        The indices of :obj:`True` in :obj:`i`-th row are nodes whose signal will be
+        kept in :obj:`i`-th channel.
     beta_dist:  array(2**M,M))
         An array, see the doc of :class:`thgsp.filters.QmfCore` for the details.
     """
@@ -219,13 +226,15 @@ def laplace(adj: spmatrix, lap_type=None, add_loop=False) -> coo_matrix:
 
 def bipartite_mask(bt, sparse=True):
     r"""
-    Generate a bool mask matrix which can extract a bipartite subgraph from any graph(represented by a matrix)
+    Generate a bool mask matrix which can extract a bipartite subgraph from any graph
+    (represented by a matrix) .
 
     Parameters
     ----------
     bt:    BoolTensor, array
-        The indicator of two bipartite sets. All nodes within a same bipartite set is characterized by
-        a same bool value, e.g.,True. Shape: `(N,)`, `N` is the number of graph nodes.
+        The indicator of two bipartite sets. All nodes within a same bipartite set is
+        characterized by a same bool value, e.g.,True. Shape: `(N,)`, `N` is the number
+        of graph nodes.
     sparse: bool
         If True, return lil_matrix.
     Returns
@@ -279,16 +288,16 @@ def is_bipartite_fix_scipy(A, fix_flag: bool = False):
 
 
 def is_bipartite_fix_th(A, fix_flag=False):
-    """
-    Check if a graph is bipartite using BFS-based 2-color coloring and furthermore can fix a graph to a bipartite one by
-    deleting edges bridging two nodes colored with a same color.
+    """Check if a graph is bipartite using BFS-based 2-color coloring and
+    furthermore can fix a graph to a bipartite one by deleting edges bridging
+    two nodes colored with a same color.
 
     Parameters
     ----------
     A:          Tensor
         The adjacency matrix
     fix_flag:   bool,optional
-        If True, will fix :obj:`A` to a bipartite graph by zeroing some elements in-place.
+        If True, fix :obj:`A` to a bipartite graph by zeroing some elements in-place.
     Returns
     -------
     flag:   bool
@@ -297,7 +306,6 @@ def is_bipartite_fix_th(A, fix_flag=False):
         A list recording the vertex colors which are all 1 or 0.
     A:      Tensor
         The adjacency matrix of returned graph.
-
     """
 
     n_node = A.shape[-1]

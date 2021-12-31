@@ -7,11 +7,11 @@ from scipy.sparse import block_diag, coo_matrix
 from torch_sparse import SparseTensor, partition
 
 from ._utils import (
-    is_bipartite_fix,
     bipartite_mask,
+    dict2perm,
     graclus_coarsen,
     graclus_refine_raw,
-    dict2perm,
+    is_bipartite_fix,
 )
 
 
@@ -75,17 +75,21 @@ def admm_bga(
     max_rho=1e10,
 ):
     r"""
-    The program is to find the bipartite graph approximation via solving the following optimization problem [2]_ .
+    The program is to find the bipartite graph approximation via solving the
+    following optimization problem [2]_ .
 
     .. math::
         \begin{array}{ll}
-        \min _{\left\{\mathbf{B}_{i}\right\}} & \sum_{i=1}^{L}\left\|\mathbf{A}-\mathbf{B}_{i}\right\|_{F}^{2}+\alpha
-        \sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T} \mathbf{B}_{j}\right\} \\
+        \min _{\left\{\mathbf{B}_{i}\right\}} & \sum_{i=1}^{L}\left\|\mathbf{
+        A}-\mathbf{B}_{i}\right\|_{F}^{2}+\alpha
+        \sum_{i=1}^{L} \sum_{j \neq i} \operatorname{Tr}\left\{\mathbf{B}_{i}^{T}
+        \mathbf{B}_{j}\right\} \\
         \text { s.t. } & \mathbf{B}_{i} \in \mathcal{B}
         \end{array}
 
     .. note::
-        This algorithm does NOT guarantee bipartite output graphs in some cases. Nevertheless, the output graphs are
+        This algorithm does NOT guarantee bipartite output graphs in some cases.
+        Nevertheless, the output graphs are
         almost bipartite,i.e., only a few edges violate the bipartiteness. One can use
         :func:`is_bipartite_fix` to fix the output under such circumstances.
 
@@ -100,7 +104,8 @@ def admm_bga(
     metric:str,optional
         The error metric between the learned bipartite graphs and the original graph
     cut_edge:bool,optional
-         If True, cut the edges in the learned bipartite graphs that not exist in the original graph
+         If True, cut the edges in the learned bipartite graphs that not exist in the
+         original graph
     init_B:Tensor,optional
          The initialization of B
     convergence_marker:float,optional
@@ -268,7 +273,7 @@ def admm_lbga_ray(
 
     if Ap_lil.dtype != np.double:
         warnings.warn(
-            "ADMM-based method is sensitive to the precision(double is much faster)"
+            "ADMM-based method is sensitive to the precision (double is much faster)"
         )
         Ap_lil = Ap_lil.astype(np.double)
 

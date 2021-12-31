@@ -1,12 +1,14 @@
-import pytest
 import numpy as np
+import pytest
+
 from thgsp.convert import get_array_module
 from thgsp.sampling._utils import (
-    construct_sampling_matrix,
-    construct_hth,
     construct_dia,
+    construct_hth,
+    construct_sampling_matrix,
 )
-from ..utils4t import sparse_formats, float_dtypes, devices
+
+from ..utils4t import devices, float_dtypes, sparse_formats
 
 
 @pytest.mark.parametrize("dtype", float_dtypes)

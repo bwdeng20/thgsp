@@ -3,6 +3,38 @@ import os.path as osp
 
 import torch
 
+import thgsp.alg  # noqa
+import thgsp.bga  # noqa
+import thgsp.datasets  # noqa
+import thgsp.filters  # noqa
+import thgsp.sampling  # noqa
+import thgsp.utils  # noqa
+from thgsp.graphs import (
+    GraphBase,
+    Graph,
+    DiGraph,
+    rand_dg,
+    rand_udg,
+    rand_bipartite,
+    random_graph,
+    random_bgraph,
+    radius,
+    knn,
+)  # noqa
+
+from .convert import to_cpx  # noqa
+from .convert import (
+    from_cpx,
+    get_array_module,
+    get_ddd,
+    to_np,
+    to_scipy,
+    to_torch_sparse,
+    to_xcipy,
+    to_xp,
+)
+from .io import loadmat  # noqa
+
 __version__ = "0.1.0"
 suffix = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -33,26 +65,6 @@ if torch.cuda.is_available():  # pragma: no cover
             f"{major}.{minor}. Please reinstall the thgsp that "
             f"matches your PyTorch install."
         )
-
-from .convert import (
-    to_torch_sparse,
-    to_xcipy,
-    to_xp,
-    to_scipy,
-    to_np,
-    to_cpx,
-    from_cpx,
-)  # noqa
-from .convert import get_array_module, get_ddd  # noqa
-from .io import loadmat  # noqa
-
-from thgsp.graphs import *  # noqa
-import thgsp.alg  # noqa
-import thgsp.filters  # noqa
-import thgsp.bga  # noqa
-import thgsp.utils  # noqa
-import thgsp.datasets  # noqa
-import thgsp.sampling  # noqa
 
 __all__ = [
     "to_torch_sparse",

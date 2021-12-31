@@ -3,7 +3,8 @@ from scipy.sparse import lil_matrix
 from torch_sparse import SparseTensor
 
 from thgsp.alg.coloring import dsatur
-from ._utils import new_order, distribute_color, bipartite_mask
+
+from ._utils import bipartite_mask, distribute_color, new_order
 
 
 def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
@@ -15,15 +16,17 @@ def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
     A:      :py:class:`SparseTensor`
         The adjacency matrix
     vtx_color: array_like, optional
-        All valid type for :py:func:`np.asarray` is acceptable, including :py:class:`torch.Tensor` on cpu. If None,
-        this function will invoke :py:func:`thgsp.alg.dsatur` silently.
+        All valid type for :py:func:`np.asarray` is acceptable, including
+        :py:class:`torch.Tensor` on cpu. If None, this function will invoke
+        :py:func:`thgsp.alg.dsatur` silently.
 
     threshold: float, optional
 
     Returns
     -------
     bptG:    array
-        An array consisting of :obj:`M` bipartite subgraphs formatted as :class:`scipy.sparse.lil_matrix`.
+        An array consisting of :obj:`M` bipartite subgraphs formatted as
+        :class:`scipy.sparse.lil_matrix`.
     beta:   array
         :obj:`beta[:,i]` is the bipartite set indicator of :obj:`i`-th subgraph.
     beta_dist:  array
@@ -31,7 +34,7 @@ def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
     new_vtx_color:  array
         The node colors
     mapper:     dict
-        Map **new_vtx_color** to the original ones. For example mapper={1:2, 2:3, 3:1} will
+        Map **new_vtx_color** to the original ones. For example mapper={1:2, 2:3, 3:1}
         map 1,2 and 3-th color to 2,3 and 1, respectively.
 
     """

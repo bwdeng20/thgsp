@@ -1,13 +1,15 @@
 import pytest
 import torch
+
 from thgsp.graphs.generators import (
-    rand_udg,
-    rand_dg,
-    rand_bipartite,
-    random_graph,
-    radius,
     knn,
+    radius,
+    rand_bipartite,
+    rand_dg,
+    rand_udg,
+    random_graph,
 )
+
 from ..utils4t import devices, float_dtypes
 
 

@@ -2,7 +2,7 @@ name: Release
 
 on:
   workflow_run:
-    workflows: [ "Building Wheels" ]
+    workflows: [ "Building Wheels", "Linting", "Testing" ]
     branches: [ main ]
     types:
       - completed

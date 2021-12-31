@@ -1,9 +1,12 @@
+import math
+
 import pytest
 import torch
-import math
+
 from thgsp.graphs.generators import random_graph
-from ..utils4t import devices, float_dtypes, snr_and_mse
 from thgsp.sampling.fastgsss import fastgsss, recon_fastssss
+
+from ..utils4t import devices, float_dtypes, snr_and_mse
 
 
 @pytest.mark.parametrize("device", devices)

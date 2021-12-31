@@ -1,18 +1,21 @@
-import pytest
 import time
+
 import numpy as np
+import pytest
 import torch
 import torch as th
-from ..utils4t import float_dtypes, snr_and_mse
+
+from thgsp.graphs import rand_udg
 from thgsp.sampling.bsgda import (
     bsgda,
-    greedy_sampling,
     computing_sets,
-    solving_set_covering,
     greedy_gda_sampling,
+    greedy_sampling,
     recon_bsgda,
+    solving_set_covering,
 )
-from thgsp.graphs import rand_udg
+
+from ..utils4t import float_dtypes, snr_and_mse
 
 np.set_printoptions(precision=5)
 th.set_printoptions(precision=5)

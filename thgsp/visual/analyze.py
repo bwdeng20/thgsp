@@ -1,11 +1,12 @@
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 import torch as th
 from scipy.sparse.linalg import eigsh
 from sklearn.cluster import KMeans
+
 from thgsp.convert import to_np
 from thgsp.graphs import GraphBase
-import plotly.graph_objects as go
-import plotly.express as px
 
 
 def fast_interpolate(x, num_sample=50):
@@ -75,7 +76,8 @@ def band_index2boundary(band_indices, ylimits, spectral_spacing):
         spectral_split = (
             spectral_spacing[first_of_this_band] + last_basis_of_previous_band
         ) / 2
-        split_lines.append(spectral_split)  # record the left split line of i-th band
+        # record the left split line of i-th band
+        split_lines.append(spectral_split)
         last_basis_of_previous_band = spectral_spacing[band[-1]]
     spectral_split = (
         last_basis_of_previous_band + (ylimits[-1] - last_basis_of_previous_band) / 2
@@ -230,7 +232,7 @@ def show_transform(
     if highlight_entry is not None:  # highlight entry
         if highlight_entry.shape != (M, N):
             raise RuntimeError(
-                f" 'highlight_entry' should have the same size with 'transform_matrix'"
+                " `highlight_entry` should have the same size with `transform_matrix`"
             )
 
     vecs = None
@@ -244,7 +246,8 @@ def show_transform(
         num_clusters = cluster
         if verbose:
             print(
-                "Clustering the nodes with applying K-means on many eigenvectors of random walk Laplacian ..."
+                "Clustering the nodes with applying K-means on many "
+                "eigenvectors of random walk Laplacian ..."
             )
         vals, vecs = compute_eigen_of_rw(G, cluster + 1)
         kmeans = KMeans(n_clusters=cluster).fit(vecs)
@@ -323,7 +326,7 @@ def show_transform(
     # Frequencies y axis coordinates
     spectral_spacing = np.arange(M)
 
-    # Bands and bands_colors  Note that this can cope with more general band information.
+    # Bands and bands_colors
     if bands is not None:
         if bands.ndim == 1:
             bands = np.hstack([bands[:-1, None], bands[1:, None]])
@@ -337,7 +340,8 @@ def show_transform(
             )
 
     # Modes scaling
-    modes = transform_matrix  # each row is a basis vector(different from that in grasp)
+    # each row is a basis vector(different from that in grasp)
+    modes = transform_matrix
     if amplitude_norm == "l2":
         modes = modes / np.linalg.norm(modes, axis=1, keepdims=True)
     elif amplitude_norm == "max_abs":
@@ -346,7 +350,8 @@ def show_transform(
         modes = modes / np.abs(modes).max()
     else:
         raise TypeError(
-            f"amplitude normalization strategy{amplitude_norm} is invalid or not supported at present"
+            f"amplitude normalization strategy{amplitude_norm} "
+            f"is invalid or not supported at present"
         )
     modes_ordered = modes[:, emd_order]
 

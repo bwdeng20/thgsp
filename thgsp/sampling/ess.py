@@ -1,14 +1,14 @@
 import numpy as np
 import torch
-import torch as th
+
 from thgsp.convert import SparseTensor, get_array_module, to_scipy
 from thgsp.utils import consecutive_spmv
 
 
 def ess_sampling(operator, M, k=2):
     r"""
-    This function has the same functionality as :func:`ess` but directly computes the matrix power of specific
-    variation operator, e.g., normalized Laplacian.
+    This function has the same functionality as :func:`ess` but directly computes the
+    matrix power of specific variation operator, e.g., normalized Laplacian.
     """
     import scipy.sparse.linalg as splin
 
@@ -58,8 +58,8 @@ def ess(operator, M, k=2, max_iter=int(5e2)):
 
     References
     ----------
-    .. [1]  Aamir Anis, Akshay Gadde, and Antonio Ortega, “Efficient sampling set selection for bandlimited graph
-            signals using graph spectral proxies,” IEEE Trans on Signal Processing, 2016.
+    .. [1]  Aamir Anis, et al., “Efficient sampling set selection for bandlimited graph
+            signals using graph spectral proxies,” IEEE TSP, 2016.
 
     """
     N = operator.size(-1)
@@ -71,18 +71,18 @@ def ess(operator, M, k=2, max_iter=int(5e2)):
             S.append(Sc[0])
             break
         sigma, psi = power_iteration4min(operator, Sc, k, max_iter)
-        v = Sc[th.argmax(psi.abs())]
+        v = Sc[torch.argmax(psi.abs())]
         S.append(v)
     return S
 
 
 def power_iteration(L: SparseTensor, Sc: iter, k=2, shift=0, num_iter=50, tol=1e-6):
-    Sc = th.as_tensor(Sc)
+    Sc = torch.as_tensor(Sc)
     Lt = L.t()
-    I = SparseTensor.eye(L.size(0), dtype=L.dtype(), device=L.device())
-    Isv = I[Sc, :]
-    Ivs = I[:, Sc]
-    x0 = th.rand(len(Sc), 1, device=L.device(), dtype=L.dtype())
+    Im = SparseTensor.eye(L.size(0), dtype=L.dtype(), device=L.device())
+    Isv = Im[Sc, :]
+    Ivs = Im[:, Sc]
+    x0 = torch.rand(len(Sc), 1, device=L.device(), dtype=L.dtype())
     for _ in range(num_iter):
         x1 = Ivs @ x0
         x1 = consecutive_spmv(L, x1, k)
@@ -110,8 +110,7 @@ def power_iteration4min(L: SparseTensor, Sc: iter, k=2, num_iter=50):
 
 
 def recon_ess(y, S, U, bd, **kwargs):
-    """
-    Naive implementation of ESS sampling reconstruction.
+    """Naive implementation of ESS sampling reconstruction.
 
     Parameters
     ----------

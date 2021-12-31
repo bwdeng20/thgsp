@@ -1,7 +1,8 @@
 import torch
-from thgsp.sampling import recon_ess, ess_sampling, ess
+
+from thgsp import Graph, loadmat
+from thgsp.sampling import ess_sampling, recon_ess
 from thgsp.utils import mse, snr
-from thgsp import loadmat, Graph
 
 
 def snr_and_mse(x, target):

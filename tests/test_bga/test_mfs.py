@@ -1,10 +1,10 @@
 import pytest
 import torch
 
+from thgsp.bga.mfs import amfs, amfs1level, compute_sigma, dkl
 from thgsp.graphs.generators import rand_bipartite, rand_udg
-from ..utils4t import float_dtypes
 
-from thgsp.bga.mfs import dkl, amfs1level, amfs, compute_sigma
+from ..utils4t import float_dtypes
 
 
 @pytest.mark.parametrize("dt", [torch.double])

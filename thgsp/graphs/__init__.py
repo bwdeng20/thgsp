@@ -1,17 +1,16 @@
-from .core import GraphBase, Graph, DiGraph
-from .degree import out_degree, in_degree, degree_matrix
+from .core import DiGraph, Graph, GraphBase
+from .degree import degree_matrix, in_degree, out_degree
 from .generators import (
-    rand_bipartite,
-    rand_udg,
-    rand_dg,
-    random_graph,
-    random_bgraph,
-    radius,
     knn,
+    radius,
+    rand_bipartite,
+    rand_dg,
+    rand_udg,
+    random_bgraph,
+    random_graph,
 )
 from .is_bipartite import is_bipartite
 from .laplace import laplace
-from .degree import degree_matrix
 
 __all__ = [
     # graphs

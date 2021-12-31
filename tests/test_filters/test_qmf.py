@@ -1,27 +1,47 @@
+import numpy as np
 import pytest
 import torch
-import numpy as np
 from torch_sparse import SparseTensor
+
+from thgsp.filters.qmf import (
+    BiorthCore,
+    BiorthOperator,
+    ColorBiorth,
+    ColorQmf,
+    NumBiorth,
+    NumQmf,
+    QmfCore,
+    QmfOperator,
+    harary,
+    meyer_kernel,
+    meyer_mirror_kernel,
+)
+from thgsp.graphs.generators import rand_bipartite, rand_udg
+from thgsp.utils.metrics import snr
+
 from ..utils4t import (
-    float_dtypes,
-    devices,
     color_strategies,
+    devices,
+    float_dtypes,
     num_strategies,
     partition_strategy,
 )
-from thgsp.filters.qmf import (
-    QmfCore,
-    BiorthCore,
-    QmfOperator,
-    BiorthOperator,
-    NumQmf,
-    ColorQmf,
-    NumBiorth,
-    ColorBiorth,
-)
-from thgsp.filters.qmf import meyer_kernel, meyer_mirror_kernel, harary
-from thgsp.graphs.generators import rand_udg, rand_bipartite
-from thgsp.utils.metrics import snr
+
+
+def ppprint(dis, pf):
+    print("reconstruction SNR:  ", pf, " dB")
+    print(
+        "|max distortion among all nodes:  ",
+        dis.max(),
+        " at {}-th node".format(dis.argmax()),
+    )
+    print(
+        "min distortion among all nodes:  ",
+        dis.min(),
+        " at {}-th node".format(dis.argmin()),
+    )
+    print("distortion sum                :  ", dis.sum())
+    print("|-----------------------------------------------------------------")
 
 
 @pytest.mark.parametrize("dtype", float_dtypes)
@@ -88,27 +108,15 @@ class TestQmfCore:
 
         z = qmf.synthesize(y)
         assert z.shape == (2 ** M, N, 1)
-        # since beta and Bs are all randomly generated, the transform are not numerically valid
+        # since beta and Bs are all randomly generated,
+        # the transform are not numerically valid
         assert (z.sum(0).squeeze() - x).abs().sum() != 0
 
         z.squeeze_()
         f_hat = z.sum(0)
         dis = (f_hat - x).abs()
-        print("\nreconstruction SNR:    ", snr(f_hat, x))
-        print(
-            "max distortion among all nodes:  ",
-            dis.max(),
-            " at {}-th node".format(dis.argmax()),
-        )
-        print(
-            "min distortion among all nodes:  ",
-            dis.min(),
-            " at {}-th node".format(dis.argmin()),
-        )
-        print("distortion sum                :  ", dis.sum())
-        print(
-            "|---------------------------------------------------------------------------------"
-        )
+        pf = snr(f_hat, x)
+        ppprint(dis, pf)
 
 
 @pytest.mark.parametrize("dtype", float_dtypes)
@@ -136,25 +144,11 @@ class TestColorQmf:
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f.squeeze_()).item()
         print(
-            "\n----- Strategy: {:8s}, M={:4d}  Device: {:5s}, Dtype: {:6s} -----------".format(
+            "\n----- Strategy: {:8s}, M={:4d}  Device: {:5s}, Dtype: {:6s} ---".format(
                 strategy, M, str(device), str(dtype)
             )
         )
-        print("|reconstruction SNR:    ", pf)
-        print(
-            "|max distortion among all nodes:  ",
-            dis.max().item(),
-            " at {}-th node".format(dis.argmax()),
-        )
-        print(
-            "|min distortion among all nodes:  ",
-            dis.min().item(),
-            " at {}-th node".format(dis.argmin()),
-        )
-        print("|distortion sum                :  ", dis.sum().item())
-        print(
-            "---------------------------------------------------------------------------------"
-        )
+        ppprint(dis, pf)
         assert pf > 20
 
 
@@ -181,25 +175,11 @@ class TestNumQMf:
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f).item()
         print(
-            "\n|------------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----------".format(
+            "\n|----- Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----".format(
                 strategy, M, str(device), str(dtype)
             )
         )
-        print("reconstruction SNR:  ", pf)
-        print(
-            "max distortion among all nodes:  ",
-            dis.max(),
-            " at {}-th node".format(dis.argmax()),
-        )
-        print(
-            "min distortion among all nodes:  ",
-            dis.min(),
-            " at {}-th node".format(dis.argmin()),
-        )
-        print("distortion sum                :  ", dis.sum())
-        print(
-            "|---------------------------------------------------------------------------------"
-        )
+        ppprint(dis, pf)
         assert pf > 20
 
 
@@ -233,7 +213,8 @@ class TestBiorthCore:
 
         z = bio.synthesize(y)
         assert z.shape == (2 ** M, N, 1)
-        # since beta and Bs are all randomly generated, the transform won't be numerically valid
+        # since beta and Bs are all randomly generated, the transform won't be
+        # numerically valid
         assert (z.sum(0).squeeze() - x).abs().sum() != 0
 
 
@@ -262,25 +243,10 @@ class TestColorBiorth:
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f).item()
         print(
-            "\n|----- Strategy: {:8s}, M:{:4d}  Device: {:5s}, Dtype: {:6s} -----------".format(
-                strategy, M, str(device), str(dtype)
-            )
+            "\n|----- Strategy: {:8s}, M:{:4d}  Device: {:5s}, Dtype: {:6s} "
+            "-----------".format(strategy, M, str(device), str(dtype))
         )
-        print("reconstruction SNR:    ", pf, " dB")
-        print(
-            "max distortion among all nodes:  ",
-            dis.max(),
-            " at {}-th node".format(dis.argmax()),
-        )
-        print(
-            "min distortion among all nodes:  ",
-            dis.min(),
-            " at {}-th node".format(dis.argmin()),
-        )
-        print("distortion sum                :  ", dis.sum())
-        print(
-            "|---------------------------------------------------------------------------------"
-        )
+        ppprint(dis, pf)
         assert pf > 20
 
 
@@ -298,7 +264,7 @@ class TestNumBiorth:
     @pytest.mark.parametrize("part", partition_strategy)
     def test_transform(self, dtype, device, strategy, M, part):
         print(
-            "\n|------------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} -----------".format(
+            "\n|------ Strategy: {:8s}, M={}, Device: {:5s}, Dtype: {:6s} ----".format(
                 strategy, M, str(device), str(dtype)
             )
         )
@@ -316,21 +282,7 @@ class TestNumBiorth:
         f_hat = z.sum(0)
         dis = (f_hat - f).abs()
         pf = snr(f_hat, f).item()
-        print("reconstruction SNR:  ", pf, " dB")
-        print(
-            "|max distortion among all nodes:  ",
-            dis.max(),
-            " at {}-th node".format(dis.argmax()),
-        )
-        print(
-            "min distortion among all nodes:  ",
-            dis.min(),
-            " at {}-th node".format(dis.argmin()),
-        )
-        print("distortion sum                :  ", dis.sum())
-        print(
-            "|---------------------------------------------------------------------------------"
-        )
+        ppprint(dis, pf)
         assert pf > 20
 
 

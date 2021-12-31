@@ -1,8 +1,10 @@
 import pytest
 import ray
+
+from thgsp.bga.admm import admm_bga, admm_lbga_ray, is_bipartite_fix
 from thgsp.graphs.generators import rand_udg
-from ..utils4t import float_dtypes, devices, partition_strategy
-from thgsp.bga.admm import admm_bga, is_bipartite_fix, admm_lbga_ray
+
+from ..utils4t import devices, float_dtypes, partition_strategy
 
 
 @pytest.mark.parametrize("dtype", float_dtypes[1:])

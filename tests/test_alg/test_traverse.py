@@ -1,6 +1,8 @@
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
+
 from thgsp.alg.traverse import bfs_lil
+
 from ..utils4t import plot
 
 
@@ -17,7 +19,7 @@ def test_lil_bfs():
     n = 10
     r = 1
     g1 = nx.random_regular_graph(d=3, n=10)
-    g1_lil = nx.adj_matrix(g1, nodelist=range(n)).tolil()
+    g1_lil = nx.adjacency_matrix(g1, nodelist=range(n)).tolil()
 
     tree_gt = nx.bfs_tree(g1, source=r)
     tree = bfs_lil(g1_lil, r=r)

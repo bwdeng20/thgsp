@@ -1,7 +1,8 @@
-import torch
 import numpy as np
 import pytest
-from thgsp.filters import meyer_kernel, ideal_kernel, Filter
+import torch
+
+from thgsp.filters import Filter, ideal_kernel, meyer_kernel
 from thgsp.graphs import random_graph
 
 

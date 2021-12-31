@@ -1,5 +1,5 @@
 from thgsp.bga.greedy import greedy_bga, is_bipartite_fix
-from thgsp.graphs.generators import random_graph, np
+from thgsp.graphs.generators import np, random_graph
 
 
 def test_greedy_bga():

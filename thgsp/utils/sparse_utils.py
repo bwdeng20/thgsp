@@ -1,9 +1,11 @@
-import torch
 import warnings
+
 import numpy as np
+import torch
 from torch_sparse import SparseTensor, coalesce
 from torch_sparse import eye as ts_eye
-from thgsp.convert import to_scipy, get_array_module, coo_matrix
+
+from thgsp.convert import coo_matrix, get_array_module, to_scipy
 
 
 def img2graph(img, threshold: int = None, grid=False):
@@ -141,7 +143,9 @@ def matrix_power(A, k: int):
 
 def absv(src: SparseTensor):
     """
-    The input and ouput SparseTensors will share the memory of row,col,rowptr fields except value.
+    The input and ouput SparseTensors will share the memory of row,col,rowptr fields
+    except value.
+
     Parameters
     ----------
     src: SparseTensor
@@ -158,16 +162,16 @@ def absv(src: SparseTensor):
 
 def absv_(src: SparseTensor):
     """
-    The input and ouput SparseTensors will share the memory of row,col,rowptr, and value. Inplace version of
-    :func:`absv`
+    The input and ouput SparseTensors will share the memory of row,col,rowptr, etc.
+    Inplace version of :func:`absv`
 
     Parameters
     ----------
-    src
+    src: SparseTensor
 
     Returns
     -------
-
+    SparseTensor
     """
     val = src.storage.value()
     assert val is not None
@@ -177,16 +181,15 @@ def absv_(src: SparseTensor):
 def multivariate_normal(
     mean=0, cov=None, precision=None, num=1, delta=0.0, return_th=True
 ):
-    """
-    Generate signals conforming with multinormal distribution characterized by either
-    covariance matrix or precision matrix.
+    """Generate signals conforming with multinormal distribution characterized
+    by either covariance matrix or precision matrix.
 
     Parameters
     ----------
     mean:  scalar, array
          If being a scalar, this is the mean vector of all variables are equal to it;
-         otherwise this array must have the length of :obj:`N`, where :obj:`N` is the number
-         of variables.
+         otherwise this array must have the length of :obj:`N`, where :obj:`N` is the
+         number of variables.
     cov:  spmatrix, None, SparseTensor
     precision: spmatrix, None, SparseTensor
     num:    int
@@ -198,15 +201,16 @@ def multivariate_normal(
     Returns
     -------
     z1:  array, None, Tensor
-        If :arg:`cov` is specified, this consists of samples according to it; otherwise None.
+        If :arg:`cov` is specified, this consists of samples according to it;
+        otherwise None.
     z2: array, None, Tensor
-        If :arg:`precision` is specified, this consists of samples according to it; otherwise None.
+        If :arg:`precision` is specified, this consists of samples according to it;
+        otherwise None.
     The shape is :obj:`(N,num)`
-
     """
     try:
         from sksparse.cholmod import cholesky
-    except:
+    except ImportError:
         raise ImportError(
             "scikit-sparse (https://github.com/scikit-sparse/scikit-sparse) is required"
         )

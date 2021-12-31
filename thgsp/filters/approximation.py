@@ -1,7 +1,8 @@
-import torch
 import numpy as np
+import torch
 from torch_sparse import SparseTensor
-from thgsp.convert import to_xcipy, from_cpx, get_array_module, get_ddd, spmatrix
+
+from thgsp.convert import from_cpx, get_array_module, get_ddd, spmatrix, to_xcipy
 
 
 def normalize_laplace(L: SparseTensor, lam_max: float = 2.0):
@@ -22,13 +23,14 @@ def cheby_op(
     Parameters
     ----------
     x:          Tensor
-        The input graph signal. It's shape can be either :obj:`(N,)` , :obj:`(N,Ci)` or :obj:`(Co,N,Ci)`, wherein
-        :obj:`N`, :obj:`Ci` and :obj:`Co` are the numbers of nodes, input channels, and output channels respectively.
+        The input graph signal. It's shape can be either :obj:`(N,)` , :obj:`(N,Ci)` or
+        :obj:`(Co,N,Ci)`, wherein :obj:`N`, :obj:`Ci` and :obj:`Co` are the numbers of
+        nodes, input channels, and output channels respectively.
     L:          SparseTensor
         The :obj:`(N,N)` Laplacian matrix.
     coeff:      Tensor
-        The :obj:`(Co,Ci,K+1)` Chebyshev coefficients for :obj:`Ci*Co` kernels, wherein :obj:`K` is the order of
-        approximation.
+        The :obj:`(Co,Ci,K+1)` Chebyshev coefficients for :obj:`Ci*Co` kernels, wherein
+        :obj:`K` is the order of approximation.
     lam_max:    float,optional
         The maximal graph frequency, i.e., :math:`\lambda_{max}`
 
@@ -87,10 +89,10 @@ def cheby_op_basis(L, coeff, lam_max=2.0, return_ts=False):
     N = L.shape[-1]
 
     coeff = xp.asarray(coeff)
-    I = xcipy.sparse.eye(N, dtype=L.dtype, format="csr")
+    Im = xcipy.sparse.eye(N, dtype=L.dtype, format="csr")
 
-    Ln = L * (2 / lam_max) - I
-    Tl_old = I
+    Ln = L * (2 / lam_max) - Im
+    Tl_old = Im
     Tl_cur = Ln
     Hl = 0.5 * coeff[0] * Tl_old + coeff[1] * Tl_cur
     for k in range(2, K):
@@ -132,7 +134,7 @@ def cheby_coeff(kernels, K=10, lam_max=2.0, num_points=None, dtype=None, device=
                 kid = id(krn)
                 if kid in kernel_cache:
                     gs[m, j, i] = kernel_cache[kid]
-                else:  # kernel_cache stores the reference to a part of memory used by gs.
+                else:  # kernel cache
                     gs[m, j, i] = krn(lam_max / 2 * (torch.cos(points) + 1))
                     kernel_cache[kid] = gs[m, j, i]
     order_cos = torch.arange(K + 1, dtype=dtype, device=device).reshape(
@@ -144,15 +146,14 @@ def cheby_coeff(kernels, K=10, lam_max=2.0, num_points=None, dtype=None, device=
 
 
 def polyval(c, x):
-    """
-    Evaluate `N`-order polynomial at the points `x` with the given `N+1` coefficients
-    in descending order.
+    """Evaluate `N`-order polynomial at the points `x` with the given `N+1`
+    coefficients in descending order.
 
     Parameters
     ----------
     c:  Tensor, a list of Tensor
-        The coefficients can be either a list of  tensors which are broadcastable with the input `x`
-        or an concatenated tensor of them.
+        The coefficients can be either a list of  tensors which are broadcastable with
+        the input `x` or an concatenated tensor of them.
 
     x:  Tensor, scalar
         Arbitrary rank-D tensor(D=1,2,...) is valid due to the broadcasting semantics.

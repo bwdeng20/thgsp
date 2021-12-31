@@ -1,26 +1,30 @@
 import os
-import torch
-import numpy as np
 from os.path import join
 from shutil import move
+
+import numpy as np
+import torch
 from scipy.sparse import coo_matrix
+from torchvision.datasets.utils import check_integrity, download_and_extract_archive
+
 from thgsp.graphs import Graph
 from thgsp.io import loadmat
-from torchvision.datasets.utils import download_and_extract_archive, check_integrity
+
 from .utils import get_data_dir_of_thgsp, remove_file_or_dir
 
 
 class Minnesota:
     r"""
-    The Minnesota traffic network shipped with "Wavelet Filterbanks on Graph" [1]_ project(with a license of GPL V3)
-    by USC-STAC group(see http://biron.usc.edu/wiki/index.php/Graph_Filterbanks). This road network is a part of
-    "The National Highway Planning Network (NHPN) 2000-Present dataset" [3]_ and also carried by MatlabBGL [2]_
-    toolbox(released under BSD).
+    The Minnesota traffic network shipped with "Wavelet Filterbanks on Graph" [1]_
+    project(with a license of GPL V3) by USC-STAC group [4]_ . This road network is a
+    part of "The National Highway Planning Network (NHPN) 2000-Present dataset" [3]_ and
+    also  carried by MatlabBGL [2]_ toolbox(released under BSD).
 
     Parameters
     ----------
     root:   str, optional
-        The root directory to place the downloaded files. If :obj:`None`, set the root dir as "thgsp.datasets.data".
+        The root directory to place the downloaded files. If :obj:`None`, set the root
+        dir as "thgsp.datasets.data".
     connected: bool
         If True, connect the traffic network.
     download: bool
@@ -28,10 +32,11 @@ class Minnesota:
 
     References
     ----------
-    .. [1]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter Banks for Graph Structured Data",
-            IEEE trans on Signal Processing, 2012.
+    .. [1]  S K. Naran, et al, "Perfect Reconstruction Two-channel Wavelet Filter Banks
+            for Graph Structured Data", IEEE trans on Signal Processing, 2012.
     .. [2] D. Gleich, "https://github.com/dgleich/matlab-bgl", GitHub, 2011
     .. [3] https://www.fhwa.dot.gov/planning/processes/tools/nhpn/
+    .. [4] http://biron.usc.edu/wiki/index.php/Graph_Filterbanks)
 
     """
     filename = "Graph_Wavelets_Demo.zip"
@@ -54,7 +59,7 @@ class Minnesota:
         if not self._check_integrity():
             raise RuntimeError(
                 "Dataset not found or corrupted."
-                + " You can use download=True to download it"
+                " You can use download=True to download it"
             )
         g = loadmat(join(self.root, self.top_dir, self.mat_list[0][0]))
         A = g["A"]

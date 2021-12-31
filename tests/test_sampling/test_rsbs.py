@@ -1,15 +1,16 @@
+import numpy as np
 import pytest
 import torch
-import numpy as np
 
 from thgsp.graphs.generators import random_graph
-from ..utils4t import devices, float_dtypes, float_np_dts, sparse_formats, snr_and_mse
 from thgsp.sampling.rsbs import (
     cheby_coeff4ideal_band_pass,
     estimate_lk,
-    rsbs,
     recon_rsbs,
+    rsbs,
 )
+
+from ..utils4t import devices, float_dtypes, snr_and_mse
 
 
 def test_cheby_coeff4ideal_band_pass():
@@ -55,7 +56,8 @@ class TestRsbs:
         appropriate_num_rv = np.int32(2 * np.round(np.log(N)))
         g = random_graph(N, 0.3, dtype=dtype, device=device, seed=2021)
         print(g.device())
-        if dtype == torch.double:  # since scikit-umfpack requires double scalars.
+        # since scikit-umfpack requires double scalars.
+        if dtype == torch.double:
             nodes, coh = rsbs(g, M, k, num_rv=appropriate_num_rv, return_list=True)
             f = torch.rand(N, 1, dtype=dtype, device=device)
             f = f / f.norm()

@@ -1,18 +1,19 @@
-import pytest
 import numpy as np
+import pytest
+import scipy.sparse as sparse
 import torch as th
-from ..utils4t import float_dtypes, lap_types, devices, snr_and_mse
+from scipy.sparse.linalg import ArpackNoConvergence, eigsh
+
+from thgsp.graphs import laplace, rand_udg
 from thgsp.sampling.ess import (
+    ess,
     ess_sampling,
     power_iteration,
     power_iteration4min,
-    ess,
     recon_ess,
 )
-from thgsp.graphs import rand_udg, laplace
-from thgsp.utils import snr, mse
-import scipy.sparse as sparse
-from scipy.sparse.linalg import eigsh, ArpackNoConvergence
+
+from ..utils4t import devices, float_dtypes, lap_types, snr_and_mse
 
 np.set_printoptions(precision=5)
 th.set_printoptions(precision=5)
@@ -35,7 +36,7 @@ class TestPowerIteration:
         sigma, psi = eigsh(reduced, k=1, which="LM")
         sigma = sigma[0]
         print(f"\nth vs sci: {val:.4f}:{sigma:.4f}")
-        print(f"th vs sci: \n", vec.view(-1), "\n", psi.ravel())
+        print(f"th vs sci: \n, {vec.view(-1)}, \n, {psi.ravel()}")
         assert (sigma - val) ** 2 < 1e-2
 
     def test_power_iteration_shift(self, dtype, device, lap):
@@ -52,13 +53,14 @@ class TestPowerIteration:
         sigma, psi = eigsh(reduced, k=1, which="LM")
         sigma = sigma[0]
         print(f"\nth vs sci: {val:.4f}:{sigma:.4f}")
-        print(f"th vs sci: \n", vec.view(-1), "\n", psi.ravel())
+        print(f"th vs sci: \n, {vec.view(-1)}, \n, {psi.ravel()}")
         assert (sigma - val) ** 2 < 1e-2
 
     def test_power_iteration_min(self, dtype, device, lap):
         if lap == "comb":
             pytest.skip(
-                "combinatorial Laplacian operator is not numerically stable according to many experiments"
+                "combinatorial Laplacian operator is not numerically "
+                "stable according to many experiments"
             )
         N = 200
         k = 2
@@ -72,7 +74,7 @@ class TestPowerIteration:
         sigma, psi = eigsh(reduced, k=1, which="SM")
         sigma = sigma[0]
         print(f"\nth vs sci: {val:.4f}:{sigma:.4f}")
-        print(f"th vs sci: \n", vec.view(-1), "\n", psi.ravel())
+        print(f"th vs sci: \n {vec.view(-1)} \n {psi.ravel()}")
         assert (sigma - val) ** 2 < 1e-3
 
 

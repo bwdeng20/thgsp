@@ -1,10 +1,8 @@
-import numpy as np
 import torch
+
+from thgsp import Graph, loadmat
 from thgsp.sampling.bsgda import bsgda, recon_bsgda
 from thgsp.utils import mse, snr
-from thgsp import loadmat, Graph
-from thgsp.visual import draw_cn
-import matplotlib.pyplot as plt
 
 
 def snr_and_mse(x, target):
@@ -30,7 +28,6 @@ L = Graph(data["L"]).to(dv, dt)
 g = Graph(data["A"])
 N = g.n_node
 
-
 S2, _ = bsgda(L, M, mu, epsilon, 12, boost=False)
 S1, _ = bsgda(L, M, mu, epsilon, 12)
 
@@ -45,6 +42,9 @@ _, _ = snr_and_mse(f_hat, f)
 _, _ = snr_and_mse(f_hat1, f)
 _, _ = snr_and_mse(f_hat2, f)
 
+# import numpy as np
+# from thgsp.visual import draw_cn
+# import matplotlib.pyplot as plt
 # fig, axes = plt.subplots(1, 2, figsize=(6, 3))
 # pos = torch.rand(N, 2)
 # s1 = np.zeros(N)

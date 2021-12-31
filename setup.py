@@ -1,13 +1,18 @@
+import glob
 import os
 import os.path as osp
 import sys
-import glob
-import torch
-from torch.__config__ import parallel_info
 from itertools import product
-from setuptools import setup, find_packages
-from torch.utils.cpp_extension import BuildExtension
-from torch.utils.cpp_extension import CppExtension, CUDAExtension, CUDA_HOME
+
+import torch
+from setuptools import find_packages, setup
+from torch.__config__ import parallel_info
+from torch.utils.cpp_extension import (
+    CUDA_HOME,
+    BuildExtension,
+    CppExtension,
+    CUDAExtension,
+)
 
 WITH_CUDA = torch.cuda.is_available() and CUDA_HOME is not None
 suffices = ["cpu", "cuda"] if WITH_CUDA else ["cpu"]
@@ -115,6 +120,9 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: BSD License",
         "Operating System :: Linux",
+        "Operating System :: Windows",
+        "Programming Language :: Python",
+        "Programming Language :: C++",
     ],
     keywords=["pytorch", "graph-signal-processing", "graph-wavelet-filterbank"],
     python_requires=">=3.6",

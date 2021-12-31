@@ -1,9 +1,11 @@
-import pytest
 import numpy as np
+import pytest
 from scipy.sparse import lil_matrix
+
 from thgsp.datasets import Toy
 from thgsp.sampling import ess_sampling
 from thgsp.visual import show_transform
+
 from ..utils4t import plot, remove_downloaded_dataset
 
 

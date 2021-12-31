@@ -1,15 +1,18 @@
 import torch
-from thgsp.convert import to_xcipy, SparseTensor
+
+from thgsp.convert import SparseTensor, to_xcipy
 
 
 def construct_sampling_matrix(
     N, S, dtype=None, device=None, layout="csr", return_ts=False
 ):
     r"""
-    Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as follows.
+    Construct the sampling matrix :math:`\mathbf{H} \in\{0,1\}^{M \times N}` defined as
+    follows.
 
     .. math::
-       \mathbf{H}_{i j}= \begin{cases}1, & j=\mathcal{S}_{i} \\ 0, & \text { otherwise }\end{cases}
+       \mathbf{H}_{i j}= \begin{cases}1, & j=\mathcal{S}_{i} \\ 0, & \text { otherwise }
+       \end{cases}
 
     Parameters
     ----------
@@ -22,9 +25,10 @@ def construct_sampling_matrix(
     layout: str
         The memory layout of the generated sparse matrix. One of ("csc", "csr", "coo").
     device: torch.device, str, optional
-        If :py:`True` and  `cupy` is installed, use `cupy`as backend; otherwise use `scipy`.
+        If :py:`True` and  `cupy` is installed, use `cupy`as backend; otherwise `scipy`.
     return_ts: bool,
-        If False, return `scipy.sparse.spmatrix` of device is GPU else 'cupyx.scipy.sparse.spmatrix'
+        If False, return `scipy.sparse.spmatrix` of device is GPU else
+        'cupyx.scipy.sparse.spmatrix'
 
     Returns
     -------

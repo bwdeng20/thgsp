@@ -1,16 +1,17 @@
-import pytest
 import numpy as np
+import pytest
 
+from thgsp.convert import get_array_module
 from thgsp.filters.approximation import (
+    SparseTensor,
     cheby_coeff,
     cheby_op,
-    SparseTensor,
+    cheby_op_basis,
     nla,
     torch,
-    cheby_op_basis,
 )
-from thgsp.convert import get_array_module
-from thgsp.filters.kernels import meyer_kernel, ideal_kernel, meyer_mirror_kernel
+from thgsp.filters.kernels import ideal_kernel, meyer_kernel, meyer_mirror_kernel
+
 from ..utils4t import devices, float_dtypes
 
 krns = np.array(

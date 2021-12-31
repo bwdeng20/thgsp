@@ -1,5 +1,5 @@
-from thgsp.bga.osglm import osglm
 from thgsp.bga._utils import is_bipartite_fix
+from thgsp.bga.osglm import osglm
 from thgsp.graphs.generators import rand_udg
 
 
@@ -11,9 +11,9 @@ def test_osglm():
     assert is_bipartite_fix(bptG[0])
 
     try:
+        import torch as th
         from torgsp.sampling import osglm as dense_osglm
         from torgsp.types import ColorG
-        import torch as th
 
         dense_bptG, dense_beta, dense_append_nodes, _ = dense_osglm(
             G.to_dense(), colorg=ColorG(vtx_color, max(vtx_color) + 1)

@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.sparse import lil_matrix
+
 from thgsp.datasets import Toy
+from thgsp.graphs import Graph
 from thgsp.sampling import ess_sampling
 from thgsp.visual import show_transform
-from thgsp.graphs import Graph
 
 # param
 sigma = 1.5
@@ -34,6 +35,6 @@ cluster = np.concatenate([np.ones(12), np.ones(8) * 2, np.ones(7) * 3])
 
 fig, _, _ = show_transform(g, U.t(), fs, highlights, cluster=2, bands=bands)
 
-# Before showing the figure, you can adjust the figure on many aspects including but not limited to
-# font, text, colors of axes, using APIs provided by `plotly.go.Figure` class.
+# Before showing the figure, you can adjust the figure on many aspects including but not
+# limited to font, text, colors of axes, using APIs provided by `plotly.go.Figure`.
 fig.show()

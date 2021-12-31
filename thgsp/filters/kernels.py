@@ -74,13 +74,14 @@ def design_p(K):
         p(\lambda)	=(2-\lambda)^{K}[1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}
         =(1-l)^{K}[1+\sum_{m=1}^{K-1}r_{m}l^{m}],\lambda=l+1.
 
-    has :math:`K` roots at :math:`\lambda=2`, and other :math:`K-1` roots which are also roots of the residual
-    polynomial below.
+    has :math:`K` roots at :math:`\lambda=2`, and other :math:`K-1` roots which are also
+    roots of the residual polynomial below.
 
     ..  math::
         R(\lambda)=1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}
 
-    This function can figure out the roots of :math:`R(\lambda)` by firstly finding the zeros(roots) of :math:`R(l)`.
+    This function can figure out the roots of :math:`R(\lambda)` by firstly finding the
+    zeros(roots) of :math:`R(l)`.
 
     Parameters
     ----------
@@ -125,22 +126,25 @@ def estimate_orthogonality(h0, g0):
 
 def design_biorth_kernel(k):
     r"""
-    Compute the coefficients of biorthogonal kernels :math:`h_0` and :math:`g_0`, which are nearly the most orthogonal
-    and maximally balanced pair among all possible factorizations of
+    Compute the coefficients of biorthogonal kernels :math:`h_0` and :math:`g_0`, which
+    are nearly the most orthogonal and maximally balanced pair among all possible
+    factorizations of
 
     .. math::
         p(\lambda)	=(2-\lambda)^{K}[1+\sum_{m=1}^{K-1}r_{m}(\lambda-1)^{m}],
 
-    where :math:`K=2k`. The design scheme detailed in [1]_ satisfies :math:`k_0=k_1=k, K=2k, l_0=2k`, and
-    :math:`l_1=2k-1`, implying that the residual polynomial :math:`R(\lambda)` is :math:`2k-1` degree, with exactly one
-    real root and :math:`(k-1)` complex conjugate pairs of roots.
-    If :math:`k` is odd, assign the only real root and :math:`(k-1)/2` complex conjugate  pairs of roots to
-    :math:`h_{0}(\lambda)`. Thus we have a :math:`2k`-degree :math:`h_{0}(\lambda)` having :math:`k` roots at
-    :math:`\lambda=2` and other :math:`k` roots which are zeros of :math:`R(\lambda)`. The :math:`2k-1` degree
-    :math:`g_{0}(\lambda)` has :math:`k` roots at :math:`\lambda=2` and other `k-1` roots from :math:`R(\lambda)`.
-    If :math:`k` is even, assign :math:`k/2` complex conjugate root pairs of :math:`R(\lambda)` to
-    :math:`h_{0}(\lambda)`; the remaining :math:`k/2-1` pairs of roots and
-    the only real root to :math:`g_{0}(\lambda)`.
+    where :math:`K=2k`. The design scheme detailed in [1]_ satisfies
+    :math:`k_0=k_1=k, K=2k, l_0=2k`, and :math:`l_1=2k-1`, implying that the residual
+    polynomial :math:`R(\lambda)` is :math:`2k-1` degree, with exactly one real root and
+    :math:`(k-1)` complex conjugate pairs of roots. If :math:`k` is odd, assign the only
+    real root and :math:`(k-1)/2` complex conjugate  pairs of roots to
+    :math:`h_{0}(\lambda)`. Thus we have a :math:`2k`-degree :math:`h_{0}(\lambda)`
+    having :math:`k` roots at :math:`\lambda=2` and other :math:`k` roots which are
+    zeros of :math:`R(\lambda)`. The :math:`2k-1` degree :math:`g_{0}(\lambda)` has
+    :math:`k` roots at :math:`\lambda=2` and other `k-1` roots from :math:`R(\lambda)`.
+    If :math:`k` is even, assign :math:`k/2` complex conjugate root pairs of
+    :math:`R(\lambda)` to :math:`h_{0}(\lambda)`; the remaining :math:`k/2-1` pairs of
+    roots and the only real root to :math:`g_{0}(\lambda)`.
 
     Parameters
     ----------
@@ -154,19 +158,19 @@ def design_biorth_kernel(k):
     g0_c:   array
         The coefficients of :math:`g_0`.
     theta_best:     float
-        A float within :math:`[0,1]`. The closer it is to :math:`1` , the more orthogonal the wavelet bases determined
-        by :math:`h_0` and :math:`g_0` are.
+        A float within :math:`[0,1]`. The closer it is to :math:`1` , the more
+        orthogonal the wavelet bases determined by :math:`h_0` and :math:`g_0` are.
 
     Notes
     -----
-    Large :math:`k(k>14)` may lead to a failed kernel design, possibly due to the accumulated computation
-    error arising in the high order power operations. Empirically speaking, a smaller :math:`k(2<k<12)` works
-    well.
+    Large :math:`k(k>14)` may lead to a failed kernel design, possibly due to the
+    accumulated computation error arising in the high order power operations.
+    Empirically speaking, a smaller :math:`k(2<k<12)` works well.
 
     References
     ----------
-    .. [1]  S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks for arbitrary
-            undirected graphs,” IEEE Trans on Signal Processing, 2013.
+    .. [1]  S. Narang and A. Ortega, “Compact support biorthogonal wavelet filterbanks
+            for arbitrary undirected graphs,” IEEE TSP, 2013.
 
     """
     K = 2 * k

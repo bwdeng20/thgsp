@@ -1,9 +1,12 @@
-import torch
 import warnings
+from typing import List, Tuple
+
 import numpy as np
-from thgsp.convert import get_ddd, get_array_module, to_xcipy, SparseTensor
-from ._utils import construct_sampling_matrix, construct_hth
-from typing import Tuple, List
+import torch
+
+from thgsp.convert import SparseTensor, get_array_module, get_ddd, to_xcipy
+
+from ._utils import construct_hth, construct_sampling_matrix
 
 
 def computing_sets(spm: SparseTensor, T, mu=0.01, p_hops=12):
@@ -44,7 +47,8 @@ def bsgda(
     boost=True,
 ) -> Tuple[List, float]:
     r"""
-    A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for smooth graph signals [2]_.
+    A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for
+    smooth graph signals [2]_.
 
     Parameters
     ----------
@@ -53,11 +57,13 @@ def bsgda(
     K:  int
         The desired number of sampling nodes.
     mu: float
-        The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7) [2]_ for the details.
+        The parameter for graph Laplacian based signal reconstruction. Refer to Eq(7)
+        [2]_ for the details.
     epsilon: float
         The numerical precision for binary search (1e-5 by default
     p_hops: int
-        Estimate the coverage subsets(refer to Definition 1 [2]_) within the :obj:`p_hops` neighborhood.
+        Estimate the coverage subsets(refer to Definition 1 [2]_) within the
+        :obj:`p_hops` neighborhood.
     boost: bool
     Returns
     -------
@@ -69,7 +75,8 @@ def bsgda(
 
     References
     ----------
-    .. [2] Y. Bai, et al., “Fast graph sampling set selection using Gershgorin disc alignment,” IEEE TSP, 2020.
+    .. [2] Y. Bai, et al., “Fast graph sampling set selection using Gershgorin disc
+            alignment,” IEEE TSP, 2020.
 
     """
     assert K >= 1
@@ -96,7 +103,8 @@ def bsgda(
 
     if not flag:
         warnings.warn(
-            "epsilon(the precision of BS) is set too large, sub-optimal lower bound is output."
+            "epsilon(the precision of BS) is set too large, "
+            "sub-optimal lower bound is output."
         )
 
     sampled_nodes, _ = greedy_gda_sampling(adj, K, T, mu, p_hops)

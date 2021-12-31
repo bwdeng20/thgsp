@@ -1,17 +1,17 @@
-import torch
-import numpy as np
-from tqdm import tqdm
 from functools import partial
-from thgsp.convert import get_ddd
+
+import numpy as np
+import torch
+from tqdm import tqdm
+
+from thgsp.convert import get_array_module, get_ddd, to_xcipy
+from thgsp.filters import cheby_coeff, cheby_op_basis, heat_kernel
 from thgsp.graphs.core import GraphBase, SparseTensor
-from thgsp.filters import cheby_coeff, heat_kernel, cheby_op_basis
-from thgsp.utils import matrix_power, absv
-from thgsp.convert import to_xcipy, get_array_module
+from thgsp.utils import absv, matrix_power
 
 
 def fastgsss(G: GraphBase, M, bandwidth, nu=75.0, cheby=True, order=12, verbose=False):
-    """
-    FastGSSS proposed in [4]_ .
+    """FastGSSS proposed in [4]_ .
 
     Parameters
     ----------
@@ -24,8 +24,8 @@ def fastgsss(G: GraphBase, M, bandwidth, nu=75.0, cheby=True, order=12, verbose=
     nu: float
         The parameter controlling the width of the heat diffusion filter kernel.
     cheby:  bool
-        If :obj:`True`, compute the localization operator with Chebyshev approximation; otherwise
-        compute it from a direct expensive EVD.
+        If :obj:`True`, compute the localization operator with Chebyshev approximation;
+        otherwise compute it from a direct expensive EVD.
     order: int
         The order of Chebyshev approximation.
 
@@ -38,9 +38,8 @@ def fastgsss(G: GraphBase, M, bandwidth, nu=75.0, cheby=True, order=12, verbose=
 
     References
     ----------
-    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, "Eigendecomposition-free sampling set selection
-            for graph signals," IEEE Transactions on Signal Processing, 202.
-
+    .. [4]  A. Sakiyama, Y. Tanaka, T. Tanaka, and A. Ortega, "Eigendecomposition-free
+            sampling set selection  for graph signals," IEEE TSP, 2020.
     """
     N = G.size(1)
     num_edge = G.numel() // 2
@@ -93,22 +92,24 @@ def fastgsss(G: GraphBase, M, bandwidth, nu=75.0, cheby=True, order=12, verbose=
 
 
 def recon_fastssss(y, S, T, order, sd=0.5):
-    """
-    A primary implementation of reconstruction method associated with "FastSSS" sampling algorithm.
+    """A primary implementation of reconstruction method associated with
+    "FastSSS" sampling algorithm.
 
     Parameters
     ----------
     y:  Tensor
-        The measurements on sampling set :obj:S:. If the localization operator :obj:`T` has a density
-        greater than the threshold :obj:`sd`, :obj:`y` has a shape of either :obj:`(M,)`，:obj:`(M,1)`，
-        or :obj:`(M,C)`; otherwise :obj:`y` could only be  either :obj:`(M,)` or :obj:`(M,1)`.
+        The measurements on sampling set :obj:S:. If the localization operator :obj:`T`
+        has a density greater than the threshold :obj:`sd`, :obj:`y` has a shape of
+        either :obj:`(M,)`，:obj:`(M,1)`，or :obj:`(M,C)`; otherwise :obj:`y` could only
+        be  either :obj:`(M,)` or :obj:`(M,1)`.
     S:  List
         A list consisting of all indices of sampled nodes.
     T:  Tensor, SparseTensor
         The localization operator
     order: int
     sd: float
-        The threshold of :obj:`T`'s density that controls when we use a dense or sparse linear solver.
+        The threshold of :obj:`T`'s density that controls when we use a dense or sparse
+        linear solver.
 
     Returns
     -------

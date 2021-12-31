@@ -1,11 +1,11 @@
 import networkx as nx
-import numpy as np
 import numba as nb
+import numpy as np
 import torch
 from torch_cluster import knn_graph, radius_graph
 from torch_sparse import SparseTensor
 
-from .core import Graph, DiGraph
+from .core import DiGraph, Graph
 
 
 def rand_udg(N, density=0.1, dtype=None, device=None):
@@ -29,7 +29,7 @@ def rand_dg(N, density=0.1, dtype=None, device=None):
 
 def rand_bipartite(N1, N2, p=0.2, dtype=None, device=None, return_partition=False):
     G = nx.bipartite.random_graph(N1, N2, p)
-    csr_sci_adj = nx.adj_matrix(G)
+    csr_sci_adj = nx.adjacency_matrix(G)
     A = SparseTensor.from_scipy(csr_sci_adj).to(device, dtype)
     bpg = Graph(A)
     if return_partition:
@@ -41,7 +41,8 @@ def rand_bipartite(N1, N2, p=0.2, dtype=None, device=None, return_partition=Fals
 
 def random_bgraph(N1, N2, p=0.2, dtype=None, device=None, seed=None) -> Graph:
     r"""
-    Generate a random bipartite graph whose tow bipartite sets have :obj:`N1` and :obj:`N2` nodes with specific data
+    Generate a random bipartite graph whose tow bipartite sets have :obj:`N1` and
+    :obj:`N2` nodes with specific data
     type and device.
 
     Parameters
@@ -99,7 +100,8 @@ def random_graph(
         k = int(density * n_all_edge)
         if k < 1:
             raise RuntimeError(
-                f"Density {density} is too small to generate 1 edge of {N}-node undirected graph."
+                f"Density {density} is too small to generate 1 edge "
+                f"of {N}-node undirected graph."
             )
         ind = random_state.choice(n_all_edge, size=k, replace=False)
         data = random_state.rand(k) if weighted else None
@@ -120,7 +122,8 @@ def random_graph(
         k = int(density * n_all_edge)
         if k < 1:
             raise RuntimeError(
-                f"Density {density} is too small to generate 1 edge of {N}-node directed graph."
+                f"Density {density} is too small to "
+                f"generate 1 edge of {N}-node directed graph."
             )
         ind = random_state.choice(n_all_edge, size=k, replace=False)
         data = random_state.rand(k) if weighted else None

@@ -1,6 +1,7 @@
-from thgsp.bga.harary import harary
 from thgsp.bga._utils import is_bipartite_fix
+from thgsp.bga.harary import harary
 from thgsp.graphs.generators import rand_udg
+
 from ..utils4t import remove_downloaded_dataset
 
 
@@ -19,8 +20,8 @@ def test_harary():
 
 
 def test_harary_minnesota():
-    from thgsp.datasets import Minnesota
     from thgsp.convert import SparseTensor
+    from thgsp.datasets import Minnesota
 
     ds = Minnesota(download=True, connected=True)
     A = ds.A

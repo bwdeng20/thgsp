@@ -1,6 +1,7 @@
-import torch
 import pytest
-from ..utils4t import float_dtypes, devices, snr, mse
+import torch
+
+from ..utils4t import devices, float_dtypes, mse, snr
 
 
 @pytest.mark.parametrize("device", devices)

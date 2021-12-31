@@ -1,7 +1,9 @@
-import torch
 import matplotlib.pyplot as plt
+import torch
+
+from thgsp.graphs.generators import rand_dg, rand_udg
 from thgsp.visual.plotting import draw_cn, draw_signal
-from thgsp.graphs.generators import rand_udg, rand_dg
+
 from ..utils4t import plot
 
 N = 10

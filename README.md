@@ -1,11 +1,12 @@
 # *thgsp*
 
 ![](./docs/source/_static/img/logo.svg) \
-[![Travis Build Status](https://travis-ci.com/bwdeng20/thgsp.svg?branch=main)](https://travis-ci.com/bwdeng20/thgsp)
-![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/thgsp-build-test.yml/badge.svg)
-[![Github Doc Status](https://github.com/bwdeng20/thgsp/actions/workflows/ghdocs.yml/badge.svg)](https://bwdeng20.github.io/thgsp)
+[![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/building.yml/badge.svg)](http://16.162.201.90/whl/)
+[![Github Doc Status](https://github.com/bwdeng20/thgsp/actions/workflows/doc.yml/badge.svg)](https://bwdeng20.github.io/thgsp)
 [![codecov](https://codecov.io/gh/bwdeng20/thgsp/branch/main/graph/badge.svg?token=H45AEGPM0P)](https://codecov.io/gh/bwdeng20/thgsp)
+[![Linting](https://github.com/bwdeng20/thgsp/actions/workflows/linting.yml/badge.svg)]()
 [![license](https://img.shields.io/static/v1?label=license&message=BSD&color=red)](https://github.com/bwdeng20/thgsp/blob/main/LICENSE) \
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) \
 A **g**raph **s**ignal **p**rocessing toolbox built on [py**t**orc**h**](https://github.com/pytorch/pytorch). The repository
 now mainly consists of the following stuffs:
 
@@ -18,7 +19,7 @@ now mainly consists of the following stuffs:
 As this package is built on [PyTorch](https://pytorch.org)  and
 [pytorch_sparse](https://github.com/rusty1s/pytorch_sparse>), you can easily integrate functionalities from
 **thgsp** into a PyTorch pipeline. Check the [document](https://bwdeng20.github.io/thgsp/)
-for installation and introduction.
+for **installation** and introduction.
 
 ## Table of Contents
 
@@ -55,7 +56,11 @@ See the full program [here](./demos/images/bio_cmn.py).
 [Akie Sakiyama, et al.] [Oversampled Graph Laplacian Matrix for Graph Filter Banks](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6937182) \
 [Jing Zen, et al.] [Bipartite Subgraph Decomposition for Critically Sampledwavelet Filterbanks on Arbitrary Graphs](https://ieeexplore.ieee.org/document/7472871) \
 [Aamir Anis, et al.] [Towards a Sampling Theorem for Signals on Arbitrary Graphs](https://ieeexplore.ieee.org/document/6854325) \
-[Aimin Jiang, et al.] [ Admm-based Bipartite Graph Approximation](https://ieeexplore.ieee.org/document/8682548/)
+[Aimin Jiang, et al.] [ Admm-based Bipartite Graph Approximation](https://ieeexplore.ieee.org/document/8682548/) \
+[Yuanchao Bai, et al.] Fast graph sampling set selection using Gershgorin disc alignment, IEEE TSP, 2020 \
+[G. Puy, et al.] Random sampling of bandlimited signals on graphs,  ACHA, 2018. \
+[A. Sakiyama, et al.] Eigendecomposition-free sampling set selection for graph signals，IEEE TSP, 2020. \
+[Aamir Anis et al.] Efficient sampling set selection for bandlimited graph signals using graph spectral proxies, IEEE TSP, 2016.
 
 ## Citation
 ```

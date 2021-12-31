@@ -1,7 +1,8 @@
-import torch
-import numpy as np
 import matplotlib.pyplot as plt
-from thgsp.datasets.utils import remove_file_or_dir, get_data_dir_of_thgsp, os
+import numpy as np
+import torch
+
+from thgsp.datasets.utils import get_data_dir_of_thgsp, os, remove_file_or_dir
 from thgsp.utils import mse, snr
 
 np.set_printoptions(linewidth=10000, precision=4)

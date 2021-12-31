@@ -1,5 +1,6 @@
 import pytest
-from thgsp.alg.coloring import dsatur_py, check_coloring, dsatur_cpp, dsatur
+
+from thgsp.alg.coloring import check_coloring, dsatur, dsatur_cpp, dsatur_py
 from thgsp.graphs.generators import rand_udg, torch
 from thgsp.visual.plotting import draw_cn
 

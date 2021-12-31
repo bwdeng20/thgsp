@@ -1,12 +1,12 @@
-from .metrics import snr, mse
+from .metrics import mse, snr
 from .sparse_utils import (
-    consecutive_spmv,
-    eye,
-    matrix_power,
     absv,
     absv_,
-    multivariate_normal,
+    consecutive_spmv,
+    eye,
     img2graph,
+    matrix_power,
+    multivariate_normal,
     sparse_xcipy_logdet,
 )
 

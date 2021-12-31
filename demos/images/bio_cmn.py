@@ -1,7 +1,8 @@
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 import numpy as np
 import torch as th
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+
 from thgsp.filters import BiorthCore
 from thgsp.utils import img2graph
 

@@ -1,21 +1,24 @@
 import os
+
+from torchvision.datasets.utils import check_integrity, download_and_extract_archive
+
 from thgsp.graphs import Graph
 from thgsp.io import loadmat
-from torchvision.datasets.utils import download_and_extract_archive, check_integrity
+
 from .utils import get_data_dir_of_thgsp
 
 
 class Toy:
-    """
-    USC toy graph(released under GPL v2) by STAC group(https://github.com/STAC-USC/GraphStructures).
+    """USC toy graph(released under GPL v2) by STAC
+    group(https://github.com/STAC-USC/GraphStructures).
 
     Parameters
     ----------
     root:   str, optional
-        The root directory to place the downloaded files. If :obj:`None`, set the root dir as "thgsp.datasets.data".
+        The root directory to place the downloaded files. If :obj:`None`, set the root
+        dir as "thgsp.datasets.data".
     download: bool
         If True, download the raw .zip file and process it.
-
     """
 
     zip_md5 = "ecd24f2683add0f7d37a15e63abdc79e"
@@ -34,7 +37,7 @@ class Toy:
         if not self._check_integrity():
             raise RuntimeError(
                 "Dataset not found or corrupted."
-                + " You can use download=True to download it"
+                " You can use download=True to download it"
             )
 
         data = loadmat(self.path)["toy_graph"][0, 0]

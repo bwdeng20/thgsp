@@ -1,20 +1,22 @@
-import torch
-import pytest
 import numpy as np
+import pytest
+import torch
+
 from thgsp.utils.sparse_utils import (
-    img2graph,
+    SparseTensor,
     absv,
     absv_,
+    img2graph,
     matrix_power,
-    SparseTensor,
     multivariate_normal,
-    sparse_xcipy_logdet,
 )
-from ..utils4t import plot, devices, float_dtypes
+
+from ..utils4t import devices, float_dtypes, plot
 
 try:
     from sksparse.cholmod import cholesky
 
+    print(cholesky)
     is_sksparse_installed = True
 except ImportError:
     is_sksparse_installed = False
@@ -33,9 +35,10 @@ def test_img2graph(shape, threshold):
     assert Ar.sizes() == [N, N]
     assert xy.shape == (N, 2)
     if N < 256 * 256:
-        from thgsp.visual.plotting import draw_cn
-        from thgsp.graphs.core import Graph
         import matplotlib.pyplot as plt
+
+        from thgsp.graphs.core import Graph
+        from thgsp.visual.plotting import draw_cn
 
         xy = xy * 10
         plt.subplot(121)

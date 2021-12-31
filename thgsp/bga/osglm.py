@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse import lil_matrix, eye
+from scipy.sparse import eye, lil_matrix
 
 from ._utils import bipartite_mask
 
@@ -13,8 +13,9 @@ def osglm(A, lc=None, vtx_color=None):
     A:        SparseTensor
       The adjacent matrix of graph.
     lc:       int
-      The ordinal of color marking the boundary such that all nodes with a smaller color ordinal are
-      grouped into the low-pass channel while those with a larger color ordinal are in the high-pass channel.
+      The ordinal of color marking the boundary such that all nodes with a smaller color
+      ordinal are grouped into the low-pass channel while those with a larger color
+      ordinal are in the high-pass channel.
     vtx_color:iter
       The graph coloring result
 
@@ -30,7 +31,8 @@ def osglm(A, lc=None, vtx_color=None):
 
     References
     ----------
-    .. [1]  Akie Sakiyama, et al, "Oversampled Graph Laplacian Matrix for Graph Filter Banks", IEEE trans on SP, 2016
+    .. [1]  Akie Sakiyama, et al, "Oversampled Graph Laplacian Matrix for Graph Filter
+            Banks", IEEE trans on SP, 2016.
 
     """
     if vtx_color is None:
@@ -70,7 +72,8 @@ def osglm(A, lc=None, vtx_color=None):
 
     beta = np.zeros((Nos, 1), dtype=bool)
     beta[idx_s1, 0] = 1
-    # appended nodes corresponding to idx_s2 are assigned to the L channel of oversampled graph with idx_s1
+    # appended nodes corresponding to idx_s2 are assigned to
+    # the L channel of oversampled graph with idx_s1
     _, node_ordinal_append, _ = np.intersect1d(
         append_nodes, idx_s2, return_indices=True
     )

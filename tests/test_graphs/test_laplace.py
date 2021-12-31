@@ -4,7 +4,7 @@ from torch_sparse import SparseTensor
 
 from thgsp.graphs.laplace import laplace
 
-from ..utils4t import lap_types, devices
+from ..utils4t import devices, lap_types
 
 
 @pytest.mark.parametrize("device", devices)

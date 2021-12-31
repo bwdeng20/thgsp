@@ -2,22 +2,23 @@ import numpy as np
 import torch
 
 from thgsp.graphs.core import GraphBase
-from .approximation import cheby_op, cheby_coeff
-from .kernels import meyer_kernel, get_kernel_name
+
+from .approximation import cheby_coeff, cheby_op
+from .kernels import get_kernel_name, meyer_kernel
 
 
 class Filter:
-    """
-    A graph filter(bank) class.
+    """A graph filter(bank) class.
 
     Parameters
     ----------
     G: GraphBase
        Any instance of :py:obj:`GraphBase` or its subclass.
     kernels: array, callable, None
-        Case1: The :obj:`(Co,Ci)` array of :obj:`Co*Ci` filters; :obj:`Co` and :obj:`Ci` are the dimensions of input and
-        output signals, respectively Case2: A callable python object; all :obj:`Co*Ci` filters employ this kernel.
-        Case3: Set all :obj:`Co*Ci` filters as ideal low-pass ones.
+        Case1: The :obj:`(Co,Ci)` array of :obj:`Co*Ci` filters; :obj:`Co` and :obj:`Ci`
+        are the dimensions of input and output signals, respectively Case2: A callable
+        python object; all :obj:`Co*Ci` filters employ this kernel. Case3: Set all
+        :obj:`Co*Ci` filters as ideal low-pass ones.
     lam_max:    float
         The supremum of graph frequencies.
 
@@ -28,14 +29,14 @@ class Filter:
     order: int
         The degree of Chebyshev approximation.
     weight:     Tensor
-        Shape: :obj:`(Co,Ci)`.  The signal of every output channel is a weighted sum of :obj:`Ci` filtered signals. The
-        :obj:`i,j`-th entry is the weight of filtered signal from :obj:`j`-th input channel to :obj:`i`-th output
-        channel. All-one tensor in default.
+        Shape: :obj:`(Co,Ci)`.  The signal of every output channel is a weighted sum of
+        :obj:`Ci` filtered signals. The :obj:`i,j`-th entry is the weight of filtered
+        signal from :obj:`j`-th input channel to :obj:`i`-th output channel. All-one
+        tensor in default.
     dtype:      torch.dtype
         The data type of signals and graph adjacency.
     device:     torch.device
         The device of graph.
-
     """
 
     def __init__(
@@ -104,7 +105,8 @@ class Filter:
 
         if x.shape[-2] != self.N:
             raise RuntimeError(
-                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of nodes: {self.N}"
+                f"The penultimate dimension of signal:{x.shape[-2]}"
+                f"!= the number of nodes: {self.N}"
             )
         return x.to(self.dtype)
 
@@ -178,7 +180,8 @@ class Filter:
             order = self.order
         if order > self.order:
             raise RuntimeError(
-                f"The coefficients of Chebyshev polynomials beyond order {self.order} are not computed"
+                f"The coefficients of Chebyshev polynomials beyond "
+                f"order {self.order} are not computed"
             )
         x = self._check_signal(x)
         coeff = self.cheby_coefficients[:, :, : order + 1]  # Co x Ci x K+1
@@ -186,18 +189,17 @@ class Filter:
         return out
 
     def __call__(self, x, cheby=True):
-        """
-        Filter the input signal **x**.
+        """Filter the input signal **x**.
 
         Parameters
         ----------
         x:  Tensor
-            The signal to filter. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and :obj:`N` are the numbers of input
-            channels and graph nodes, separately.
+            The signal to filter. Shape: :obj:`(N,)` or :obj:`(N,Ci)`.  :obj:`Ci` and
+            :obj:`N` are the numbers of input channels and graph nodes, separately.
         cheby: bool
-            If :py:obj:`True`, conduct filtering via Chebyshev approximation. Otherwise signals are filtered in a
-            brute-force way - do a complete eigenvalue decomposition of Laplacian :math:`L` to get the GFT and IGFT
-            matrices.
+            If :py:obj:`True`, conduct filtering via Chebyshev approximation. Otherwise
+            signals are filtered in a brute-force way - do a complete eigenvalue
+            decomposition of Laplacian :math:`L` to get the GFT and IGFT matrices.
 
         Returns
         -------
@@ -211,8 +213,8 @@ class Filter:
 
     def __repr__(self):
         info = (
-            self.__class__.__name__
-            + "(lap_type={} ,in_channels={}, out_channels={}, N={},\nkernels:\n{})".format(
+            self.__class__.__name__ + "(lap_type={} ,in_channels={}, out_channels={}, "
+            "N={},\nkernels:\n{})".format(
                 self.lap_type,
                 self.in_channels,
                 self.out_channels,

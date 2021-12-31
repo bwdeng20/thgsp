@@ -2,22 +2,28 @@ from .approximation import (
     cheby_coeff,
     cheby_op,
     cheby_op_basis,
-    polyval,
-    nla,
     hard_threshold,
+    nla,
+    polyval,
 )
 from .filter import Filter
-from .kernels import get_kernel_name, get_kernel_id
-from .kernels import ideal_kernel, meyer_mirror_kernel, meyer_kernel, heat_kernel
+from .kernels import (
+    get_kernel_id,
+    get_kernel_name,
+    heat_kernel,
+    ideal_kernel,
+    meyer_kernel,
+    meyer_mirror_kernel,
+)
 from .qmf import (
-    QmfCore,
-    ColorQmf,
-    NumQmf,
     BiorthCore,
-    NumBiorth,
-    ColorBiorth,
-    QmfOperator,
     BiorthOperator,
+    ColorBiorth,
+    ColorQmf,
+    NumBiorth,
+    NumQmf,
+    QmfCore,
+    QmfOperator,
 )
 
 __all__ = [

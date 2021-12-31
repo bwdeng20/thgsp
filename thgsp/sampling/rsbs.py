@@ -1,11 +1,14 @@
-import torch
 import warnings
+
 import numpy as np
+import torch
 from numba import jit, prange
-from thgsp.graphs.core import GraphBase, SparseTensor
+
+from thgsp.convert import get_array_module, get_ddd, to_xcipy, to_xp
 from thgsp.filters import cheby_op
-from thgsp.convert import get_ddd, to_xcipy, to_xp, get_array_module
-from ._utils import construct_sampling_matrix, construct_dia
+from thgsp.graphs.core import GraphBase, SparseTensor
+
+from ._utils import construct_dia, construct_sampling_matrix
 
 
 @jit("f8[:](f8,f8,f8,f8,i4)", nopython=True)
@@ -39,8 +42,8 @@ def estimate_lk(
     verbose=False,
 ):
     r"""
-    Estimate the optimal distribution according to which the bandlimited graph signals are
-    sampled [3]_ .
+    Estimate the optimal distribution according to which the bandlimited graph signals
+    are sampled [3]_ .
 
     Parameters
     ----------
@@ -59,12 +62,13 @@ def estimate_lk(
     lmax: float
         The largest frequency of graph Laplacian
     return_coherence: bool
-        If :obj:`True`, return the estimated square of graph local cumulative coherence [3]_ of all nodes
+        If :obj:`True`, return the estimated square of graph local cumulative coherence
+        [3]_ of all nodes
     order: int
         The order of the Chebyshev approximation
     lap_type: str
-        :obj:`comb`, :obj:`sym`, and :obj:`rw` represent combinatorial, symmetric normalized, and random-walk normalized
-        Laplacian, separately
+        :obj:`comb`, :obj:`sym`, and :obj:`rw` represent combinatorial, symmetric
+        normalized, and random-walk normalized Laplacian, separately
     verbose: bool
 
     Returns
@@ -72,13 +76,13 @@ def estimate_lk(
     lambda_k: float
         The eventual estimated :obj:`k`-th smallest graph frequency
     cum_coh:  Tensor or(None)
-        If :obj:`return_coherence` is :obj:`True` , return the estimated graph local cumulative coherence [3]_ of
-        every node, otherwise :obj:`None`
+        If :obj:`return_coherence` is :obj:`True` , return the estimated graph local
+        cumulative coherence [3]_ of every node, otherwise :obj:`None`
 
     References
     ----------
-    .. [3] G. Puy, N. Tremblay, R. Gribonval, and P. Vandergheynst, “Random sampling of
-            bandlimited signals on graphs,” Applied and Computational Harmonic Analysis, 2018.
+    .. [3] G. Puy, et al., “Random sampling of bandlimited signals on graphs,”
+            Applied and Computational Harmonic Analysis, 2018.
     """
     N = G.size(1)
     appropriate_num_rv = np.int32(2 * np.round(np.log(N)))
@@ -127,12 +131,14 @@ def estimate_lk(
                 lambda_min = lambda_mid
             if verbose:
                 print(
-                    f"[estimating lambda_k]counts: {int(counts):8d}, bottom: {lambda_min:.4f}, top: {lambda_max:.4f}"
+                    f"[estimating lambda_k]counts: {int(counts):8d}, "
+                    f"bottom: {lambda_min:.4f}, top: {lambda_max:.4f}"
                 )
         estimated_lam_k[i] = (lambda_min + lambda_max) / 2
         if verbose:
             print(
-                f"{i:4d} estimation lambda_k: {estimated_lam_k[i]:8f}, bottom: {lambda_min:.4f}, top: {lambda_max:.4f}"
+                f"{i:4d} estimation lambda_k: {estimated_lam_k[i]:8f}, "
+                f"bottom: {lambda_min:.4f}, top: {lambda_max:.4f}"
             )
 
         if return_coherence:
@@ -146,18 +152,18 @@ def estimate_lk(
 
 
 def rsbs(
-    G,
-    M,
-    k=None,
-    num_estimation=1,
-    num_rv=None,
-    epsilon=1e-2,
-    lmin=None,
-    lmax=None,
-    order=30,
-    lap_type="comb",
-    return_list=False,
-    verbose=False,
+    G: GraphBase,
+    M: int,
+    k: int = None,
+    num_estimation: int = 1,
+    num_rv: int = None,
+    epsilon: float = 1e-2,
+    lmin: float = None,
+    lmax: float = None,
+    order: int = 30,
+    lap_type: str = "comb",
+    return_list: bool = False,
+    verbose: bool = False,
 ):
     r"""
     Random sampling algorithm for bandlimited signals [3]_ .
@@ -181,13 +187,13 @@ def rsbs(
     lmax: float
         The largest frequency of graph Laplacian
     return_list: bool
-        If :obj:`True`, return :class:`List` otherwise a :obj:`Tensor` having the same :obj:`dtype` and :obj:`device` as
-        the input graph :obj:`G` .
+        If :obj:`True`, return :class:`List` otherwise a :obj:`Tensor` having the same
+        :obj:`dtype` and :obj:`device` as the input graph :obj:`G` .
     order: int
         The order of the Chebyshev approximation
     lap_type: str
-        :obj:`comb`, :obj:`sym`, and :obj:`rw` represent combinatorial, symmetric normalized, and random-walk normalized
-        Laplacian, separately
+        :obj:`comb`, :obj:`sym`, and :obj:`rw` represent combinatorial, symmetric
+        normalized, and random-walk normalized Laplacian, separately.
     verbose: bool
 
     Returns

@@ -1,9 +1,11 @@
 import pytest
 import torch
-from thgsp.graphs.generators import rand_udg, rand_bipartite, Graph
-from ..utils4t import float_dtypes, lap_types, plot
 from scipy.sparse import coo_matrix
+
 from thgsp.bga._utils import is_bipartite_fix, laplace
+from thgsp.graphs.generators import Graph, rand_bipartite, rand_udg
+
+from ..utils4t import float_dtypes, lap_types, plot
 
 
 class TestIbFix:
@@ -28,8 +30,9 @@ class TestIbFix:
 
         print("the last one\n", B)
         # visual
-        from thgsp.visual import draw_cn, draw
         import matplotlib.pyplot as plt
+
+        from thgsp.visual import draw, draw_cn
 
         pos = torch.rand(N, 2)
         _, axes = plt.subplots(1, 2)

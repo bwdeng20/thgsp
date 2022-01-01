@@ -5,6 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>thgsp.filters &mdash; thgsp 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
@@ -29,7 +31,7 @@
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
             <a href="../index.html">
-            <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1.0
@@ -121,7 +123,7 @@ If <span class="math notranslate nohighlight">\(k\)</span> is even, assign <span
 roots and the only real root to <span class="math notranslate nohighlight">\(g_{0}(\lambda)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – This integer determines the degree of all polynomial kernels.</p>
+<dd class="field-odd"><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – This integer determines the degree of all polynomial kernels.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
@@ -162,7 +164,7 @@ roots of the residual polynomial below.</p>
 zeros(roots) of <span class="math notranslate nohighlight">\(R(l)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>K</strong> (<em>int</em>) – The order of <span class="math notranslate nohighlight">\(p(\lambda)\)</span> is <span class="math notranslate nohighlight">\(2K-1\)</span></p>
+<dd class="field-odd"><p><strong>K</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The order of <span class="math notranslate nohighlight">\(p(\lambda)\)</span> is <span class="math notranslate nohighlight">\(2K-1\)</span></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
@@ -176,7 +178,7 @@ zeros(roots) of <span class="math notranslate nohighlight">\(R(l)\)</span>.</p>
 
 <span class="target" id="module-thgsp.filters.approximation"></span><dl class="py function">
 <dt class="sig sig-object py" id="thgsp.filters.approximation.cheby_op">
-<span class="sig-name descname"><span class="pre">cheby_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch_sparse.tensor.SparseTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/approximation.html#cheby_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.approximation.cheby_op" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">cheby_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.11.0a0+gitce86881 ))"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch_sparse.tensor.SparseTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.11.0a0+gitce86881 ))"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/approximation.html#cheby_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.approximation.cheby_op" title="Permalink to this definition">¶</a></dt>
 <dd><p>Chebyshev approximation of graph filtering</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -187,7 +189,7 @@ nodes, input channels, and output channels respectively.</p></li>
 <li><p><strong>L</strong> (<em>SparseTensor</em>) – The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,N)</span></code> Laplacian matrix.</p></li>
 <li><p><strong>coeff</strong> (<em>Tensor</em>) – The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci,K+1)</span></code> Chebyshev coefficients for <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci*Co</span></code> kernels, wherein
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">K</span></code> is the order of approximation.</p></li>
-<li><p><strong>lam_max</strong> (<em>float</em><em>,</em><em>optional</em>) – The maximal graph frequency, i.e., <span class="math notranslate nohighlight">\(\lambda_{max}\)</span></p></li>
+<li><p><strong>lam_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>,</em><em>optional</em>) – The maximal graph frequency, i.e., <span class="math notranslate nohighlight">\(\lambda_{max}\)</span></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -232,11 +234,11 @@ the input <cite>x</cite> or an concatenated tensor of them.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<a class="reference internal" href="graphs.html#thgsp.graphs.GraphBase" title="thgsp.graphs.GraphBase"><em>GraphBase</em></a>) – Any instance of <code class="xref py py-obj docutils literal notranslate"><span class="pre">GraphBase</span></code> or its subclass.</p></li>
-<li><p><strong>kernels</strong> (<em>array</em><em>, </em><em>callable</em><em>, </em><em>None</em>) – Case1: The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci)</span></code> array of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters; <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code>
+<li><p><strong>kernels</strong> (<em>array</em><em>, </em><em>callable</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – Case1: The <code class="xref py py-obj docutils literal notranslate"><span class="pre">(Co,Ci)</span></code> array of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters; <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code>
 are the dimensions of input and output signals, respectively Case2: A callable
 python object; all <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters employ this kernel. Case3: Set all
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Co*Ci</span></code> filters as ideal low-pass ones.</p></li>
-<li><p><strong>lam_max</strong> (<em>float</em>) – The supremum of graph frequencies.</p></li>
+<li><p><strong>lam_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – The supremum of graph frequencies.</p></li>
 </ul>
 </dd>
 </dl>
@@ -246,7 +248,7 @@ python object; all <code class="xref py py-obj docutils literal notranslate"><sp
 <dd><p>The number of graph nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -257,7 +259,7 @@ python object; all <code class="xref py py-obj docutils literal notranslate"><sp
 <dd><p>The degree of Chebyshev approximation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,7 +309,7 @@ tensor in default.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>Tensor</em>) – The signal to filter. Shape: <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,Ci)</span></code>.  <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ci</span></code> and
 <a class="reference internal" href="#thgsp.filters.Filter.N" title="thgsp.filters.Filter.N"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code></a> are the numbers of input channels and graph nodes, separately.</p></li>
-<li><p><strong>cheby</strong> (<em>bool</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, conduct filtering via Chebyshev approximation. Otherwise
+<li><p><strong>cheby</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, conduct filtering via Chebyshev approximation. Otherwise
 signals are filtered in a brute-force way - do a complete eigenvalue
 decomposition of Laplacian <span class="math notranslate nohighlight">\(L\)</span> to get the GFT and IGFT matrices.</p></li>
 </ul>
@@ -359,7 +361,7 @@ non-zero items.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thgsp.filters.NumQmf">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NumQmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="graphs.html#thgsp.graphs.Graph" title="thgsp.graphs.core.Graph"><span class="pre">thgsp.graphs.core.Graph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'admm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroDC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/qmf.html#NumQmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.NumQmf" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NumQmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="graphs.html#thgsp.graphs.Graph" title="thgsp.graphs.core.Graph"><span class="pre">thgsp.graphs.core.Graph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'admm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroDC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/qmf.html#NumQmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.NumQmf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py class">
@@ -400,7 +402,7 @@ non-zero items.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thgsp.filters.QmfCore">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QmfCore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bptG</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torch_sparse.tensor.SparseTensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyze_kernels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synthesis_kernels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroDC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/qmf.html#QmfCore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.QmfCore" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QmfCore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bptG</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torch_sparse.tensor.SparseTensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.11.0a0+gitce86881 ))"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyze_kernels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synthesis_kernels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroDC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thgsp/filters/qmf.html#QmfCore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thgsp.filters.QmfCore" title="Permalink to this definition">¶</a></dt>
 <dd><p>The core implementation of GraphQmf <a class="footnote-reference brackets" href="#id6" id="id3">2</a> and GraphBiorth <a class="footnote-reference brackets" href="#id7" id="id4">3</a> filterbanks.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -414,7 +416,7 @@ broadcast one filterbank among all input channels.</p>
 <dd><p>The number of nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -425,7 +427,7 @@ broadcast one filterbank among all input channels.</p>
 <dd><p>The number of bipartite (sub)graphs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -484,7 +486,7 @@ build different graphQmf or graphBiorth wavelet filterbanks
 (via using different analysis and synthesis kernel functions).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int, optional</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>, optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -495,7 +497,7 @@ build different graphQmf or graphBiorth wavelet filterbanks
 <dd><p>The order of Chebyshev approximation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int, optional</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a>, optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -506,7 +508,7 @@ build different graphQmf or graphBiorth wavelet filterbanks
 <dd><p>Compute the Chebyshev approximation within the interval <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">lam_max]</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>float, optional</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a>, optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -517,7 +519,7 @@ build different graphQmf or graphBiorth wavelet filterbanks
 <dd><p>If True, the zeroDC filter bank is employed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>bool, optional</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a>, optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -575,7 +577,7 @@ non-zero items.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Bowen Deng.</p>
+    <p>&#169; Copyright 2022, Bowen Deng.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

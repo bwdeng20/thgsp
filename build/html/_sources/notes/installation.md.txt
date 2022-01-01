@@ -30,13 +30,6 @@ pip install torch-sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 ```
 
-
-On Arch (Manjaro) Linux, run:
-
-```
-sudo pacman -S suitesparse
-```
-
 ### Install cupy for linear algebra on GPU (Optional)
 
 If you do NOT have an Nvidia GPU, please skip this section.

@@ -93,7 +93,7 @@ def random_graph(
     """
     if density < 0 or density > 1:
         raise ValueError("density expected to be from [0,1]")
-    random_state = np.random.RandomState(seed)
+    rng = np.random.default_rng(seed=seed)
 
     if not directed:
         n_all_edge = int((N - 1) * N / 2)
@@ -103,8 +103,8 @@ def random_graph(
                 f"Density {density} is too small to generate 1 edge "
                 f"of {N}-node undirected graph."
             )
-        ind = random_state.choice(n_all_edge, size=k, replace=False)
-        data = random_state.rand(k) if weighted else None
+        ind = rng.choice(n_all_edge, size=k, replace=False)
+        data = rng.random(k) if weighted else None
         i, j = tri2square(ind)
         # construct the symmetric upper triangular part
         row = np.concatenate([i, j])
@@ -125,8 +125,8 @@ def random_graph(
                 f"Density {density} is too small to "
                 f"generate 1 edge of {N}-node directed graph."
             )
-        ind = random_state.choice(n_all_edge, size=k, replace=False)
-        data = random_state.rand(k) if weighted else None
+        ind = rng.choice(n_all_edge, size=k, replace=False)
+        data = rng.random(k) if weighted else None
         i, j = flat2squre(ind, N)
         row = torch.as_tensor(i, device=device, dtype=torch.long)
         col = torch.as_tensor(j, device=device, dtype=torch.long)

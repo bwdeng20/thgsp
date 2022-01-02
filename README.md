@@ -1,13 +1,19 @@
-# *thgsp*
 
-![](./docs/source/_static/img/logo.png) \
+<p align="center">
+ <img src="./docs/source/_static/img/logo.png" width="30%"  alt="drawing"/>
+</p>
+
 [![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/building.yml/badge.svg)](http://16.162.201.90/whl/)
 [![Github Doc Status](https://github.com/bwdeng20/thgsp/actions/workflows/doc.yml/badge.svg)](https://bwdeng20.github.io/thgsp)
-[![codecov](https://codecov.io/gh/bwdeng20/thgsp/branch/main/graph/badge.svg?token=H45AEGPM0P)](https://codecov.io/gh/bwdeng20/thgsp)
 [![Linting](https://github.com/bwdeng20/thgsp/actions/workflows/linting.yml/badge.svg)]()
-[![Linting](https://github.com/bwdeng20/thgsp/actions/workflows/testing.yml/badge.svg)]()
-[![License](https://img.shields.io/static/v1?label=license&message=BSD&color=red)](https://github.com/bwdeng20/thgsp/blob/main/LICENSE) 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) \
+[![Testing](https://github.com/bwdeng20/thgsp/actions/workflows/testing.yml/badge.svg)]()
+[![codecov](https://codecov.io/gh/bwdeng20/thgsp/branch/main/graph/badge.svg?token=H45AEGPM0P)](https://codecov.io/gh/bwdeng20/thgsp)
+[![License](https://img.shields.io/static/v1?label=license&message=BSD&color=orange)](https://github.com/bwdeng20/thgsp/blob/main/LICENSE) 
+![](https://img.shields.io/badge/OS-Linux%7CWin-blue)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) 
+
+--------------------------------------------
+
 A **g**raph **s**ignal **p**rocessing toolbox built on [py**t**orc**h**](https://github.com/pytorch/pytorch). The repository
 now mainly consists of the following stuffs:
 

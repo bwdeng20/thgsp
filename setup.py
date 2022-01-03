@@ -106,7 +106,7 @@ install_requires = [
     "tqdm",
 ]
 
-tests_require = ["pytest", "pytest-cov", "pytest-pep8", "pytest-xdist"]
+tests_require = ["pytest", "pytest-cov", "pytest-pep8"]
 
 setup(
     name="thgsp",

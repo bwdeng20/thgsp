@@ -82,6 +82,7 @@ class QmfCore:
             filterbanks for arbitrary undirected graphs,” IEEE TSP, 2013.
 
     """
+
     def __init__(
         self,
         bptG: List[SparseTensor],

@@ -93,7 +93,6 @@ install_requires = [
     "torchvision",
     "ray",
     "sklearn",
-    "numpy",
     "scipy",
     "networkx",
     "numba",

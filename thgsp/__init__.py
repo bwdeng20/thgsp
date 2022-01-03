@@ -22,8 +22,8 @@ from thgsp.graphs import (  # noqa
     random_graph,
 )
 
-from .convert import to_cpx  # noqa
 from .convert import (
+    to_cpx,
     from_cpx,
     get_array_module,
     get_ddd,
@@ -42,8 +42,8 @@ cpp_tools = ["_version", "_dsatur", "_bsgda"]
 for tool in cpp_tools:
     torch.ops.load_library(
         importlib.machinery.PathFinder()
-        .find_spec(f"{tool}_{suffix}", [osp.dirname(__file__)])
-        .origin
+            .find_spec(f"{tool}_{suffix}", [osp.dirname(__file__)])
+            .origin
     )
 
 if torch.cuda.is_available():  # pragma: no cover

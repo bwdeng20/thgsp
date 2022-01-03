@@ -31,9 +31,8 @@ def test_admm_bga(density, M, dtype):
 @pytest.mark.parametrize("part", partition_strategy)
 class TestAdmmLbga:
     def test_admm_lbga_ray(self, density, style, M, dtype, device, part):
-        # https://docs.ray.io/en/latest/auto_examples/testing-tips.html
-        ray.init(local_mode=True,num_cpus=2)
-        # Tip1 & 2
+        # https://docs.ray.io/en/latest/auto_examples/testing-tips.html Tip1 & 2
+        ray.init(local_mode=True, num_cpus=2)
         N = 32 * 3
         G = rand_udg(N, density, dtype=dtype, device=device)
         bptGs, beta, partptr, perm = admm_lbga_ray(

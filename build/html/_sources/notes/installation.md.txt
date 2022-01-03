@@ -31,9 +31,10 @@ pip install torch-scatter -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.htm
 pip install torch-sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 ``` 
+
 For Windows `CMD`, try:
 
-```cmd
+```
 # Windows CMD
 set CUDA=cu113
 set TORCH=1.10.1
@@ -52,9 +53,8 @@ export CUDA=cu113
 export TORCH=1.10.1
 pip install thgsp -f https://torchgsp.xyz/whl/torch-${TORCH}+${CUDA}
 ```
-
 For Windows `CMD`, use:
-```cmd
+```
 # Windows CMD
 set CUDA=cu113
 set TORCH=1.10.1

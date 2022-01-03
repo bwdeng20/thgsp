@@ -8,12 +8,13 @@
 
 import datetime
 
+import sphinx_rtd_theme
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import thgsp
-import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
@@ -32,7 +33,7 @@ release = thgsp.__version__
 autodoc_mock_imports = ["ray", "scikit-sparse"]
 extensions = [
     "sphinx.ext.autodoc",
-    'sphinx.ext.autosummary',
+    "sphinx.ext.autosummary",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "myst_parser",
@@ -59,14 +60,14 @@ exclude_patterns = []
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_static_path = ["_static"]
-html_css_files = ['css/custom.css']
+html_css_files = ["css/custom.css"]
 html_logo = "_static/img/logo.png"
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy', None),
-    'pandas': ('http://pandas.pydata.org/pandas-docs/dev', None),
-    'torch': ('https://pytorch.org/docs/master', None)
+    "python": ("https://docs.python.org/", None),
+    "numpy": ("http://docs.scipy.org/doc/numpy", None),
+    "pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
+    "torch": ("https://pytorch.org/docs/master", None),
 }
 
 html_theme_options = {

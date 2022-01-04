@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 import pytest
 import torch
@@ -38,14 +36,14 @@ def test_computing_sets(dtype):
 
 
 def test_solving_set_cover():
-    sets = {0: [0, 4, 1, 3], 1: [2, 1], 2: [1, 4, 4, 2], 3: [1, 4, 3, 0], 4: [1, 0, 3]}
+    sets = {0: [0, 4, 1, 3], 1: [0, 1], 2: [1, 4, 4, 2], 3: [1, 4, 3, 0], 4: [1, 0, 3]}
 
     lengths = [len(sets[s]) for s in range(5)]
-    s = time.time()
     S, vf = solving_set_covering(sets, lengths, K)
-    print(f"{time.time() - s} seconds elapsed")
-    assert S == [3, 2]
+    print(S)
     assert vf
+    covered = set([item for i in S for item in sets[i]])
+    assert covered == set(range(5))
 
 
 @pytest.mark.parametrize("dtype", float_dtypes)

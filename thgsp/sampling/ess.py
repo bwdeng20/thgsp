@@ -1,14 +1,33 @@
 import numpy as np
 import torch
 
-from thgsp.convert import SparseTensor, get_array_module, to_scipy
-from thgsp.utils import consecutive_spmv
+from thgsp.convert import get_array_module, to_scipy
 
 
-def ess_sampling(operator, M, k=2):
+def ess(operator, M, k=2):
     r"""
-    This function has the same functionality as :func:`ess` but directly computes the
-    matrix power of specific variation operator, e.g., normalized Laplacian.
+    An efficient sampling set selection method for bandlimited graph signals [1]_.
+
+    Parameters
+    ----------
+    operator: SparseTensor
+        The chosen variation operators, e.g., graph normalized Laplacian.
+    M:  int
+        The number of desired sampled nodes.
+    k:  int
+        The proxy order. Refer to the literature for details.
+
+    Returns
+    -------
+    S:  list
+        A list containing sampled nodes with the sampling order
+
+    References
+    ----------
+    .. [1]  Aamir Anis, et al., “Efficient sampling set selection for bandlimited graph
+            signals using graph spectral proxies,” IEEE TSP, 2016.
+
+
     """
     import scipy.sparse.linalg as splin
 
@@ -34,79 +53,6 @@ def ess_sampling(operator, M, k=2):
         v = Sc[np.argmax(np.abs(psi)).item()]
         S.append(v)
     return S
-
-
-def ess(operator, M, k=2, max_iter=int(5e2)):
-    r"""
-    An efficient sampling set selection method for bandlimited graph signals [1]_.
-
-    Parameters
-    ----------
-    operator: SparseTensor
-        The chosen variation operators, e.g., graph normalized Laplacian.
-    M:  int
-        The number of desired sampled nodes.
-    k:  int
-        The proxy order. Refer to the literature for details.
-    max_iter:   int
-        The maximum number of iterations acceptable in Power Iteration.
-
-    Returns
-    -------
-    S:  list
-        A list containing sampled nodes with the sampling order
-
-    References
-    ----------
-    .. [1]  Aamir Anis, et al., “Efficient sampling set selection for bandlimited graph
-            signals using graph spectral proxies,” IEEE TSP, 2016.
-
-    """
-    N = operator.size(-1)
-    V = np.arange(N)
-    S = []
-    while len(S) < M:
-        Sc = np.setdiff1d(V, S)
-        if len(Sc) == 1:
-            S.append(Sc[0])
-            break
-        sigma, psi = power_iteration4min(operator, Sc, k, max_iter)
-        v = Sc[torch.argmax(psi.abs())]
-        S.append(v)
-    return S
-
-
-def power_iteration(L: SparseTensor, Sc: iter, k=2, shift=0, num_iter=50, tol=1e-6):
-    Sc = torch.as_tensor(Sc)
-    Lt = L.t()
-    Im = SparseTensor.eye(L.size(0), dtype=L.dtype(), device=L.device())
-    Isv = Im[Sc, :]
-    Ivs = Im[:, Sc]
-    x0 = torch.rand(len(Sc), 1, device=L.device(), dtype=L.dtype())
-    for _ in range(num_iter):
-        x1 = Ivs @ x0
-        x1 = consecutive_spmv(L, x1, k)
-        x1 = consecutive_spmv(Lt, x1, k)
-        x1 = Isv @ x1
-        if shift != 0:
-            x1 = x1 - shift * x0
-        x1 = x1 / x1.norm()
-        if (x1 - x0).norm() < tol:
-            break
-        x0 = x1
-    t = Ivs @ x0
-    t = consecutive_spmv(L, t, k)
-    lam = (t ** 2).sum()
-    if shift != 0:
-        lam = lam - shift * (x0 ** 2).sum()
-    return lam.item(), x0
-
-
-def power_iteration4min(L: SparseTensor, Sc: iter, k=2, num_iter=50):
-    lam_max, _ = power_iteration(L, Sc, k, num_iter=num_iter)
-    lam_min_minus_max, v = power_iteration(L, Sc, k, shift=lam_max, num_iter=num_iter)
-    lam_min = lam_min_minus_max + lam_max
-    return lam_min, v
 
 
 def recon_ess(y, S, U, bd, **kwargs):

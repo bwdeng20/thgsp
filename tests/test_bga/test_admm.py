@@ -32,18 +32,22 @@ def test_admm_bga(density, M, dtype):
 class TestAdmmLbga:
     def test_admm_lbga_ray(self, density, style, M, dtype, device, part):
         # https://docs.ray.io/en/latest/auto_examples/testing-tips.html Tip1 & 2
-        ray.init(local_mode=True, num_cpus=2)
-        N = 32 * 3
-        G = rand_udg(N, density, dtype=dtype, device=device)
-        bptGs, beta, partptr, perm = admm_lbga_ray(
-            G, M, block_size=32, style=style, part=part
-        )
-        print(
-            f"\n---num_node: {N}, density: {density}, strategy: {style}, M: {M},"
-            f" dtype:{dtype}, device:{device}, part:{part}"
-        )
-        print("total weights: {}".format(G.sum().item()))
-        for i, bptG in enumerate(bptGs):
-            assert is_bipartite_fix(bptG)[0]
-            print("{}-th subgraph, weights: {}".format(i, bptG.sum()))
-        ray.shutdown()
+        try:
+            ray.init(num_cpus=2)
+            N = 32 * 3
+            G = rand_udg(N, density, dtype=dtype, device=device)
+            bptGs, beta, partptr, perm = admm_lbga_ray(
+                G, M, block_size=32, style=style, part=part
+            )
+            print(
+                f"\n---num_node: {N}, density: {density}, strategy: {style}, M: {M},"
+                f" dtype:{dtype}, device:{device}, part:{part}"
+            )
+            print("total weights: {}".format(G.sum().item()))
+            for i, bptG in enumerate(bptGs):
+                assert is_bipartite_fix(bptG)[0]
+                print("{}-th subgraph, weights: {}".format(i, bptG.sum()))
+        except Exception as err:
+            print("!" * 20, err)
+        finally:
+            ray.shutdown()

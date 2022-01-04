@@ -8,7 +8,7 @@ from torch_sparse import SparseTensor
 
 SparseLayouts = ("csc", "coo", "csr")
 numpy_torch_dtype_dict = {
-    np.bool: torch.bool,
+    bool: torch.bool,
     np.uint8: torch.uint8,
     np.int8: torch.int8,
     np.int16: torch.int16,
@@ -19,7 +19,7 @@ numpy_torch_dtype_dict = {
     np.float64: torch.float64,
     np.complex64: torch.complex64,
     np.complex128: torch.complex128,
-    torch.bool: np.bool,
+    torch.bool: bool,
     torch.uint8: np.uint8,
     torch.int8: np.int8,
     torch.int16: np.int16,

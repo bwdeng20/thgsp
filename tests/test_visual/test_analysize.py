@@ -3,7 +3,7 @@ import pytest
 from scipy.sparse import lil_matrix
 
 from thgsp.datasets import Toy
-from thgsp.sampling import ess_sampling
+from thgsp.sampling import ess
 from thgsp.visual import show_transform
 
 from ..utils4t import plot, remove_downloaded_dataset
@@ -18,7 +18,7 @@ class TestShowTransform:
         bands = np.linspace(fs[0], fs[-1], num=9)
         N, M = U.shape
         print("\n", bands)
-        sampled_nodes = ess_sampling(g.L("comb"), g.n_node, 4)
+        sampled_nodes = ess(g.L("comb"), g.n_node, 4)
         highlights = lil_matrix((M, N))
         highlights[range(M), sampled_nodes] = 1
         fig, _, _ = show_transform(

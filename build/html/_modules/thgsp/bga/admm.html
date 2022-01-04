@@ -119,16 +119,16 @@
     <span class="c1"># compute eigenvalue of the bipartite bga of A</span>
     <span class="n">lambda_</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="n">n_eig</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="p">:],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="n">lambda_</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">lambda_</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">N</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
-            <span class="n">delta</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">delta</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="p">)</span>
-        <span class="n">lambda_</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">lambda_</span><span class="p">[</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="o">-</span><span class="n">lambda_</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">n_eig</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>  <span class="c1"># delete the middle N-n_eig eigenvalues of B</span>
-        <span class="n">lambda_</span><span class="p">[</span><span class="n">n_eig</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">:</span> <span class="o">-</span><span class="n">n_eig</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">lambda_</span><span class="p">[</span><span class="n">n_eig</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span> <span class="o">-</span><span class="n">n_eig</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">if</span> <span class="n">min_eig</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">lambda_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_eig</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span>
@@ -140,21 +140,21 @@
 
 
 <div class="viewcode-block" id="admm_bga"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga.admm.admm_bga">[docs]</a><span class="k">def</span> <span class="nf">admm_bga</span><span class="p">(</span>
-    <span class="n">A</span><span class="p">,</span>
-    <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
-    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;fro21&quot;</span><span class="p">,</span>
-    <span class="n">cut_edge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">init_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">convergence_marker</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_step</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">nonnegative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">rho</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-    <span class="n">eta</span><span class="o">=</span><span class="mf">1.01</span><span class="p">,</span>
-    <span class="n">max_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">),</span>
-    <span class="n">early_stop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">max_rho</span><span class="o">=</span><span class="mf">1e10</span><span class="p">,</span>
+        <span class="n">A</span><span class="p">,</span>
+        <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;fro21&quot;</span><span class="p">,</span>
+        <span class="n">cut_edge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">init_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">convergence_marker</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+        <span class="n">check_step</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">nonnegative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">rho</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">eta</span><span class="o">=</span><span class="mf">1.01</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">),</span>
+        <span class="n">early_stop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">max_rho</span><span class="o">=</span><span class="mf">1e10</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The program is to find the bipartite graph approximation via solving the</span>
@@ -319,16 +319,16 @@
 
 
 <span class="k">def</span> <span class="nf">admm_lbga_ray</span><span class="p">(</span>
-    <span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span>
-    <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">block_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">style</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">part</span><span class="o">=</span><span class="s2">&quot;metis&quot;</span><span class="p">,</span>
-    <span class="n">num_cpus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">iperm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span>
+        <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">block_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">part</span><span class="o">=</span><span class="s2">&quot;metis&quot;</span><span class="p">,</span>
+        <span class="n">num_cpus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">iperm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="n">block_size</span><span class="p">:</span>
@@ -372,11 +372,7 @@
         <span class="n">global_beta</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;constructing </span><span class="si">{:4d}</span><span class="s2">-th bipartite subgraph ... (style:1) &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;constructing </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2">-th bipartite subgraph ... (style:1) &quot;</span><span class="p">)</span>
             <span class="n">futures</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cluster_sizes</span><span class="p">)):</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="n">partptr</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>

@@ -128,7 +128,7 @@ class GraphBase(SparseTensor):
         if self._U is not None:
             U = self._U
         else:
-            fs, U = torch.symeig(lap.to_dense(), eigenvectors=True)
+            fs, U = torch.linalg.eigh(lap.to_dense(), eigenvectors=True)
             if self.cache:
                 fs[fs.abs() < 1e-6] = 0
                 self._fs = fs

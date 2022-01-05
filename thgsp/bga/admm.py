@@ -37,16 +37,16 @@ def admm_simple(A, n_eig=None, min_eig=0.0):
     # compute eigenvalue of the bipartite bga of A
     lambda_ = A.new_zeros(n_eig)
     if N % 2 == 0:
-        lambda_[: N // 2] = 0.5 * (delta[: N // 2] - torch.flip(delta[N // 2:], [0]))
-        lambda_[N // 2:] = torch.flip(-lambda_[: N // 2], [0])
+        lambda_[: N // 2] = 0.5 * (delta[: N // 2] - torch.flip(delta[N // 2 :], [0]))
+        lambda_[N // 2 :] = torch.flip(-lambda_[: N // 2], [0])
     elif N % 2 != 0:
         lambda_[: N // 2] = 0.5 * (
-                delta[: N // 2] - torch.flip(delta[N // 2 + 1:], [0])
+            delta[: N // 2] - torch.flip(delta[N // 2 + 1 :], [0])
         )
-        lambda_[N // 2 + 1:] = torch.flip(-lambda_[: N // 2], [0])
+        lambda_[N // 2 + 1 :] = torch.flip(-lambda_[: N // 2], [0])
 
     if n_eig < N:  # delete the middle N-n_eig eigenvalues of B
-        lambda_[n_eig / 2: -n_eig / 2] = 0
+        lambda_[n_eig / 2 : -n_eig / 2] = 0
 
     if min_eig > 0:
         idx = (abs(lambda_) < min_eig).nonzero()[:, 0]
@@ -58,21 +58,21 @@ def admm_simple(A, n_eig=None, min_eig=0.0):
 
 
 def admm_bga(
-        A,
-        M=1,
-        alpha=100.0,
-        metric="fro21",
-        cut_edge=True,
-        init_B=None,
-        convergence_marker=1e-8,
-        check_step=1000,
-        verbose=False,
-        nonnegative=True,
-        rho=0.01,
-        eta=1.01,
-        max_iter=int(1e5),
-        early_stop=False,
-        max_rho=1e10,
+    A,
+    M=1,
+    alpha=100.0,
+    metric="fro21",
+    cut_edge=True,
+    init_B=None,
+    convergence_marker=1e-8,
+    check_step=1000,
+    verbose=False,
+    nonnegative=True,
+    rho=0.01,
+    eta=1.01,
+    max_iter=int(1e5),
+    early_stop=False,
+    max_rho=1e10,
 ):
     r"""
     The program is to find the bipartite graph approximation via solving the
@@ -237,16 +237,16 @@ def lbga_block(Ab, M, **kwargs):
 
 
 def admm_lbga_ray(
-        A: SparseTensor,
-        M=1,
-        block_size=32,
-        style=1,
-        weighted=False,
-        part="metis",
-        num_cpus=None,
-        iperm=True,
-        verbose=False,
-        **kwargs,
+    A: SparseTensor,
+    M=1,
+    block_size=32,
+    style=1,
+    weighted=False,
+    part="metis",
+    num_cpus=None,
+    iperm=True,
+    verbose=False,
+    **kwargs,
 ):
     N = A.size(-1)
     if N < block_size:

@@ -244,6 +244,7 @@ def admm_lbga_ray(
     weighted=False,
     part="metis",
     num_cpus=None,
+    num_gpus=None,
     iperm=True,
     verbose=False,
     **kwargs,
@@ -298,7 +299,9 @@ def admm_lbga_ray(
                 Ab = Ap_lil[s:e, s:e].toarray()
                 Ab = torch.from_numpy(Ab)
                 futures.append(
-                    lbga_block.options(num_cpus=num_cpus).remote(Ab, M=1, **kwargs)
+                    lbga_block.options(num_cpus=num_cpus, num_gpus=num_gpus).remote(
+                        Ab, M=1, **kwargs
+                    )
                 )
 
             results = ray.get(futures)
@@ -325,7 +328,9 @@ def admm_lbga_ray(
             Ab = Ap_lil[s:e, s:e].toarray()
             Ab = torch.from_numpy(Ab)
             futures.append(
-                lbga_block.options(num_cpus=num_cpus).remote(Ab, M=M, **kwargs)
+                lbga_block.options(num_cpus=num_cpus, num_gpus=num_gpus).remote(
+                    Ab, M=M, **kwargs
+                )
             )
 
         results = ray.get(futures)

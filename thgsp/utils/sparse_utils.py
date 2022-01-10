@@ -209,7 +209,7 @@ def multivariate_normal(
     The shape is :obj:`(N,num)`
     """
     try:
-        from sksparse.cholmod import cholesky
+        from sksparse.cholmod import cholesky  # noqa
     except ImportError:
         raise ImportError(
             "scikit-sparse (https://github.com/scikit-sparse/scikit-sparse) is required"

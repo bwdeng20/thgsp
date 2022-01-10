@@ -63,9 +63,9 @@ class TestXy2Graph:
         assert graph.device() == device
         assert graph.dtype() == dtype
         if loop:
-            assert graph.to_scipy().diagonal().sum() == N
+            assert graph.to_scipy(layout="csr").diagonal().sum() == N
         else:
-            assert graph.to_scipy().diagonal().sum() == 0
+            assert graph.to_scipy(layout="csr").diagonal().sum() == 0
 
     def test_radius_graph(self, dtype, device, loop):
         N = 12
@@ -79,6 +79,6 @@ class TestXy2Graph:
         # radius graph is symmetric
         assert (dense_adj - dense_adj.t()).abs().sum() == 0
         if loop:
-            assert adj.to_scipy().diagonal().sum() == N
+            assert adj.to_scipy(layout="csr").diagonal().sum() == N
         else:
-            assert adj.to_scipy().diagonal().sum() == 0
+            assert adj.to_scipy(layout="csr").diagonal().sum() == 0

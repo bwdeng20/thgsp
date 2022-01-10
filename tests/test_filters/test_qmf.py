@@ -1,7 +1,6 @@
-import sys
-
 import numpy as np
 import pytest
+import ray
 import torch
 from torch_sparse import SparseTensor
 
@@ -22,6 +21,8 @@ from thgsp.graphs.generators import rand_bipartite, rand_udg
 from thgsp.utils.metrics import snr
 
 from ..utils4t import (
+    RAY_NUM_CPUS,
+    RAY_NUM_GPUS,
     color_strategies,
     devices,
     float_dtypes,
@@ -44,6 +45,14 @@ def ppprint(dis, pf):
     )
     print("distortion sum                :  ", dis.sum())
     print("|-----------------------------------------------------------------")
+
+
+ray.init(
+    num_cpus=RAY_NUM_CPUS,
+    num_gpus=RAY_NUM_GPUS,
+    log_to_driver=False,
+    ignore_reinit_error=True,
+)
 
 
 @pytest.mark.parametrize("dtype", float_dtypes)
@@ -156,26 +165,18 @@ class TestColorQmf:
 @pytest.mark.parametrize("dtype", float_dtypes)
 @pytest.mark.parametrize("device", devices)
 @pytest.mark.parametrize("strategy", num_strategies)
-@pytest.mark.parametrize("N", [32, 32 * 3])
+@pytest.mark.parametrize("N", [32 * 5])
 class TestNumQMf:
     def test_init(self, dtype, device, strategy, N):
-        if sys.platform == "win32" and N > 80:
-            pytest.skip(
-                "Skip [NumQMF] ADMM-LBGA on Windows due to consistently crashes"
-            )
+        ray.init(num_cpus=RAY_NUM_CPUS, log_to_driver=False, ignore_reinit_error=True)
 
         graph = rand_udg(N, dtype=dtype, device=device)
-        NumQmf(graph)
         f1 = NumQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
         print(f1)
 
-    @pytest.mark.parametrize("M", [2])
+    @pytest.mark.parametrize("M", [1, 2])
     def test_transform(self, dtype, device, strategy, M, N):
-        if sys.platform == "win32" and N > 80:
-            pytest.skip(
-                "Skip [NumQMF] ADMM-LBGA on Windows due to consistently crashes"
-            )
-
+        ray.init(num_cpus=2, log_to_driver=False, ignore_reinit_error=True)
         graph = rand_udg(N, device=device, dtype=dtype)
         qmf = NumQmf(graph, strategy=strategy, M=M)
         f = torch.rand(N, device=device, dtype=dtype)
@@ -191,6 +192,15 @@ class TestNumQMf:
         )
         ppprint(dis, pf)
         assert pf > 20
+
+
+def test_single():
+    ray.init(num_cpus=3, ignore_reinit_error=True, log_to_driver=False)
+    N = 32 * 3
+    strategy = "admm"
+    graph = rand_udg(N)
+    f1 = NumQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
+    print(f1)
 
 
 @pytest.mark.parametrize("dtype", float_dtypes)
@@ -266,10 +276,7 @@ class TestColorBiorth:
 class TestNumBiorth:
     @pytest.mark.parametrize("N", [20, 100])
     def test_init(self, dtype, device, strategy, N):
-        if sys.platform == "win32" and N > 80:
-            pytest.skip(
-                "Skip [NumBiorth] ADMM-LBGA on Windows due to consistently crashes"
-            )
+        ray.init(num_cpus=2, log_to_driver=False, ignore_reinit_error=True)
         graph = rand_udg(N, dtype=dtype, device=device)
         NumBiorth(graph)
         NumBiorth(graph, in_channels=3, zeroDC=True, strategy=strategy)
@@ -277,12 +284,8 @@ class TestNumBiorth:
     @pytest.mark.parametrize("M", [1, 2])
     @pytest.mark.parametrize("part", partition_strategy)
     def test_transform(self, dtype, device, strategy, M, part):
+        ray.init(num_cpus=2, log_to_driver=False, ignore_reinit_error=True)
         N = 32 * 3
-        if sys.platform == "win32" and N > 80:
-            pytest.skip(
-                "Skip [NumBiorth] ADMM-LBGA on Windows due to consistently crashes"
-            )
-
         print(
             f"\n|----- Strategy: {strategy:8s}, M={M}, "
             f"Device: {str(device):5s}, Dtype: {str(dtype):6s} ----"
@@ -370,3 +373,7 @@ class TestBiorWaveletBasis:
     def display_density(self, op, inv_op):
         print("Ta       density: ", op.density())
         print("Ta^-1    density: ", inv_op.density())
+
+
+if ray.is_initialized():
+    ray.shutdown()

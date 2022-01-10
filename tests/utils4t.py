@@ -5,26 +5,18 @@ import torch
 from thgsp.datasets.utils import get_data_dir_of_thgsp, os, remove_file_or_dir
 from thgsp.utils import mse, snr
 
-np.set_printoptions(linewidth=10000, precision=4)
-torch.set_printoptions(linewidth=10000, precision=4)
 
-dtypes = [torch.float, torch.double, torch.int, torch.long]
-
-grad_dtypes = [torch.float, torch.double]
-float_dtypes = grad_dtypes
-float_np_dts = [np.float32, np.float64]
-int_dtypes = [torch.int, torch.long]
-sparse_formats = ("csc", "csr", "coo")
-lap_types = ["comb", "sym", "rw", None]
-
-color_strategies = ["harary", "osglm"]
-num_strategies = ["admm", "amfs"]
-
-devices = [torch.device("cpu")]
-if torch.cuda.is_available():
-    devices += [torch.device(f"cuda:{torch.cuda.current_device()}")]
-
-partition_strategy = ["graclus", "metis"]
+def get_number_env(key_str, default_val=None):
+    key_val = os.environ.get(key_str)
+    if key_val is None:
+        key_val = default_val
+        return key_val
+    # key_val is str
+    if key_val.isdigit():
+        nbr = int(key_val)
+    else:
+        nbr = float(key_val)
+    return nbr
 
 
 def to_tensor(x, dtype, device=None):
@@ -49,3 +41,28 @@ def snr_and_mse(x, target):
     s, m = snr(x, target), mse(x, target)
     print(f"SNR: {s:.4f} | MSE: {m:.4f}")
     return s, m
+
+
+np.set_printoptions(linewidth=10000, precision=4)
+torch.set_printoptions(linewidth=10000, precision=4)
+
+dtypes = [torch.float, torch.double, torch.int, torch.long]
+
+grad_dtypes = [torch.float, torch.double]
+float_dtypes = grad_dtypes
+float_np_dts = [np.float32, np.float64]
+int_dtypes = [torch.int, torch.long]
+sparse_formats = ("csc", "csr", "coo")
+lap_types = ["comb", "sym", "rw", None]
+
+color_strategies = ["harary", "osglm"]
+num_strategies = ["admm", "amfs"]
+
+devices = [torch.device("cpu")]
+if torch.cuda.is_available():
+    devices += [torch.device(f"cuda:{torch.cuda.current_device()}")]
+
+partition_strategy = ["graclus", "metis"]
+
+RAY_NUM_CPUS = get_number_env("RAY_NUM_CPUS", 2)
+RAY_NUM_GPUS = get_number_env("RAY_NUM_GPUS")

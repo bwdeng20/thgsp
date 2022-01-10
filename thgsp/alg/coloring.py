@@ -1,4 +1,4 @@
-import collections
+from collections import deque
 
 import numpy as np
 import torch
@@ -63,13 +63,12 @@ def check_coloring(spm, vtx_color):
     while len(vtx2reach) > 0:
         r = vtx2reach.pop()
         vtx2reach.add(r)
-        q = collections.deque([r])
+        q = deque([r])
         while len(q) > 0:
             cur_node = q.popleft()
             vtx2reach.remove(cur_node)
-            cur_c = vtx_color[cur_node]
             nbr = col[ptr[cur_node] : ptr[cur_node + 1]]
             for i in nbr:
-                if vtx_color[i] == cur_c:
+                if vtx_color[i] == vtx_color[cur_node]:
                     return False
     return True

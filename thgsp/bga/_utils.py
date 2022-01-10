@@ -1,10 +1,12 @@
-import collections
 import math
 import random
+from collections import deque
+from typing import Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 from scipy.sparse import coo_matrix, lil_matrix, spmatrix
+from torch import Tensor
 from torch_cluster import graclus_cluster
 from torch_sparse import SparseTensor
 
@@ -160,7 +162,7 @@ def beta2channel_mask(beta):
     N, M = beta.shape
     n_channel = 2 ** M  # pseudo channel number
     mask = torch.zeros(n_channel, N, dtype=torch.bool)
-    if isinstance(beta, torch.Tensor):
+    if isinstance(beta, Tensor):
         beta = np.asarray(beta.cpu())
     beta = beta.astype("uint8")
     beta_dist = distribute_color(n_channel, M, th=False)  # n_channel x M np.array
@@ -175,17 +177,9 @@ def beta2channel_mask(beta):
     return mask, beta_dist
 
 
-def adj_sentinel(A):
-    if isinstance(A, SparseTensor):
-        Alil = A.to_scipy("csr").tolil()  # csr2lil will allocate new memory
-    elif isinstance(A, spmatrix):
-        Alil = A.tolil(copy=True)
-    else:
-        raise TypeError("{} is not a supported matrix type".format(type(A)))
-    return Alil
-
-
-def laplace(adj: spmatrix, lap_type=None, add_loop=False) -> coo_matrix:
+def laplace(
+    adj: spmatrix, lap_type: Optional[str] = None, add_loop: bool = False
+) -> coo_matrix:
     M, N = adj.shape
     assert M == N
     dt = adj.dtype if adj.dtype in (np.float64, np.float32) else np.float32
@@ -248,25 +242,28 @@ def bipartite_mask(bt, sparse=True):
     return lil_matrix(b1 ^ b2) if sparse else b1 ^ b2
 
 
-def is_bipartite_fix(A, fix_flag: bool = False):
+def is_bipartite_fix(
+    A: Union[spmatrix, Tensor], fix_flag: bool = False
+) -> Union[Tuple[bool, Iterable[int], spmatrix], Tuple[bool, Iterable[int], Tensor]]:
     if isinstance(A, spmatrix):
         return is_bipartite_fix_scipy(A, fix_flag)
-    elif isinstance(A, torch.Tensor):
+    elif isinstance(A, Tensor):
         return is_bipartite_fix_th(A, fix_flag)
     else:
-        raise TypeError("{} not supported!".format(type(A)))
+        raise TypeError(f"{type(A)} not supported!")
 
 
-def is_bipartite_fix_scipy(A, fix_flag: bool = False):
+def is_bipartite_fix_scipy(
+    A: spmatrix, fix_flag: bool = False
+) -> Tuple[bool, List[int], spmatrix]:
     A = A.tolil()
     n_node = A.shape[-1]
     vtx2reach = set(range(n_node))
-    # the same initial color for all nodes
     vtx_color = [-1 for _ in range(n_node)]
     flag = True
     while len(vtx2reach) > 0:
-        r = random.sample(vtx2reach, 1)[0]  # [r] --> r
-        q = collections.deque([r])
+        r = random.sample(list(vtx2reach), 1)[0]  # [r] --> r
+        q = deque([r])
         while len(q) > 0:
             cur_node = q.popleft()
             vtx2reach.remove(cur_node)
@@ -287,7 +284,9 @@ def is_bipartite_fix_scipy(A, fix_flag: bool = False):
     return flag, vtx_color, A
 
 
-def is_bipartite_fix_th(A, fix_flag=False):
+def is_bipartite_fix_th(
+    A: Tensor, fix_flag: bool = False
+) -> Tuple[bool, List[int], Tensor]:
     """Check if a graph is bipartite using BFS-based 2-color coloring and
     furthermore can fix a graph to a bipartite one by deleting edges bridging
     two nodes colored with a same color.
@@ -312,11 +311,10 @@ def is_bipartite_fix_th(A, fix_flag=False):
     flag = True
     vtx2reach = set(range(n_node))
     # BFS traversal binary coloring -1 means no color
-    # the same initial color for all nodes
     vtx_color = [-1 for _ in range(n_node)]
     while len(vtx2reach) > 0:
-        r = random.sample(vtx2reach, 1)[0]  # [r] --> r
-        q = collections.deque([r])
+        r = random.sample(list(vtx2reach), 1)[0]  # [r] --> r
+        q = deque([r])
         while len(q) > 0:
             cur_node = q.popleft()
             vtx2reach.remove(cur_node)
@@ -333,7 +331,7 @@ def is_bipartite_fix_th(A, fix_flag=False):
                     else:  # do not fix
                         flag = False
                         return flag, vtx_color, A
-                else:  # cur_node and the nbr is colored with different different colors
+                else:  # cur_node and the nbr is colored with different colors
                     continue
     return flag, vtx_color, A
 
@@ -341,7 +339,7 @@ def is_bipartite_fix_th(A, fix_flag=False):
 def dict2perm(cluster_dict):
     perm = np.concatenate(list(cluster_dict.values()))
     part = [0] + [len(it) for it in cluster_dict.values()]
-    part = np.cumsum(part)
+    part = np.cumsum(part, dtype=np.int64)
     return perm, part
 
 

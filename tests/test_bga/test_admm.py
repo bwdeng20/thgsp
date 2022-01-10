@@ -1,12 +1,24 @@
-import sys
-
 import pytest
 import ray
+import torch
 
 from thgsp.bga.admm import admm_bga, admm_lbga_ray, is_bipartite_fix
 from thgsp.graphs.generators import rand_udg
 
-from ..utils4t import devices, float_dtypes, partition_strategy
+from ..utils4t import (
+    RAY_NUM_CPUS,
+    RAY_NUM_GPUS,
+    devices,
+    float_dtypes,
+    partition_strategy,
+)
+
+ray.init(
+    num_cpus=RAY_NUM_CPUS,
+    num_gpus=RAY_NUM_GPUS,
+    ignore_reinit_error=True,
+    log_to_driver=False,
+)
 
 
 @pytest.mark.parametrize("dtype", float_dtypes[1:])
@@ -16,9 +28,8 @@ def test_admm_bga(density, M, dtype):
     N = 32
     G = rand_udg(N, density, dtype)
     bptGs = admm_bga(G.to_dense(), M=M)
-    for i in range(
-        M
-    ):  # use is_bipartite_fix() is recommended to ensure the bipartiteness
+    for i in range(M):
+        # use is_bipartite_fix() is recommended to ensure the bipartiteness
         assert is_bipartite_fix(bptGs[i], fix_flag=True)[0]
 
     for i in range(M):  # Check the bipartiteness
@@ -31,16 +42,10 @@ def test_admm_bga(density, M, dtype):
 @pytest.mark.parametrize("style", [1, 2])
 @pytest.mark.parametrize("M", [1, 2])
 @pytest.mark.parametrize("part", partition_strategy)
-@pytest.mark.skipif(
-    sys.platform == "win32",
-    reason="Skip ADMM-LBGA on Windows due to consistently Ray crashes",
-)
 class TestAdmmLbga:
     def test_admm_lbga_ray(self, density, style, M, dtype, device, part):
-        # https://docs.ray.io/en/latest/auto_examples/testing-tips.html Tip1 & 2
-        if not ray.is_initialized:
-            ray.init(num_cpus=2)
-        N = 32 * 3
+        ray.init(num_cpus=RAY_NUM_CPUS, ignore_reinit_error=True, log_to_driver=False)
+        N = 32 * 3 + 10
         G = rand_udg(N, density, dtype=dtype, device=device)
         bptGs, beta, partptr, perm = admm_lbga_ray(
             G, M, block_size=32, style=style, part=part
@@ -54,9 +59,25 @@ class TestAdmmLbga:
             assert is_bipartite_fix(bptG)[0]
             print("{}-th subgraph, weights: {}".format(i, bptG.sum()))
 
-        for i, bptG in enumerate(bptGs):
-            assert is_bipartite_fix(bptG)[0]
-            print("{}-th subgraph, weights: {}".format(i, bptG.sum()))
 
-        if ray.is_initialized:
-            ray.shutdown()
+def test_admm_lbga_ray_single(
+    density=0.1, style=1, M=2, dtype=torch.double, device="cpu", part="graclus"
+):
+    ray.init(num_cpus=RAY_NUM_CPUS, ignore_reinit_error=True, log_to_driver=False)
+    N = 32 * 3
+    G = rand_udg(N, density, dtype=dtype, device=device)
+    bptGs, beta, partptr, perm = admm_lbga_ray(
+        G, M, block_size=5, style=style, part=part
+    )
+    print(
+        f"\n---num_node: {N}, density: {density}, strategy: {style}, M: {M},"
+        f" dtype:{dtype}, device:{device}, part:{part}"
+    )
+    print("total weights: {}".format(G.sum().item()))
+    for i, bptG in enumerate(bptGs):
+        assert is_bipartite_fix(bptG)[0]
+        print("{}-th subgraph, weights: {}".format(i, bptG.sum()))
+
+
+if ray.is_initialized():
+    ray.shutdown()

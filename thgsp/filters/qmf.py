@@ -1,5 +1,4 @@
 from functools import partial
-from typing import List
 
 import numpy as np
 import torch
@@ -18,6 +17,7 @@ from thgsp.bga import (
     osglm,
 )
 from thgsp.graphs import Graph
+from thgsp.typing import KernelType, List, Optional, Tensor, Tuple, Union, VertexColor
 
 from .approximation import cheby_coeff, cheby_op, cheby_op_basis, polyval
 from .kernels import (
@@ -86,18 +86,30 @@ class QmfCore:
     def __init__(
         self,
         bptG: List[SparseTensor],
-        beta: torch.Tensor,
-        analyze_kernels=None,
-        synthesis_kernels=None,
-        in_channels=1,
-        order=24,
-        lam_max=2.0,
-        zeroDC=False,
+        beta: Tensor,
+        analyze_kernels: Optional[KernelType] = None,
+        synthesis_kernels: Optional[KernelType] = None,
+        in_channels: int = 1,
+        order: int = 24,
+        lam_max: float = 2.0,
+        zeroDC: bool = False,
     ):
-        assert len(bptG) == beta.shape[-1]
-        assert bptG[0].size(-1) == beta.shape[0]
-        assert lam_max > 0
-        assert order > 0
+        if len(bptG) != beta.shape[-1]:
+            raise RuntimeError(
+                f"Mismatch of # ({len(bptG)}) of bipartite graphs "
+                f"and # ({beta.shape[-1]}) of bipartite indicators"
+            )
+        if bptG[0].size(-1) != beta.shape[0]:
+            raise RuntimeError(
+                f"Mismatch of # of nodes ({bptG[0].size(-1)}!={beta.shape[0]})"
+            )
+        if not lam_max > 0:
+            raise ValueError(
+                f"The maximal eigenvalue ({lam_max}) of graph operator "
+                f"adopted by QMF and Biorth has to be positive "
+            )
+        if not order > 0:
+            raise ValueError(f"The order of Chebyshev approximation has to be positive")
 
         self.N, self.M = beta.shape
         self.in_channels = self.Ci = in_channels
@@ -271,9 +283,8 @@ class QmfCore:
 
     def _synthesize(self, y):
         z = y
-        for g in range(
-            self.M - 1, -1, -1
-        ):  # M-1, M-2, ..., 0 totally M bipartite graphs
+        # M-1, M-2, ..., 0 totally M bipartite graphs
+        for g in range(self.M - 1, -1, -1):
             z = cheby_op(z, self.bptL[g], self.coefficient_s[g], lam_max=self.lam_max)
             z = self.bptD05[g] * z if self.zeroDC else z
         return z  # Co x N x Ci
@@ -293,9 +304,8 @@ class QmfOperator:
         self.device = device
         self.lam_max = lam_max
 
-        krn = np.array(
-            [[[meyer_kernel], [meyer_mirror_kernel]]]
-        )  # 1(n_graph) x 2(Cout) x 1(Cin) kernel
+        # 1(n_graph) x 2(Cout) x 1(Cin) kernel
+        krn = np.array([[[meyer_kernel], [meyer_mirror_kernel]]])
         # (1,2,1,K) --> (2,K)
         coeff = cheby_coeff(krn, K=order, lam_max=lam_max).squeeze_()
 
@@ -383,13 +393,13 @@ class ColorQmf(QmfCore):
     def __init__(
         self,
         G: Graph,
-        kernel=None,
-        in_channels=1,
-        order=24,
-        strategy="harary",
-        vtx_color=None,
-        lam_max=2.0,
-        zeroDC=False,
+        kernel: Optional[KernelType] = None,
+        in_channels: int = 1,
+        order: int = 24,
+        strategy: str = "harary",
+        vtx_color: Optional[VertexColor] = None,
+        lam_max: float = 2.0,
+        zeroDC: bool = False,
         **kwargs,
     ):
         self.adj = G
@@ -414,7 +424,7 @@ class ColorQmf(QmfCore):
 
         super(ColorQmf, self).__init__(
             bptG,
-            beta,
+            torch.from_numpy(beta),
             analyze_kernels=kernel,
             in_channels=in_channels,
             order=order,
@@ -441,13 +451,13 @@ class NumQmf(QmfCore):
     def __init__(
         self,
         G: Graph,
-        kernel=None,
-        in_channels=1,
-        order=24,
+        kernel: np.ndarray = None,
+        in_channels: int = 1,
+        order: int = 24,
         strategy: str = "admm",
-        M=1,
-        lam_max=2.0,
-        zeroDC=False,
+        M: int = 1,
+        lam_max: float = 2.0,
+        zeroDC: bool = False,
         **kwargs,
     ):
         self.adj = G
@@ -499,7 +509,14 @@ class NumQmf(QmfCore):
 
 class BiorthCore(QmfCore):
     def __init__(
-        self, bptG, beta, k=8, in_channels=1, order=16, lam_max=2.0, zeroDC=False
+        self,
+        bptG: List[SparseTensor],
+        beta: Tensor,
+        k: int = 8,
+        in_channels: int = 1,
+        order: int = 16,
+        lam_max: float = 2.0,
+        zeroDC: bool = False,
     ):
         h0_c, g0_c, orthogonality = design_biorth_kernel(k)
         h0 = partial(polyval, torch.from_numpy(h0_c))
@@ -535,13 +552,13 @@ class ColorBiorth(BiorthCore):
     def __init__(
         self,
         G: Graph,
-        k=8,
-        in_channels=1,
-        order=16,
-        strategy="harary",
-        vtx_color=None,
-        lam_max=2.0,
-        zeroDC=False,
+        k: int = 8,
+        in_channels: int = 1,
+        order: int = 16,
+        strategy: str = "harary",
+        vtx_color: VertexColor = None,
+        lam_max: float = 2.0,
+        zeroDC: bool = False,
         **kwargs,
     ):
         self.adj = G
@@ -587,14 +604,14 @@ class ColorBiorth(BiorthCore):
 class NumBiorth(BiorthCore):
     def __init__(
         self,
-        G,
-        k=8,
-        in_channels=1,
-        order=16,
-        strategy="admm",
-        M=1,
-        lam_max=2.0,
-        zeroDC=False,
+        G: Graph,
+        k: int = 8,
+        in_channels: int = 1,
+        order: int = 16,
+        strategy: str = "admm",
+        M: int = 1,
+        lam_max: float = 2.0,
+        zeroDC: bool = False,
         **kwargs,
     ):
         self.adj = G

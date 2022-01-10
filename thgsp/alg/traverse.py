@@ -9,19 +9,19 @@ def bfs_lil(lil_adj, r=0, father=False):
     else:
         tree[r] = list()
 
-    arrived = set()
+    arrived = [False] * lil_adj.shape[-1]
+    arrived[r] = True
     q = deque([r])
     while len(q) > 0:
         u = q.popleft()
-        arrived.add(u)
+        arrived[u] = True
         nbr = rows[u]
         for v in nbr:
-            if v not in arrived:
+            if not arrived[v]:
                 tree[u].append(v)
                 if father:
                     tree[v] = [v]
                 else:
                     tree[v] = list()
                 q.append(v)
-                arrived.add(v)
     return tree

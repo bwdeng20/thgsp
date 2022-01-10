@@ -79,6 +79,6 @@ def recon_ess(y, S, U, bd, **kwargs):
     assert len(S) > 1
     dv = U.device
     xp, _, _ = get_array_module(U.is_cuda)
-    tmp = xp.linalg.lstsq(xp.asarray(U[S, :bd]), xp.asarray(y), **kwargs)[0]
+    tmp = xp.linalg.lstsq(xp.asarray(U[S, :bd]), xp.asarray(y), **kwargs, rcond=None)[0]
     f_hat = U[:, :bd] @ torch.as_tensor(tmp, device=dv)
     return f_hat

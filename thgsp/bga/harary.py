@@ -3,11 +3,14 @@ from scipy.sparse import lil_matrix
 from torch_sparse import SparseTensor
 
 from thgsp.alg.coloring import dsatur
+from thgsp.typing import Dict, List, Optional, Tuple, VertexColor
 
 from ._utils import bipartite_mask, distribute_color, new_order
 
 
-def harary(A: SparseTensor, vtx_color=None, threshold=0.97):
+def harary(
+    A: SparseTensor, vtx_color: Optional[VertexColor] = None, threshold: float = 0.97
+) -> Tuple[List[lil_matrix], np.ndarray, np.ndarray, np.ndarray, Dict[int, int]]:
     r"""
     Harary bipartite decomposition
 

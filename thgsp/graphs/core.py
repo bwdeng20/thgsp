@@ -15,8 +15,8 @@ class GraphBase(SparseTensor):
         self,
         adjacency,
         coords: Optional[torch.Tensor] = None,
-        cache=True,
-        requires_grad=False,
+        cache: bool = True,
+        requires_grad: bool = False,
         **kwargs
     ):
 
@@ -96,6 +96,9 @@ class GraphBase(SparseTensor):
         edge_idx = torch.cat([row.clone().unsqueeze_(0), col.clone().unsqueeze_(0)], 0)
         val = val.clone()
         return edge_idx, val
+
+    def A(self):
+        return self.to_dense()
 
     def L(self, lap_type: str = "sym"):
         r"""
@@ -209,9 +212,9 @@ class Graph(GraphBase):
         self,
         adjacency,
         coords: Optional[torch.Tensor] = None,
-        cache=False,
-        requires_grad=False,
-        copy=True,
+        cache: bool = False,
+        requires_grad: bool = False,
+        copy: bool = True,
         **kwargs
     ):
         if isinstance(adjacency, Graph):
@@ -231,7 +234,6 @@ class Graph(GraphBase):
     def n_edge(self):
         return self.nnz() / 2
 
-    @property
     def is_bipartite(self):
         return is_bipartite(self)[0]
 
@@ -241,9 +243,9 @@ class DiGraph(GraphBase):
         self,
         adjacency,
         coords: Optional[torch.Tensor] = None,
-        cache=False,
-        requires_grad=False,
-        copy=True,
+        cache: bool = False,
+        requires_grad: bool = False,
+        copy: bool = True,
         **kwargs
     ):
         adj = adjacency.clone().detach_() if copy else adjacency

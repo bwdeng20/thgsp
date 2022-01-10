@@ -23,6 +23,8 @@ def test_lil_bfs():
 
     tree_gt = nx.bfs_tree(g1, source=r)
     tree = bfs_lil(g1_lil, r=r)
+    print("\n", tree)
+    print(nx.to_dict_of_lists(tree_gt))
 
     pos = nx.spring_layout(g1)
     plt.subplot(131)

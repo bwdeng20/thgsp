@@ -103,6 +103,7 @@ install_requires = [
     "pandas",
     "plotly",
     "tqdm",
+    "numpy",
 ]
 
 tests_require = ["pytest", "pytest-cov", "pytest-pep8"]

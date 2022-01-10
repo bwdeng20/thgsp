@@ -1,9 +1,11 @@
-import warnings
+import logging
+from typing import List, Optional, Tuple
 
 import numpy as np
 import ray
 import torch
-from scipy.sparse import block_diag, coo_matrix
+from scipy.sparse import block_diag, coo_matrix, lil_matrix
+from torch import Tensor
 from torch_sparse import SparseTensor, partition
 
 from ._utils import (
@@ -14,15 +16,17 @@ from ._utils import (
     is_bipartite_fix,
 )
 
+logger = logging.getLogger(__name__)
 
-def admm_simple(A, n_eig=None, min_eig=0.0):
+
+def admm_simple(A: Tensor, n_eig: Optional[int] = None, min_eig: float = 0.0) -> Tensor:
     N = A.shape[1]
     if n_eig:  # if specify the number of eigen components
         if (0 < n_eig <= N) and (n_eig % 2 == 0):
             pass
         else:
             raise ValueError(
-                " {} not a valid number of eigen component to reserve".format(n_eig)
+                f" {n_eig} not a valid number of eigen component to reserve"
             )
     else:
         n_eig = N
@@ -49,7 +53,7 @@ def admm_simple(A, n_eig=None, min_eig=0.0):
         lambda_[n_eig / 2 : -n_eig / 2] = 0
 
     if min_eig > 0:
-        idx = (abs(lambda_) < min_eig).nonzero()[:, 0]
+        idx = (torch.abs(lambda_) < min_eig).nonzero()[:, 0]
         lambda_[idx] = (lambda_[idx]).sign() * min_eig
 
     # recover B
@@ -58,22 +62,22 @@ def admm_simple(A, n_eig=None, min_eig=0.0):
 
 
 def admm_bga(
-    A,
-    M=1,
-    alpha=100.0,
-    metric="fro21",
-    cut_edge=True,
-    init_B=None,
-    convergence_marker=1e-8,
-    check_step=1000,
-    verbose=False,
-    nonnegative=True,
-    rho=0.01,
-    eta=1.01,
-    max_iter=int(1e5),
-    early_stop=False,
-    max_rho=1e10,
-):
+    A: Tensor,
+    M: int = 1,
+    alpha: float = 100.0,
+    metric: str = "fro21",
+    cut_edge: bool = True,
+    B0: Optional[Tensor] = None,
+    convergence_marker: float = 1e-8,
+    check_step: int = 1000,
+    verbose: bool = False,
+    nonnegative: bool = True,
+    rho: float = 0.01,
+    eta: float = 1.01,
+    max_iter: int = int(1e5),
+    early_stop: bool = False,
+    max_rho: float = 1e10,
+) -> Tensor:
     r"""
     The program is to find the bipartite graph approximation via solving the
     following optimization problem [2]_ .
@@ -106,7 +110,7 @@ def admm_bga(
     cut_edge:bool,optional
          If True, cut the edges in the learned bipartite graphs that not exist in the
          original graph
-    init_B:Tensor,optional
+    B0:Tensor,optional
          The initialization of B
     convergence_marker:float,optional
          the procedure converges if the error between B and A < this value
@@ -136,19 +140,27 @@ def admm_bga(
 
     """
     if A.dtype is not torch.double:
-        warnings.warn(
+        logger.warning(
             "ADMM-based method is sensitive to the precision(double is much faster)"
         )
-    N = A.shape[0]
+
+    N = A.shape[-1]
     if cut_edge:
         disjoint_edge_mask = A == 0
     else:
         disjoint_edge_mask = None
 
-    # initialization
-    if init_B:
-        init_B = init_B.to(A.device)
-        B = torch.stack([init_B for _ in range(M)])
+    # initialization B
+    if B0 is not None:
+        assert B0.shape[-1] == N
+        B0 = B0.to(A.device)
+        if B0.ndim == 2:
+            B = torch.stack([B0 for _ in range(M)])
+        elif B0.ndim == 3:
+            assert B0.shape == (M, N, N)
+            B = B0
+        else:
+            raise RuntimeError(f"B0 is expected to be `({M},{N},{N})` or ({N},{N})")
     else:
         B = torch.stack([A.new_zeros(A.shape) for _ in range(M)])
 
@@ -179,7 +191,7 @@ def admm_bga(
 
             B[m] = (B[m] + B[m].t()) * 0.5
             # hard thresholding operation on B
-            B[m][abs(B[m]) <= 1e-6] = 0
+            B[m][torch.abs(B[m]) <= 1e-6] = 0
 
             if nonnegative:
                 B[m].clamp_(min=0)  # inplace op
@@ -202,34 +214,36 @@ def admm_bga(
                 if early_stop:
                     M_bipartite += is_bipartite_fix(B[m], fix_flag=True)[0]
                 if verbose:
-                    # eigenvalues in an ascending order
-                    a, _ = torch.symeig(B[m])
+                    # eigenvalues in a ascending order
+                    a = torch.linalg.eigvalsh(B[m])
                     b = torch.flip(a, dims=[0])
                     dist[m, 1] = torch.norm(a[: N // 2 + 1] + b[: N // 2 + 1])
             if verbose:
-                print(
-                    "Iter %5d: %5.3e\t%5.3e\t%5.3e"
-                    % (times, dist[:, 0].max().item(), dist[:, 1].max().item(), rho)
+                logger.info(
+                    f"Iter {times:5d}: {dist[:, 0].max().item():5.3e}\t{dist[:, 1].max().item():5.3e}\t{rho:5.3e}"
                 )
 
             if times > 1 and (dist[:, 0].max().item() <= convergence_marker):
                 break
 
             if times > max_iter:
-                print("\n===========> Max iteration achieved <===========\n")
+                if verbose:
+                    logger.info("\n=======> Max iteration achieved <======\n")
                 break
 
             if early_stop and M_bipartite == M:
-                print("\n====> Early Stop once all subgraphs are bipartite <====\n")
+                logger.info(
+                    "\n====> Early Stop once all subgraphs are bipartite <====\n"
+                )
                 break
     return B
 
 
-@ray.remote
-def lbga_block(Ab, M, **kwargs):
+@ray.remote(num_returns=2)
+def lbga_block(Ab: Tensor, M: int, **kwargs) -> Tuple[Tensor, Tensor]:
     Nb = Ab.shape[-1]
     Bb = admm_bga(Ab, M, **kwargs)
-    betab = Ab.new_zeros(Nb, M, dtype=torch.bool)
+    betab = torch.zeros(Nb, M, dtype=torch.bool, device=Ab.device)
     for i in range(M):
         _, vtx_color, _ = is_bipartite_fix(Bb[i], fix_flag=True)
         betab[:, i] = torch.as_tensor(vtx_color)
@@ -238,17 +252,17 @@ def lbga_block(Ab, M, **kwargs):
 
 def admm_lbga_ray(
     A: SparseTensor,
-    M=1,
-    block_size=32,
-    style=1,
-    weighted=False,
-    part="metis",
-    num_cpus=None,
-    num_gpus=None,
-    iperm=True,
-    verbose=False,
+    M: int = 1,
+    block_size: int = 32,
+    style: int = 1,
+    weighted: bool = False,
+    part: str = "metis",
+    num_cpus: Optional[int] = None,
+    iperm: bool = True,
+    verbose: bool = False,
+    ray_log_to_driver: bool = False,
     **kwargs,
-):
+) -> Tuple[List[lil_matrix], Tensor, np.ndarray, np.ndarray]:
     N = A.size(-1)
     if N < block_size:
         raise RuntimeError(
@@ -273,8 +287,8 @@ def admm_lbga_ray(
         raise RuntimeError(f"{part} is not a valid graph partition strategy")
 
     if Ap_lil.dtype != np.double:
-        warnings.warn(
-            "ADMM-based method is sensitive to the precision (double is much faster)"
+        logger.warning(
+            "ADMM-based method is sensitive to precision (double is much faster)"
         )
         Ap_lil = Ap_lil.astype(np.double)
 
@@ -285,34 +299,37 @@ def admm_lbga_ray(
     )
 
     if not ray.is_initialized():
-        ray.init()
+        ray.init(ignore_reinit_error=True, log_to_driver=ray_log_to_driver)
 
     if style == 1:
         global_beta = []
         for i in range(M):
+            bipartite_futures, beta_futures = list(), list()
             if verbose:
-                print(f"constructing {i + 1:4d}-th bipartite subgraph ... (style:1) ")
-            futures = []
+                logger.warning(
+                    f"constructing {i + 1:4d}-th bipartite subgraph ... (style:1) "
+                )
+
             for t in range(len(cluster_sizes)):
                 s = partptr[t]
                 e = partptr[t + 1]
                 Ab = Ap_lil[s:e, s:e].toarray()
                 Ab = torch.from_numpy(Ab)
-                futures.append(
-                    lbga_block.options(num_cpus=num_cpus, num_gpus=num_gpus).remote(
-                        Ab, M=1, **kwargs
-                    )
-                )
+                bipartite_future, beta_future = lbga_block.options(
+                    num_cpus=num_cpus
+                ).remote(Ab, M=1, **kwargs)
+                bipartite_futures.append(bipartite_future)
+                beta_futures.append(beta_future)
 
-            results = ray.get(futures)
-            Bbs, local_betas = list(zip(*results))
+            Bbs = ray.get(bipartite_futures)
+            local_betas = ray.get(beta_futures)
             beta = torch.cat(local_betas).squeeze_(-1)  # N x (M=1) --> (N,)
             global_beta.append(beta)
 
             mask = bipartite_mask(beta)
             B = block_diag([coo_matrix(Bb.squeeze_()) for Bb in Bbs], format="lil")
             append_mask = mask.copy()
-            append_mask[block_mask] = 0
+            append_mask[block_mask] = False
 
             # add links not in diagonal block
             B[append_mask] = Ap_lil[append_mask]
@@ -321,20 +338,20 @@ def admm_lbga_ray(
         global_beta = torch.stack(global_beta).t_()  # (N,M)
 
     elif style == 2:
-        futures = []
+        bipartite_futures, beta_futures = list(), list()
         for t in range(len(cluster_sizes)):
             s = partptr[t]
             e = partptr[t + 1]
             Ab = Ap_lil[s:e, s:e].toarray()
             Ab = torch.from_numpy(Ab)
-            futures.append(
-                lbga_block.options(num_cpus=num_cpus, num_gpus=num_gpus).remote(
-                    Ab, M=M, **kwargs
-                )
-            )
+            bipartite_future, beta_future = lbga_block.options(
+                num_cpus=num_cpus
+            ).remote(Ab, M=M, **kwargs)
+            bipartite_futures.append(bipartite_future)
+            beta_futures.append(beta_future)
 
-        results = ray.get(futures)
-        Bbs, local_betas = list(zip(*results))
+        Bbs = ray.get(bipartite_futures)
+        local_betas = ray.get(beta_futures)
         global_beta = torch.cat(local_betas)
 
         for i in range(M):
@@ -347,9 +364,7 @@ def admm_lbga_ray(
             bptG.append(B)
 
     else:
-        raise RuntimeError(
-            "style should be either 1 or 2, but got {}".format(str(style))
-        )
+        raise RuntimeError(f"style should be either 1 or 2, but got {str(style)}")
 
     if iperm:
         inv_perm = np.argsort(perm)

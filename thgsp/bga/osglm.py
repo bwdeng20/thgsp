@@ -1,10 +1,14 @@
 import numpy as np
 from scipy.sparse import eye, lil_matrix
 
+from thgsp.typing import Optional, SparseTensor, VertexColor
+
 from ._utils import bipartite_mask
 
 
-def osglm(A, lc=None, vtx_color=None):
+def osglm(
+    A: SparseTensor, lc: Optional[int] = None, vtx_color: Optional[VertexColor] = None
+):
     r"""
     The oversampled bipartite graph approximation method proposed in [1]_
 

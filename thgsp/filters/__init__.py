@@ -6,7 +6,7 @@ from .approximation import (
     nla,
     polyval,
 )
-from .filter import Filter
+from .filter import Filter, check_signal
 from .kernels import (
     get_kernel_id,
     get_kernel_name,
@@ -48,4 +48,5 @@ __all__ = [
     "heat_kernel",
     "get_kernel_id",
     "get_kernel_name",
+    "check_signal",
 ]

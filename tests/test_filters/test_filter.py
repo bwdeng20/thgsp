@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from thgsp.filters import Filter, ideal_kernel, meyer_kernel
+from thgsp.filters import Filter, check_signal, ideal_kernel, meyer_kernel
 from thgsp.graphs import random_graph
 
 
@@ -47,19 +47,19 @@ class TestFilter:
     def test_check_signal(self, filters):
         flt = filters["23"]
         with pytest.raises(RuntimeError):  # rank-4 tensor not valid
-            flt._check_signal(torch.rand(4, 2, 4, 10))
+            check_signal(torch.rand(4, 2, 4, 10), 5)
         # N. rank-1
-        flt._check_signal(torch.rand(flt.N))
+        check_signal(torch.rand(flt.N), flt.N)
 
         # N x Ci. rank-2
-        flt._check_signal(torch.rand(flt.N, flt.Ci))
+        check_signal(torch.rand(flt.N, flt.Ci), flt.N)
 
         # Co x N x Ci . rank-3
-        flt._check_signal(torch.rand(flt.Co, flt.N, flt.Ci))
+        check_signal(torch.rand(flt.Co, flt.N, flt.Ci), flt.N)
 
         # M(!=N)x Ci. not valid
         with pytest.raises(RuntimeError):
-            flt._check_signal(torch.rand(100, flt.Ci))
+            check_signal(torch.rand(100, flt.Ci), flt.N)
 
     def test_evd_filter(self, filters):
         flt = filters["plain"]

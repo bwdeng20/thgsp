@@ -171,10 +171,8 @@ class Filter:
                 lam_max=self.lam_max,
                 dtype=self.dtype,
                 device=self.device,
-            ).squeeze_(
-                0
             )  # the first dim is pseudo
-            self._coeff = coeff
+            self._coeff = coeff.squeeze_(0)
         return self._coeff
 
     def cheby_filter(self, x, order=None):

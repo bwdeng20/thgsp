@@ -63,9 +63,9 @@ def check_coloring(spm, vtx_color):
     while len(vtx2reach) > 0:
         r = vtx2reach.pop()
         vtx2reach.add(r)
-        q = deque([r])
-        while len(q) > 0:
-            cur_node = q.popleft()
+        q_fifo = deque([r])
+        while len(q_fifo) > 0:
+            cur_node = q_fifo.popleft()
             vtx2reach.remove(cur_node)
             nbr = col[ptr[cur_node] : ptr[cur_node + 1]]
             for i in nbr:

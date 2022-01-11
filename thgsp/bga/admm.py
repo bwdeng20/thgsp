@@ -220,7 +220,8 @@ def admm_bga(
                     dist[m, 1] = torch.norm(a[: N // 2 + 1] + b[: N // 2 + 1])
             if verbose:
                 logger.info(
-                    f"Iter {times:5d}: {dist[:, 0].max().item():5.3e}\t{dist[:, 1].max().item():5.3e}\t{rho:5.3e}"
+                    f"Iter {times:5d}: {dist[:, 0].max().item():5.3e}\t"
+                    f"{dist[:, 1].max().item():5.3e}\t{rho:5.3e}"
                 )
 
             if times > 1 and (dist[:, 0].max().item() <= convergence_marker):

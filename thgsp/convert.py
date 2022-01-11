@@ -206,34 +206,34 @@ def from_cpx(mat):
 def get_array_module(on_gpu):
     if on_gpu:
         try:
-            import cupy as xp
-            import cupyx.scipy as xcipy
-            import cupyx.scipy.sparse.linalg as xsplin
+            import cupy as xp  # noqa
+            import cupyx.scipy as xcipy  # noqa
+            import cupyx.scipy.sparse.linalg as xsplin  # noqa
         except ImportError:
             warnings.warn("CuPy is not installed, use numpy and scipy instead")
-            import numpy as xp
-            import scipy as xcipy
-            import scipy.sparse.linalg as xsplin
+            import numpy as xp  # noqa
+            import scipy as xcipy  # noqa
+            import scipy.sparse.linalg as xsplin  # noqa
     else:
-        import numpy as xp
-        import scipy as xcipy
-        import scipy.sparse.linalg as xsplin
+        import numpy as xp  # noqa
+        import scipy as xcipy  # noqa
+        import scipy.sparse.linalg as xsplin  # noqa
     return xp, xcipy, xsplin
 
 
-def get_ddd(A):
-    if isinstance(A, SparseTensor):
-        density = A.density()
-        dt = A.dtype()
-        dv = A.device()
-        on_gpu = A.is_cuda()
-    elif isinstance(A, torch.Tensor):
-        num = torch.prod(torch.as_tensor(A.shape))
-        nnz = A._nnz() if A.is_sparse else A.count_nonzero()
+def get_ddd(mat):
+    if isinstance(mat, SparseTensor):
+        density = mat.density()
+        dt = mat.dtype()
+        dv = mat.device()
+        on_gpu = mat.is_cuda()
+    elif isinstance(mat, torch.Tensor):
+        num = torch.prod(torch.as_tensor(mat.shape))
+        nnz = mat._nnz() if mat.is_sparse else mat.count_nonzero()
         density = (nnz / num).item()
-        dt = A.dtype
-        dv = A.device
-        on_gpu = A.is_cuda
+        dt = mat.dtype
+        dv = mat.device
+        on_gpu = mat.is_cuda
     else:
-        raise TypeError(f"Type {type(A)} is not supported")
+        raise TypeError(f"Type {type(mat)} is not supported")
     return dt, dv, density, on_gpu

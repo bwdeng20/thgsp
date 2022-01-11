@@ -6,6 +6,7 @@
   <title>thgsp.bga.osglm &mdash; thgsp 0.1.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -15,6 +16,8 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -80,13 +83,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for thgsp.bga.osglm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">eye</span><span class="p">,</span> <span class="n">lil_matrix</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+
+<span class="kn">from</span> <span class="nn">thgsp.typing</span> <span class="kn">import</span> <span class="n">VertexColor</span>
 
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">bipartite_mask</span>
 
 
-<div class="viewcode-block" id="osglm"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga.osglm.osglm">[docs]</a><span class="k">def</span> <span class="nf">osglm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">lc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vtx_color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="osglm"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga.osglm.osglm">[docs]</a><span class="k">def</span> <span class="nf">osglm</span><span class="p">(</span>
+    <span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">lc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">vtx_color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VertexColor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The oversampled bipartite graph approximation method proposed in [1]_</span>
 

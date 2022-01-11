@@ -6,6 +6,7 @@
   <title>thgsp.bga.admm &mdash; thgsp 0.1.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -15,6 +16,8 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -80,12 +83,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for thgsp.bga.admm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">block_diag</span><span class="p">,</span> <span class="n">coo_matrix</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">block_diag</span><span class="p">,</span> <span class="n">coo_matrix</span><span class="p">,</span> <span class="n">lil_matrix</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">partition</span>
 
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -96,15 +101,17 @@
     <span class="n">is_bipartite_fix</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">admm_simple</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">n_eig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_eig</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">admm_simple</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">n_eig</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">min_eig</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">n_eig</span><span class="p">:</span>  <span class="c1"># if specify the number of eigen components</span>
         <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">n_eig</span> <span class="o">&lt;=</span> <span class="n">N</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_eig</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot; </span><span class="si">{}</span><span class="s2"> not a valid number of eigen component to reserve&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_eig</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">n_eig</span><span class="si">}</span><span class="s2"> not a valid number of eigen component to reserve&quot;</span>
             <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">n_eig</span> <span class="o">=</span> <span class="n">N</span>
@@ -131,7 +138,7 @@
         <span class="n">lambda_</span><span class="p">[</span><span class="n">n_eig</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">:</span> <span class="o">-</span><span class="n">n_eig</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">if</span> <span class="n">min_eig</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">lambda_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_eig</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lambda_</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_eig</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">lambda_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lambda_</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span> <span class="o">*</span> <span class="n">min_eig</span>
 
     <span class="c1"># recover B</span>
@@ -140,22 +147,22 @@
 
 
 <div class="viewcode-block" id="admm_bga"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga.admm.admm_bga">[docs]</a><span class="k">def</span> <span class="nf">admm_bga</span><span class="p">(</span>
-    <span class="n">A</span><span class="p">,</span>
-    <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
-    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;fro21&quot;</span><span class="p">,</span>
-    <span class="n">cut_edge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">init_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">convergence_marker</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_step</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">nonnegative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">rho</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-    <span class="n">eta</span><span class="o">=</span><span class="mf">1.01</span><span class="p">,</span>
-    <span class="n">max_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">),</span>
-    <span class="n">early_stop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">max_rho</span><span class="o">=</span><span class="mf">1e10</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">A</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">M</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,</span>
+    <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fro21&quot;</span><span class="p">,</span>
+    <span class="n">cut_edge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">B0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">convergence_marker</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">nonnegative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">eta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.01</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">),</span>
+    <span class="n">early_stop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_rho</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e10</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The program is to find the bipartite graph approximation via solving the</span>
 <span class="sd">    following optimization problem [2]_ .</span>
@@ -188,7 +195,7 @@
 <span class="sd">    cut_edge:bool,optional</span>
 <span class="sd">         If True, cut the edges in the learned bipartite graphs that not exist in the</span>
 <span class="sd">         original graph</span>
-<span class="sd">    init_B:Tensor,optional</span>
+<span class="sd">    B0:Tensor,optional</span>
 <span class="sd">         The initialization of B</span>
 <span class="sd">    convergence_marker:float,optional</span>
 <span class="sd">         the procedure converges if the error between B and A &lt; this value</span>
@@ -218,19 +225,27 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;ADMM-based method is sensitive to the precision(double is much faster)&quot;</span>
         <span class="p">)</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">cut_edge</span><span class="p">:</span>
         <span class="n">disjoint_edge_mask</span> <span class="o">=</span> <span class="n">A</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">disjoint_edge_mask</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="c1"># initialization</span>
-    <span class="k">if</span> <span class="n">init_B</span><span class="p">:</span>
-        <span class="n">init_B</span> <span class="o">=</span> <span class="n">init_B</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">init_B</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+    <span class="c1"># initialization B</span>
+    <span class="k">if</span> <span class="n">B0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">B0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">N</span>
+        <span class="n">B0</span> <span class="o">=</span> <span class="n">B0</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">B0</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">B0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+        <span class="k">elif</span> <span class="n">B0</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">B0</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">B0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;B0 is expected to be `(</span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">)` or (</span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">A</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
 
@@ -261,7 +276,7 @@
 
             <span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+</span> <span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">t</span><span class="p">())</span> <span class="o">*</span> <span class="mf">0.5</span>
             <span class="c1"># hard thresholding operation on B</span>
-            <span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="nb">abs</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="k">if</span> <span class="n">nonnegative</span><span class="p">:</span>
                 <span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># inplace op</span>
@@ -284,34 +299,37 @@
                 <span class="k">if</span> <span class="n">early_stop</span><span class="p">:</span>
                     <span class="n">M_bipartite</span> <span class="o">+=</span> <span class="n">is_bipartite_fix</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">fix_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                    <span class="c1"># eigenvalues in an ascending order</span>
-                    <span class="n">a</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">symeig</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+                    <span class="c1"># eigenvalues in a ascending order</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
                     <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">dist</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[:</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;Iter </span><span class="si">%5d</span><span class="s2">: </span><span class="si">%5.3e</span><span class="se">\t</span><span class="si">%5.3e</span><span class="se">\t</span><span class="si">%5.3e</span><span class="s2">&quot;</span>
-                    <span class="o">%</span> <span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">dist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">dist</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">rho</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Iter </span><span class="si">{</span><span class="n">times</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">5.3e</span><span class="si">}</span><span class="se">\t</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dist</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">5.3e</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">rho</span><span class="si">:</span><span class="s2">5.3e</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">times</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">convergence_marker</span><span class="p">):</span>
                 <span class="k">break</span>
 
             <span class="k">if</span> <span class="n">times</span> <span class="o">&gt;</span> <span class="n">max_iter</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===========&gt; Max iteration achieved &lt;===========</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=======&gt; Max iteration achieved &lt;======</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
 
             <span class="k">if</span> <span class="n">early_stop</span> <span class="ow">and</span> <span class="n">M_bipartite</span> <span class="o">==</span> <span class="n">M</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">====&gt; Early Stop once all subgraphs are bipartite &lt;====</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">====&gt; Early Stop once all subgraphs are bipartite &lt;====</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
                 <span class="k">break</span>
     <span class="k">return</span> <span class="n">B</span></div>
 
 
-<span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">lbga_block</span><span class="p">(</span><span class="n">Ab</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">lbga_block</span><span class="p">(</span><span class="n">Ab</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
     <span class="n">Nb</span> <span class="o">=</span> <span class="n">Ab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">Bb</span> <span class="o">=</span> <span class="n">admm_bga</span><span class="p">(</span><span class="n">Ab</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">betab</span> <span class="o">=</span> <span class="n">Ab</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="n">Nb</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="n">betab</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Nb</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">Ab</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">vtx_color</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">is_bipartite_fix</span><span class="p">(</span><span class="n">Bb</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fix_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">betab</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">vtx_color</span><span class="p">)</span>
@@ -320,16 +338,17 @@
 
 <span class="k">def</span> <span class="nf">admm_lbga_ray</span><span class="p">(</span>
     <span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span>
-    <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">block_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">style</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">part</span><span class="o">=</span><span class="s2">&quot;metis&quot;</span><span class="p">,</span>
-    <span class="n">num_cpus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">iperm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">M</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">block_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">weighted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">part</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;metis&quot;</span><span class="p">,</span>
+    <span class="n">num_cpus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">iperm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">ray_log_to_driver</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">lil_matrix</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="n">block_size</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -354,8 +373,8 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2"> is not a valid graph partition strategy&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">Ap_lil</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;ADMM-based method is sensitive to the precision (double is much faster)&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;ADMM-based method is sensitive to precision (double is much faster)&quot;</span>
         <span class="p">)</span>
         <span class="n">Ap_lil</span> <span class="o">=</span> <span class="n">Ap_lil</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 
@@ -366,32 +385,37 @@
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
-        <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ignore_reinit_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_to_driver</span><span class="o">=</span><span class="n">ray_log_to_driver</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">global_beta</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">bipartite_futures</span><span class="p">,</span> <span class="n">beta_futures</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;constructing </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2">-th bipartite subgraph ... (style:1) &quot;</span><span class="p">)</span>
-            <span class="n">futures</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;constructing </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2">-th bipartite subgraph ... (style:1) &quot;</span>
+                <span class="p">)</span>
+
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cluster_sizes</span><span class="p">)):</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="n">partptr</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
                 <span class="n">e</span> <span class="o">=</span> <span class="n">partptr</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
                 <span class="n">Ab</span> <span class="o">=</span> <span class="n">Ap_lil</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
                 <span class="n">Ab</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">Ab</span><span class="p">)</span>
-                <span class="n">futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">lbga_block</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="n">num_cpus</span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">Ab</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="n">bipartite_future</span><span class="p">,</span> <span class="n">beta_future</span> <span class="o">=</span> <span class="n">lbga_block</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                    <span class="n">num_cpus</span><span class="o">=</span><span class="n">num_cpus</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">Ab</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">bipartite_futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bipartite_future</span><span class="p">)</span>
+                <span class="n">beta_futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta_future</span><span class="p">)</span>
 
-            <span class="n">results</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span>
-            <span class="n">Bbs</span><span class="p">,</span> <span class="n">local_betas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">))</span>
+            <span class="n">Bbs</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bipartite_futures</span><span class="p">)</span>
+            <span class="n">local_betas</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beta_futures</span><span class="p">)</span>
             <span class="n">beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">local_betas</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># N x (M=1) --&gt; (N,)</span>
             <span class="n">global_beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
 
             <span class="n">mask</span> <span class="o">=</span> <span class="n">bipartite_mask</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
             <span class="n">B</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">([</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">Bb</span><span class="o">.</span><span class="n">squeeze_</span><span class="p">())</span> <span class="k">for</span> <span class="n">Bb</span> <span class="ow">in</span> <span class="n">Bbs</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lil&quot;</span><span class="p">)</span>
             <span class="n">append_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">append_mask</span><span class="p">[</span><span class="n">block_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">append_mask</span><span class="p">[</span><span class="n">block_mask</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="c1"># add links not in diagonal block</span>
             <span class="n">B</span><span class="p">[</span><span class="n">append_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ap_lil</span><span class="p">[</span><span class="n">append_mask</span><span class="p">]</span>
@@ -400,18 +424,20 @@
         <span class="n">global_beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">global_beta</span><span class="p">)</span><span class="o">.</span><span class="n">t_</span><span class="p">()</span>  <span class="c1"># (N,M)</span>
 
     <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">futures</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bipartite_futures</span><span class="p">,</span> <span class="n">beta_futures</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cluster_sizes</span><span class="p">)):</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">partptr</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
             <span class="n">e</span> <span class="o">=</span> <span class="n">partptr</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             <span class="n">Ab</span> <span class="o">=</span> <span class="n">Ap_lil</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
             <span class="n">Ab</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">Ab</span><span class="p">)</span>
-            <span class="n">futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">lbga_block</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="n">num_cpus</span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">Ab</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">bipartite_future</span><span class="p">,</span> <span class="n">beta_future</span> <span class="o">=</span> <span class="n">lbga_block</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                <span class="n">num_cpus</span><span class="o">=</span><span class="n">num_cpus</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">Ab</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">bipartite_futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bipartite_future</span><span class="p">)</span>
+            <span class="n">beta_futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta_future</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span>
-        <span class="n">Bbs</span><span class="p">,</span> <span class="n">local_betas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">))</span>
+        <span class="n">Bbs</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bipartite_futures</span><span class="p">)</span>
+        <span class="n">local_betas</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beta_futures</span><span class="p">)</span>
         <span class="n">global_beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">local_betas</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
@@ -424,9 +450,7 @@
             <span class="n">bptG</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;style should be either 1 or 2, but got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">style</span><span class="p">))</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;style should be either 1 or 2, but got </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">style</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">iperm</span><span class="p">:</span>
         <span class="n">inv_perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>

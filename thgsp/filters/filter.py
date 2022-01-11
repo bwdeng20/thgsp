@@ -7,6 +7,26 @@ from .approximation import cheby_coeff, cheby_op
 from .kernels import get_kernel_name, meyer_kernel
 
 
+def check_signal(x, true_num_node, dtype=None):
+    if x.dim() == 1:  # N -> 1 x N x 1
+        x = x.reshape(1, -1, 1)
+    elif x.dim() == 2:  # N x Ci -> 1 x N x Ci
+        x = x.unsqueeze(0)
+    elif x.dim() == 3:  # keep Co x N x Ci or 1 x N x Ci
+        x = x
+    else:
+        raise RuntimeError(
+            "rank-1,2,3 tensor expected, but got rank-{}".format(x.dim())
+        )
+
+    if x.shape[-2] != true_num_node:
+        raise RuntimeError(
+            f"The penultimate dimension of signal: {x.shape[-2]}"
+            f"!= {true_num_node} (the number of nodes)"
+        )
+    return x.to(dtype)
+
+
 class Filter:
     """A graph filter(bank) class.
 
@@ -56,7 +76,7 @@ class Filter:
         self.lam_max = G.max_frequency(lap_type) if lam_max is None else lam_max
         assert self.lam_max > 0
 
-        self.kernels, self.in_channels, self.out_channels = self._check_kernels(
+        self.kernels, self.in_channels, self.out_channels = self.check_kernels(
             kernels, in_channels, out_channels
         )
         self.Ci = self.in_channels
@@ -71,13 +91,14 @@ class Filter:
             weight = torch.ones(self.Co, self.Ci, dtype=self.dtype, device=self.device)
         else:
             assert weight.shape == (self.Co, self.Ci)
-        self.weight = weight
+        self.channel_aggr_weight = weight
 
         # for Chebyshev approximation
         self.max_cheby_order = order
         self._coeff = None
 
-    def _check_kernels(self, kernels=None, Ci=None, Co=None):
+    @staticmethod
+    def check_kernels(kernels=None, Ci=None, Co=None):
         if isinstance(kernels, np.ndarray):
             if Ci is None and Co is None:
                 Co, Ci = kernels.shape
@@ -90,25 +111,6 @@ class Filter:
             single_krn = np.array([[meyer_kernel if kernels is None else kernels]])
             kernels = np.tile(single_krn, [Co, Ci])
         return kernels, Ci, Co
-
-    def _check_signal(self, x):
-        if x.dim() == 1:  # N -> 1 x N x 1
-            x = x.reshape(1, -1, 1)
-        elif x.dim() == 2:  # N x Ci -> 1 x N x Ci
-            x = x.unsqueeze(0)
-        elif x.dim() == 3:  # keep Co x N x Ci or 1 x N x Ci
-            x = x
-        else:
-            raise RuntimeError(
-                "rank-1,2,3 tensor expected, but got rank-{}".format(x.dim())
-            )
-
-        if x.shape[-2] != self.N:
-            raise RuntimeError(
-                f"The penultimate dimension of signal:{x.shape[-2]}"
-                f"!= the number of nodes: {self.N}"
-            )
-        return x.to(self.dtype)
 
     def evaluate(self, low=None, high=None, in_channels=None, out_channels=None):
         if low is None:
@@ -150,7 +152,7 @@ class Filter:
         return fre_response
 
     def filter(self, x):
-        x = self._check_signal(x)  # (Co,N,Ci)
+        x = check_signal(x, self.N, dtype=self.dtype)  # (Co,N,Ci)
         U = self.G.U()
         response = self.evaluate()  # (Co,Ci,N)
         gft_coeff = U.t() @ x  # (Co,N,Ci)
@@ -183,7 +185,7 @@ class Filter:
                 f"The coefficients of Chebyshev polynomials beyond "
                 f"order {self.order} are not computed"
             )
-        x = self._check_signal(x)
+        x = check_signal(x, self.N, dtype=self.dtype)
         coeff = self.cheby_coefficients[:, :, : order + 1]  # Co x Ci x K+1
         out = cheby_op(x, self.G.L(self.lap_type), coeff, self.lam_max)  # Co x N X Ci
         return out
@@ -208,18 +210,16 @@ class Filter:
         """
         out = self.cheby_filter(x) if cheby else self.filter(x)
         # (Co, N ,Ci) @ (Co, Ci, 1) = (Co, N, 1)
-        out_aggr = out @ self.weight[:, :, None]
+        out_aggr = out @ self.channel_aggr_weight[:, :, None]
         return out_aggr.permute(1, 0, 2).squeeze_()
 
     def __repr__(self):
         info = (
-            self.__class__.__name__ + "(lap_type={} ,in_channels={}, out_channels={}, "
-            "N={},\nkernels:\n{})".format(
-                self.lap_type,
-                self.in_channels,
-                self.out_channels,
-                self.N,
-                get_kernel_name(self.kernels, True),
-            )
+            f"{self.__class__.__name__}"
+            f"(lap_type={self.lap_type}, in_channels={self.in_channels},"
+            f" out_channels={self.out_channels}, N={self.N},\n"
+            f"kernels:\n"
+            f"{get_kernel_name(self.kernels, True)})"
         )
+
         return info

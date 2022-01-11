@@ -1,9 +1,11 @@
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 from scipy.sparse import lil_matrix
 from torch_sparse import SparseTensor
 
 from thgsp.alg.coloring import dsatur
-from thgsp.typing import Dict, List, Optional, Tuple, VertexColor
+from thgsp.typing import VertexColor
 
 from ._utils import bipartite_mask, distribute_color, new_order
 
@@ -11,7 +13,7 @@ from ._utils import bipartite_mask, distribute_color, new_order
 def harary(
     A: SparseTensor, vtx_color: Optional[VertexColor] = None, threshold: float = 0.97
 ) -> Tuple[List[lil_matrix], np.ndarray, np.ndarray, np.ndarray, Dict[int, int]]:
-    r"""
+    """
     Harary bipartite decomposition
 
     Parameters
@@ -27,11 +29,11 @@ def harary(
 
     Returns
     -------
-    bptG:    array
-        An array consisting of :obj:`M` bipartite subgraphs formatted as
-        :class:`scipy.sparse.lil_matrix`.
+    bptG:   List[lil_matrix]
+            An array consisting of :obj:`M` bipartite subgraphs formatted
+            as :class:`scipy.sparse.lil_matrix`
     beta:   array
-        :obj:`beta[:,i]` is the bipartite set indicator of :obj:`i`-th subgraph.
+        :obj:`beta[:,i]` is the bipartite set indicator of :obj:`i`-th subgraph
     beta_dist:  array
         A table showing the relationship between :obj:`beta` and  :obj:`channels`
     new_vtx_color:  array

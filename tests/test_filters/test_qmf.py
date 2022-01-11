@@ -64,7 +64,7 @@ class TestQmfCore:
         Bs = [rand_udg(N, dtype=dtype, device=device) for _ in range(M)]
         beta_np = np.random.rand(N, M) > 0.5
 
-        qmf = QmfCore(bptG=Bs, beta=beta_np, order=K)
+        qmf = QmfCore(bipartite_graphs=Bs, beta=beta_np, order=K)
         assert qmf.coefficient_a.shape == (M, 2 ** M, 1, K + 1)
         assert qmf.coefficient_a.shape == qmf.coefficient_s.shape
 
@@ -112,15 +112,13 @@ class TestQmfCore:
 
         beta = torch.stack(beta).T
 
-        qmf = QmfCore(bptG=Bs, beta=beta, order=K)
+        qmf = QmfCore(bipartite_graphs=Bs, beta=beta, order=K)
         x = torch.rand(N, dtype=dtype, device=device)
         y = qmf.analyze(x)
         assert y.shape == (2 ** M, N, 1)
 
         z = qmf.synthesize(y)
         assert z.shape == (2 ** M, N, 1)
-        # since beta and Bs are all randomly generated,
-        # the transform are not numerically valid
         assert (z.sum(0).squeeze() - x).abs().sum() != 0
 
         z.squeeze_()
@@ -139,14 +137,14 @@ class TestColorQmf:
         graph = rand_udg(N, dtype=dtype, device=device)
         ColorQmf(graph)
         ColorQmf(graph)
-        ColorQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
+        ColorQmf(graph, in_channels=3, zero_dc=True, strategy=strategy)
 
     @pytest.mark.parametrize("Ci", [5])
     def test_transform(self, dtype, device, strategy, Ci):
         N = 60
         graph = rand_udg(N, device=device, dtype=dtype)
         qmf = ColorQmf(graph, strategy=strategy, in_channels=1)
-        M = qmf.M
+        M = qmf.num_bgraph
         f = torch.rand(N, Ci, device=device, dtype=dtype)
         y = qmf.analyze(f)
         z = qmf.synthesize(y)
@@ -171,14 +169,14 @@ class TestNumQMf:
         ray.init(num_cpus=RAY_NUM_CPUS, log_to_driver=False, ignore_reinit_error=True)
 
         graph = rand_udg(N, dtype=dtype, device=device)
-        f1 = NumQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
+        f1 = NumQmf(graph, in_channels=3, zero_dc=True, strategy=strategy)
         print(f1)
 
     @pytest.mark.parametrize("M", [1, 2])
     def test_transform(self, dtype, device, strategy, M, N):
         ray.init(num_cpus=2, log_to_driver=False, ignore_reinit_error=True)
         graph = rand_udg(N, device=device, dtype=dtype)
-        qmf = NumQmf(graph, strategy=strategy, M=M)
+        qmf = NumQmf(graph, strategy=strategy, level=M)
         f = torch.rand(N, device=device, dtype=dtype)
         y = qmf.analyze(f)
         z = qmf.synthesize(y)
@@ -199,7 +197,7 @@ def test_single():
     N = 32 * 3
     strategy = "admm"
     graph = rand_udg(N)
-    f1 = NumQmf(graph, in_channels=3, zeroDC=True, strategy=strategy)
+    f1 = NumQmf(graph, in_channels=3, zero_dc=True, strategy=strategy)
     print(f1)
 
 
@@ -217,7 +215,7 @@ class TestBiorthCore:
         assert bio.coefficient_a.shape == (M, 2 ** M, 1, K + 1)
         assert bio.coefficient_a.shape == bio.coefficient_s.shape
 
-        bio = BiorthCore(Bs, torch.as_tensor(beta_np), in_channels=3, zeroDC=True)
+        bio = BiorthCore(Bs, torch.as_tensor(beta_np), in_channels=3, zero_dc=True)
         # 16 is the default order of approximation
         assert bio.coefficient_a.shape == (M, 2 ** M, 3, 16 + 1)
 
@@ -247,13 +245,14 @@ class TestColorBiorth:
         graph = rand_udg(N, dtype=dtype, device=device)
         ColorBiorth(graph)
         ColorBiorth(graph)
-        ColorBiorth(graph, in_channels=3, strategy=strategy, zeroDC=True)
+        ColorBiorth(graph, in_channels=3, strategy=strategy, zero_dc=True)
 
-    def test_transform(self, dtype, device, strategy):
+    @pytest.mark.parametrize("zero_dc", [True, False])
+    def test_transform(self, dtype, device, strategy, zero_dc):
         N = 100
         graph = rand_udg(N, device=device, dtype=dtype)
         bio = ColorBiorth(graph, strategy=strategy)
-        M = bio.M
+        M = bio.num_bgraph
 
         f = torch.rand(N, device=bio.device, dtype=bio.dtype)
         y = bio.analyze(f)
@@ -279,7 +278,7 @@ class TestNumBiorth:
         ray.init(num_cpus=2, log_to_driver=False, ignore_reinit_error=True)
         graph = rand_udg(N, dtype=dtype, device=device)
         NumBiorth(graph)
-        NumBiorth(graph, in_channels=3, zeroDC=True, strategy=strategy)
+        NumBiorth(graph, in_channels=3, zero_dc=True, strategy=strategy)
 
     @pytest.mark.parametrize("M", [1, 2])
     @pytest.mark.parametrize("part", partition_strategy)
@@ -296,7 +295,7 @@ class TestNumBiorth:
             kwargs["part"] = part
 
         graph = rand_udg(N, device=device, dtype=dtype)
-        bio = NumBiorth(graph, strategy=strategy, M=M, **kwargs)
+        bio = NumBiorth(graph, strategy=strategy, level=M, **kwargs)
         f = torch.randn(N, device=device, dtype=dtype)
         y = bio.analyze(f)
         z = bio.synthesize(y)
@@ -332,7 +331,6 @@ class TestQmfWaveletBasis:
 
         basis = QmfOperator(bptG, beta, order=4, device=device)
         x = torch.ones(N, 1, dtype=dtype, device=device)
-        y = basis.transform(x)
         y = basis(x)
         z = basis.inverse_transform(y)
         print("\nsnr: ", snr(z.permute(-1, -2), x.permute(-1, -2)).item(), "dB.")
@@ -370,7 +368,8 @@ class TestBiorWaveletBasis:
         print("dis: ", (z - x).abs().sum())
         self.display_density(basis.operator, basis.inv_operator)
 
-    def display_density(self, op, inv_op):
+    @staticmethod
+    def display_density(op, inv_op):
         print("Ta       density: ", op.density())
         print("Ta^-1    density: ", inv_op.density())
 

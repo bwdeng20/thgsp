@@ -1,4 +1,5 @@
 from functools import partial
+from typing import List, Optional, Union
 
 import numpy as np
 import torch
@@ -17,9 +18,10 @@ from thgsp.bga import (
     osglm,
 )
 from thgsp.graphs import Graph
-from thgsp.typing import KernelType, List, Optional, Tensor, Tuple, Union, VertexColor
+from thgsp.typing import KernelType, Tensor, VertexColor
 
 from .approximation import cheby_coeff, cheby_op, cheby_op_basis, polyval
+from .filter import check_signal
 from .kernels import (
     design_biorth_kernel,
     get_kernel_name,
@@ -38,9 +40,9 @@ class QmfCore:
 
     Attributes
     ----------
-    N: int
+    num_node: int
         The number of nodes.
-    M: int
+    num_bgraph: int
         The number of bipartite (sub)graphs.
     beta: (Bool)Tensor(N,M)
         Each column of :attr:`beta` corresponds to one bipartite (sub)graph It has ones
@@ -71,8 +73,8 @@ class QmfCore:
         The order of Chebyshev approximation.
     lam_max: float, optional
         Compute the Chebyshev approximation within the interval :obj:`[0, lam_max]`.
-    zeroDC: bool, optional
-         If True, the zeroDC filter bank is employed.
+    zero_dc: bool, optional
+         If True, the zero_dc filter bank is employed.
 
     References
     ----------
@@ -85,50 +87,50 @@ class QmfCore:
 
     def __init__(
         self,
-        bptG: List[SparseTensor],
-        beta: Tensor,
+        bipartite_graphs: List[SparseTensor],
+        beta: Union[Tensor, np.ndarray],
         analyze_kernels: Optional[KernelType] = None,
         synthesis_kernels: Optional[KernelType] = None,
         in_channels: int = 1,
         order: int = 24,
         lam_max: float = 2.0,
-        zeroDC: bool = False,
+        zero_dc: bool = False,
     ):
-        if len(bptG) != beta.shape[-1]:
+        if len(bipartite_graphs) != beta.shape[-1]:
             raise RuntimeError(
-                f"Mismatch of # ({len(bptG)}) of bipartite graphs "
+                f"Mismatch of # ({len(bipartite_graphs)}) of bipartite graphs "
                 f"and # ({beta.shape[-1]}) of bipartite indicators"
             )
-        if bptG[0].size(-1) != beta.shape[0]:
+        if bipartite_graphs[0].size(-1) != beta.shape[0]:
             raise RuntimeError(
-                f"Mismatch of # of nodes ({bptG[0].size(-1)}!={beta.shape[0]})"
+                f"Mismatch of # of nodes "
+                f"({bipartite_graphs[0].size(-1)}!={beta.shape[0]})"
             )
-        if not lam_max > 0:
+        if lam_max <= 0:
             raise ValueError(
                 f"The maximal eigenvalue ({lam_max}) of graph operator "
                 f"adopted by QMF and Biorth has to be positive "
             )
-        if not order > 0:
-            raise ValueError(f"The order of Chebyshev approximation has to be positive")
+        if order <= 0:
+            raise ValueError("The order of Chebyshev approximation has to be positive")
 
-        self.N, self.M = beta.shape
-        self.in_channels = self.Ci = in_channels
-
-        self.bptG = bptG
+        self.num_node, self.num_bgraph = beta.shape
+        self.in_channels = in_channels
         self.beta = beta
 
         self.order = order
-        self.dtype = bptG[0].dtype()
-        self.device = bptG[0].device()
+        self.dtype = bipartite_graphs[0].dtype()
+        self.device = bipartite_graphs[0].device()
 
         self.lam_max = lam_max
-        self.zeroDC = zeroDC
+        self.zero_dc = zero_dc
 
-        self.bptL, self.bptD05 = self.compute_laplace(bptG)
+        self.bipartite_laplacian, self.bipartite_neg05pow = self.compute_laplace(
+            bipartite_graphs, zero_dc=zero_dc, device=self.device
+        )
         self.channel_mask, self.beta_dist = beta2channel_mask(beta)
         self.channel_mask = self.channel_mask.to(self.device)
         self.out_channels, _ = self.beta_dist.shape
-        self.Co = self.out_channels  # alias of out_channels
         self.channel_name = beta_dist2channel_name(self.beta_dist)
 
         self.kernel_a = self.parse_kernels(analyze_kernels)
@@ -136,8 +138,8 @@ class QmfCore:
 
         self.coefficient_a = cheby_coeff(
             self.kernel_a,
-            lam_max=lam_max,
             K=order,
+            lam_max=lam_max,
             dtype=self.dtype,
             device=self.device,
         )
@@ -147,37 +149,45 @@ class QmfCore:
         else:  # GraphBiorth
             self.coefficient_s = cheby_coeff(
                 self.kernel_s,
-                lam_max=lam_max,
                 K=order,
+                lam_max=lam_max,
                 dtype=self.dtype,
                 device=self.device,
             )
 
-    def compute_laplace(self, bptG):
-        bptL = []
-        N = bptG[0].size(-1)
-        bptD05 = (
-            torch.zeros(self.M, self.N, device=self.device) if self.zeroDC else None
+    @staticmethod
+    def compute_laplace(
+        bipartite_graphs: List[SparseTensor],
+        zero_dc: bool = False,
+        device: Optional[Union[torch.device, int, str]] = None,
+    ):
+        bipartite_laplacian = []
+        num_bgraph = len(bipartite_graphs)
+        num_node = bipartite_graphs[0].size(-1)
+        bipartite_neg05pow = (
+            torch.zeros(num_bgraph, num_node, device=device) if zero_dc else None
         )
-        loop_index = torch.arange(N, device=self.device).unsqueeze_(0)
-        for i, adj in enumerate(bptG):
+        loop_index = torch.arange(num_node, device=device).unsqueeze_(0)
+        for i, adj in enumerate(bipartite_graphs):
             deg = adj.sum(0)
             row, col, val = adj.clone().coo()
             deg05 = deg.pow(-0.5)
-            if self.zeroDC:
+            if zero_dc:
                 deg05dc = deg05.clone().detach()
                 deg05dc[deg05dc == float("inf")] = 1
-                bptD05[i] = deg05dc
+                bipartite_neg05pow[i] = deg05dc
 
             deg05[deg05 == float("inf")] = 0
             wgt = deg05[row] * val * deg05[col]
-            wgt = torch.cat([-wgt.unsqueeze_(0), val.new_ones(1, N)], 1).squeeze_()
+            wgt = torch.cat(
+                [-wgt.unsqueeze_(0), val.new_ones(1, num_node)], 1
+            ).squeeze_()
 
             row = torch.cat([row.unsqueeze_(0), loop_index], 1).squeeze_()
             col = torch.cat([col.unsqueeze_(0), loop_index], 1).squeeze_()
             lap = SparseTensor(row=row, col=col, value=wgt)
-            bptL.append(lap)
-        return bptL, bptD05
+            bipartite_laplacian.append(lap)
+        return bipartite_laplacian, bipartite_neg05pow
 
     def parse_kernels(self, raw_kernels):
         if raw_kernels is None:
@@ -189,7 +199,11 @@ class QmfCore:
 
         # a complete np.ndarray of kernels(functions)
         elif isinstance(raw_kernels, np.ndarray):
-            assert raw_kernels.shape == (self.M, self.Co, self.Ci)
+            assert raw_kernels.shape == (
+                self.num_bgraph,
+                self.out_channels,
+                self.in_channels,
+            )
             kernel = raw_kernels
 
         else:
@@ -199,7 +213,7 @@ class QmfCore:
     def kernel_array_from_beta_dist(self, kernel1, kernel2):
         f1c = np.where(self.beta_dist, kernel1, kernel2)
         f1c = np.transpose(f1c)
-        return np.stack([f1c] * self.Ci, axis=-1)
+        return np.stack([f1c] * self.in_channels, axis=-1)
 
     def empty_channels(self):
         empty_channels = (self.channel_mask.sum(1) == 0).nonzero().view(-1)
@@ -220,42 +234,35 @@ class QmfCore:
                 self.lam_max,
                 self.out_channels,
                 len(self.not_empty_channels()),
-                self.N,
+                self.num_node,
                 get_kernel_name(self.kernel_a[0], True),
                 get_kernel_name(self.kernel_s[0], True),
             )
         )
         return info
 
-    def _check_signal(self, x):
-        if x.dim() == 1:  # N -> 1 x  N x 1
-            x = x.reshape(1, -1, 1)
-        elif x.dim() == 2:  # N x Ci -> 1 x N x Ci
-            x = x.unsqueeze(0)
-        elif x.dim() == 3:  # keep Co x N x Ci or 1 x N x Ci # Check for synthesis
-            x = x
-        else:
-            raise RuntimeError(
-                "rank-1,2,3 tensor expected, but got rank-{}".format(x.dim())
-            )
-
-        if x.shape[-2] != self.N:
-            raise RuntimeError(
-                f"The penultimate dimension of signal:{x.shape[-2]}!= the number of "
-                f"nodes: {self.N}"
-            )
-
-        return x.to(self.dtype)
-
     def _analyze(self, x):
         y = x  # Co x N x Ci
-        for g in range(self.M):
-            y = self.bptD05[g].pow(-1) * y if self.zeroDC else y
-            y = cheby_op(y, self.bptL[g], self.coefficient_a[g], lam_max=self.lam_max)
+        for g in range(self.num_bgraph):
+            y = (
+                self.bipartite_neg05pow[g].pow(-1).view(1, -1, 1) * y
+                if self.zero_dc
+                else y
+            )
+            y = cheby_op(
+                y,
+                self.bipartite_laplacian[g],
+                self.coefficient_a[g],
+                lam_max=self.lam_max,
+            )
         # Co x N --> Co x N x 1 for broadcast 'masked_fill_'
         mask = self.channel_mask.unsqueeze(-1)
         y.masked_fill_(~mask, 0)
         return y
+
+    def before_analyze(self, x):
+        x = check_signal(x, self.num_node, self.dtype)
+        return x
 
     def analyze(self, x):
         """Conduct a wavelet transform on the input signal.
@@ -278,28 +285,41 @@ class QmfCore:
             The wavelet coefficients with a shape of :obj:`(Co,N,Ci)` or equally
             :obj:`(2^M,N,Ci)`. :attr:`M` is the # of output channels.
         """
-        x = self._check_signal(x)
+        x = self.before_analyze(x)
         return self._analyze(x)
 
     def _synthesize(self, y):
         z = y
         # M-1, M-2, ..., 0 totally M bipartite graphs
-        for g in range(self.M - 1, -1, -1):
-            z = cheby_op(z, self.bptL[g], self.coefficient_s[g], lam_max=self.lam_max)
-            z = self.bptD05[g] * z if self.zeroDC else z
+        for g in range(self.num_bgraph - 1, -1, -1):
+            z = cheby_op(
+                z,
+                self.bipartite_laplacian[g],
+                self.coefficient_s[g],
+                lam_max=self.lam_max,
+            )
+            z = self.bipartite_neg05pow[g].view(1, -1, 1) * z if self.zero_dc else z
         return z  # Co x N x Ci
 
+    def before_synthesize(self, y):  # noqa
+        return y
+
+    def after_synthesize(self, z):  # noqa
+        return z
+
     def synthesize(self, y):
-        y = self._check_signal(y)
-        return self._synthesize(y)
+        y = self.before_synthesize(y)
+        z = self._synthesize(y)
+        z = self.after_synthesize(z)
+        return z
 
 
 class QmfOperator:
-    def __init__(self, bptG, beta, order=24, lam_max=2.0, device=None):
+    def __init__(self, bipartite_graphs, beta, order=24, lam_max=2.0, device=None):
         N, M = beta.shape
-        assert len(bptG) == M
+        assert len(bipartite_graphs) == M
 
-        self.N, self.M = N, M
+        self.num_node, self.num_bgraph = N, M
         self.order = order
         self.device = device
         self.lam_max = lam_max
@@ -309,7 +329,7 @@ class QmfOperator:
         # (1,2,1,K) --> (2,K)
         coeff = cheby_coeff(krn, K=order, lam_max=lam_max).squeeze_()
 
-        operator = self.compute_basis(bptG, coeff, beta, lam_max)
+        operator = self.compute_basis(bipartite_graphs, coeff, beta, lam_max)
         self.operator = SparseTensor.from_scipy(operator).to(device)
 
         self.dtype = self.operator.dtype()
@@ -322,23 +342,25 @@ class QmfOperator:
         return self.operator.t() @ y
 
     @staticmethod
-    def compute_basis(bptG, coeff, beta, lam_max):
-        M = len(bptG)
-        dt = bptG[0].dtype
+    def compute_basis(bipartite_graphs, coeff, beta, lam_max):
+        M = len(bipartite_graphs)
+        dt = bipartite_graphs[0].dtype
         beta = np.asarray(beta, dtype=dt)
         beta = 1 - beta * 2
 
-        bptL = [laplace(B, lap_type="sym", add_loop=True) for B in bptG]
+        bipartite_laplacian = [
+            laplace(B, lap_type="sym", add_loop=True) for B in bipartite_graphs
+        ]
 
-        H0 = cheby_op_basis(bptL[0], coeff[0], lam_max)
-        H1 = cheby_op_basis(bptL[0], coeff[1], lam_max)
+        H0 = cheby_op_basis(bipartite_laplacian[0], coeff[0], lam_max)
+        H1 = cheby_op_basis(bipartite_laplacian[0], coeff[1], lam_max)
         t1 = H0 + H1
         t2 = H1 - H0
         Ta = t1 + diags(beta[:, 0]) * t2
 
         for i in range(1, M):
-            H0 = cheby_op_basis(bptL[i], coeff[0], lam_max)
-            H1 = cheby_op_basis(bptL[i], coeff[1], lam_max)
+            H0 = cheby_op_basis(bipartite_laplacian[i], coeff[0], lam_max)
+            H1 = cheby_op_basis(bipartite_laplacian[i], coeff[1], lam_max)
             t1 = H0 + H1
             t2 = H1 - H0
             Ta_sub = t1 + diags(beta[:, i]) * t2
@@ -351,8 +373,8 @@ class QmfOperator:
 
 
 class BiorthOperator:
-    def __init__(self, bptG, beta, k=4, lam_max=2.0, device=None):
-        h0_c, g0_c, orthogonality = design_biorth_kernel(k)
+    def __init__(self, bipartite_graphs, beta, k=4, lam_max=2.0, device=None):
+        h0_c, g0_c, self.orthogonality = design_biorth_kernel(k)
         h0 = partial(polyval, torch.from_numpy(h0_c))
         h0.__name__ = "h0"
         g0 = partial(polyval, torch.from_numpy(g0_c))
@@ -364,7 +386,6 @@ class BiorthOperator:
         def g1(x):
             return h0(2 - x)
 
-        self.orthogonality = orthogonality
         self.analysis_krn = np.array([[[h0], [h1]]])
 
         self.synthesis_krn = np.array([[[g0], [g1]]])
@@ -376,10 +397,12 @@ class BiorthOperator:
             self.synthesis_krn, K=2 * k, lam_max=lam_max
         ).squeeze_()  # (1,2,1,K) --> (2,K)
 
-        operator = QmfOperator.compute_basis(bptG, ana_coeff, beta, lam_max)
+        operator = QmfOperator.compute_basis(bipartite_graphs, ana_coeff, beta, lam_max)
         self.operator = SparseTensor.from_scipy(operator).to(device)
 
-        inv_operator = QmfOperator.compute_basis(bptG, syn_coeff, beta, lam_max)
+        inv_operator = QmfOperator.compute_basis(
+            bipartite_graphs, syn_coeff, beta, lam_max
+        )
         self.inv_operator = SparseTensor.from_scipy(inv_operator).to(device)
 
     def transform(self, x):
@@ -389,7 +412,78 @@ class BiorthOperator:
         return self.inv_operator.t() @ y
 
 
-class ColorQmf(QmfCore):
+class ColoringBGA:
+    def get_bga(self, adj, strategy, vtx_color, **kwargs):
+        dv = adj.device()
+        if strategy == "harary":
+            bipartite_graphs, beta, beta_dist, new_vtx_color, mapper = harary(
+                adj, vtx_color=vtx_color, **kwargs
+            )
+        elif strategy == "osglm":
+            bipartite_graphs, beta, append_nodes, new_vtx_color = osglm(
+                adj, vtx_color=vtx_color, **kwargs
+            )
+            self.append_nodes = append_nodes  # noqa
+        else:
+            raise RuntimeError(
+                f"{strategy} is not a valid color-based decomposition algorithm."
+            )
+        self.vtx_color = new_vtx_color  # noqa
+        self.num_node = adj.size(-1)  # noqa
+        self.strategy = strategy  # noqa
+        self.dtype = adj.dtype()  # noqa
+        bipartite_graphs = [SparseTensor.from_scipy(B).to(dv) for B in bipartite_graphs]
+        return bipartite_graphs, beta
+
+    def before_analyze(self, x):
+        x = check_signal(x, self.num_node, self.dtype)
+        if self.strategy == "osglm":
+            x_append = x[:, self.append_nodes, :]
+            x = torch.cat([x, x_append], 1)
+        return x
+
+    def after_synthesize(self, z):
+        if self.strategy == "osglm":
+            z = z[:, : self.num_node, :]
+        return z
+
+
+class NumericalBGA:
+    @staticmethod
+    def get_bga(adj, strategy, num_bgraph, **kwargs):
+        num_node = adj.size(-1)
+        dv = adj.device()
+        if strategy == "admm":
+            if num_node < 80:
+                bipartite_graphs_dense = admm_bga(
+                    adj.to_dense().to(torch.double), M=num_bgraph, **kwargs
+                )
+                beta = torch.zeros(num_node, num_bgraph, dtype=torch.bool, device=dv)
+                bipartite_graphs = []
+                for i, B in enumerate(bipartite_graphs_dense):
+                    _, vtx_color, _ = is_bipartite_fix(B, fix_flag=True)
+                    beta[:, i] = torch.as_tensor(vtx_color)
+                    bipartite_graphs.append(SparseTensor.from_dense(B))
+                return bipartite_graphs, beta
+
+            else:
+                bipartite_graphs, beta, partptr, perm = admm_lbga_ray(
+                    adj, num_bgraph, **kwargs
+                )
+
+        elif strategy == "amfs":
+            bipartite_graphs, beta = amfs(adj, level=num_bgraph, **kwargs)
+
+        else:
+            raise RuntimeError(
+                f"{str(strategy)} is not a valid numerical decomposition algorithm "
+                f"supported at present."
+            )
+        bipartite_graphs = [SparseTensor.from_scipy(B).to(dv) for B in bipartite_graphs]
+        return bipartite_graphs, beta
+
+
+class ColorQmf(ColoringBGA, QmfCore):
     def __init__(
         self,
         G: Graph,
@@ -399,126 +493,34 @@ class ColorQmf(QmfCore):
         strategy: str = "harary",
         vtx_color: Optional[VertexColor] = None,
         lam_max: float = 2.0,
-        zeroDC: bool = False,
+        zero_dc: bool = False,
         **kwargs,
     ):
-        self.adj = G
-        self.strategy = strategy
-
-        if strategy == "harary":
-            bptG, beta, beta_dist, vtx_color, mapper = harary(
-                self.adj, vtx_color=vtx_color, **kwargs
-            )
-        elif strategy == "osglm":
-            bptG, beta, append_nodes, vtx_color = osglm(
-                self.adj, vtx_color=vtx_color, **kwargs
-            )
-            self.append_nodes = append_nodes
-        else:
-            raise RuntimeError(
-                f"{strategy} is not a valid color-based decomposition algorithm."
-            )
-        self.vtx_color = vtx_color
-
-        bptG = [SparseTensor.from_scipy(B).to(G.device()) for B in bptG]
-
-        super(ColorQmf, self).__init__(
-            bptG,
-            torch.from_numpy(beta),
-            analyze_kernels=kernel,
-            in_channels=in_channels,
-            order=order,
-            lam_max=lam_max,
-            zeroDC=zeroDC,
-        )
-        self.N = self.adj.size(-1)  # osglm compatible
-
-    def analyze(self, x):
-        x = self._check_signal(x)
-        if self.strategy == "osglm":
-            x_append = x[:, self.append_nodes, :]
-            x = torch.cat([x, x_append], 1)
-        return self._analyze(x)
-
-    def synthesize(self, y):
-        z = self._synthesize(y)
-        if self.strategy == "osglm":
-            z = z[:, : self.N, :]
-        return z
-
-
-class NumQmf(QmfCore):
-    def __init__(
-        self,
-        G: Graph,
-        kernel: np.ndarray = None,
-        in_channels: int = 1,
-        order: int = 24,
-        strategy: str = "admm",
-        M: int = 1,
-        lam_max: float = 2.0,
-        zeroDC: bool = False,
-        **kwargs,
-    ):
-        self.adj = G
-        N = self.adj.size(-1)
-        self.strategy = strategy
-        self.M = M
-
-        device = self.adj.device()
-        dtype = self.adj.dtype()
-        if strategy == "admm":
-            if N < 80:
-                bptG_dense = admm_bga(
-                    self.adj.to_dense().to(torch.double), M=M, **kwargs
-                )
-                beta = bptG_dense.new_zeros(N, M, dtype=bool)
-                bptG_dense = bptG_dense.to(dtype).to(device)
-                bptG = []
-                for i, B in enumerate(bptG_dense):
-                    _, vtx_color, _ = is_bipartite_fix(B, fix_flag=True)
-                    beta[:, i] = torch.as_tensor(vtx_color)
-                    bptG.append(SparseTensor.from_dense(B))
-
-            else:
-                bptG, beta, self.partptr, self.perm = admm_lbga_ray(
-                    self.adj, M, **kwargs
-                )
-                bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
-
-        elif strategy == "amfs":
-            bptG, beta = amfs(self.adj, level=self.M, **kwargs)
-            bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
-
-        else:
-            raise RuntimeError(
-                f"{str(strategy)} is not a valid numerical decomposition algorithm "
-                f"supported at present."
-            )
-
-        super(NumQmf, self).__init__(
-            bptG,
+        bipartite_graphs, beta = self.get_bga(G, strategy, vtx_color, **kwargs)
+        super().__init__(
+            bipartite_graphs,
             beta,
             analyze_kernels=kernel,
             in_channels=in_channels,
             order=order,
             lam_max=lam_max,
-            zeroDC=zeroDC,
+            zero_dc=zero_dc,
         )
+        self.num_node = G.size(-1)  # osglm compatible
 
 
 class BiorthCore(QmfCore):
     def __init__(
         self,
-        bptG: List[SparseTensor],
-        beta: Tensor,
+        bipartite_graphs: List[SparseTensor],
+        beta: Union[Tensor, np.ndarray],
         k: int = 8,
         in_channels: int = 1,
         order: int = 16,
         lam_max: float = 2.0,
-        zeroDC: bool = False,
+        zero_dc: bool = False,
     ):
-        h0_c, g0_c, orthogonality = design_biorth_kernel(k)
+        h0_c, g0_c, self.orthogonality = design_biorth_kernel(k)
         h0 = partial(polyval, torch.from_numpy(h0_c))
         h0.__name__ = "h0"
         g0 = partial(polyval, torch.from_numpy(g0_c))
@@ -530,16 +532,15 @@ class BiorthCore(QmfCore):
         def g1(x):
             return h0(2 - x)
 
-        self.orthogonality = orthogonality
-        super(BiorthCore, self).__init__(
-            bptG,
+        super().__init__(
+            bipartite_graphs,
             beta,
             analyze_kernels=(h0, h1),
             synthesis_kernels=(g0, g1),
             in_channels=in_channels,
             order=order,
             lam_max=lam_max,
-            zeroDC=zeroDC,
+            zero_dc=zero_dc,
         )
 
     def __repr__(self):
@@ -548,7 +549,7 @@ class BiorthCore(QmfCore):
         return info + "\n)"
 
 
-class ColorBiorth(BiorthCore):
+class ColorBiorth(ColoringBGA, BiorthCore):
     def __init__(
         self,
         G: Graph,
@@ -558,50 +559,74 @@ class ColorBiorth(BiorthCore):
         strategy: str = "harary",
         vtx_color: VertexColor = None,
         lam_max: float = 2.0,
-        zeroDC: bool = False,
+        zero_dc: bool = False,
         **kwargs,
     ):
-        self.adj = G
-        self.lam_max = lam_max
-        self.strategy = strategy
-
-        if strategy == "harary":
-            bptG, beta, beta_dist, vtx_color, mapper = harary(
-                self.adj, vtx_color=vtx_color, **kwargs
-            )
-        elif strategy == "osglm":
-            bptG, beta, append_nodes, vtx_color = osglm(
-                self.adj, vtx_color=vtx_color, **kwargs
-            )
-            self.append_nodes = append_nodes
-        else:
-            raise RuntimeError(
-                f"{strategy} is not a valid color-based decomposition algorithm."
-            )
-        self.vtx_color = vtx_color
-
-        bptG = [SparseTensor.from_scipy(B).to(G.device()) for B in bptG]
-
-        super(ColorBiorth, self).__init__(
-            bptG, beta, k, in_channels, order, lam_max, zeroDC
+        bipartite_graphs, beta = self.get_bga(G, strategy, vtx_color, **kwargs)
+        super().__init__(
+            bipartite_graphs,
+            beta,
+            k=k,
+            in_channels=in_channels,
+            order=order,
+            lam_max=lam_max,
+            zero_dc=zero_dc,
         )
-        self.N = self.adj.size(-1)  # osglm compatible
-
-    def analyze(self, x):
-        x = self._check_signal(x)
-        if self.strategy == "osglm":
-            x_append = x[:, self.append_nodes, :]
-            x = torch.cat([x, x_append], 1)
-        return self._analyze(x)
-
-    def synthesize(self, y):
-        z = self._synthesize(y)
-        if self.strategy == "osglm":
-            z = z[:, : self.N, :]
-        return z
+        self.num_node = G.size(-1)  # osglm compatible
 
 
-class NumBiorth(BiorthCore):
+class NumQmf(NumericalBGA, QmfCore):
+    def __init__(
+        self,
+        G: Graph,
+        kernel: np.ndarray = None,
+        in_channels: int = 1,
+        order: int = 24,
+        strategy: str = "admm",
+        level: int = 1,
+        lam_max: float = 2.0,
+        zero_dc: bool = False,
+        **kwargs,
+    ):
+        bipartite_graphs, beta = self.get_bga(G, strategy, level, **kwargs)
+        super().__init__(
+            bipartite_graphs,
+            beta,
+            analyze_kernels=kernel,
+            in_channels=in_channels,
+            order=order,
+            lam_max=lam_max,
+            zero_dc=zero_dc,
+        )
+
+
+class NumBiorth(NumericalBGA, BiorthCore):
+    def __init__(
+        self,
+        G: Graph,
+        k: int = 8,
+        in_channels: int = 1,
+        order: int = 24,
+        strategy: str = "admm",
+        level: int = 1,
+        lam_max: float = 2.0,
+        zero_dc: bool = False,
+        **kwargs,
+    ):
+        bipartite_graphs, beta = self.get_bga(G, strategy, level, **kwargs)
+
+        super().__init__(
+            bipartite_graphs,
+            beta,
+            k=k,
+            in_channels=in_channels,
+            order=order,
+            lam_max=lam_max,
+            zero_dc=zero_dc,
+        )
+
+
+class NumBiorth1(BiorthCore):
     def __init__(
         self,
         G: Graph,
@@ -609,41 +634,47 @@ class NumBiorth(BiorthCore):
         in_channels: int = 1,
         order: int = 16,
         strategy: str = "admm",
-        M: int = 1,
+        level: int = 1,
         lam_max: float = 2.0,
-        zeroDC: bool = False,
+        zero_dc: bool = False,
         **kwargs,
     ):
         self.adj = G
         N = self.adj.size(-1)
         self.lam_max = lam_max
         self.strategy = strategy
-        self.M = M
+        self.num_bgraph = level
 
         device = self.adj.device()
         dtype = self.adj.dtype()
         if strategy == "admm":
             if N < 80:
-                bptG_dense = admm_bga(
-                    self.adj.to_dense().to(torch.double), M=M, **kwargs
+                bipartite_graphs_dense = admm_bga(
+                    self.adj.to_dense().to(torch.double), M=level, **kwargs
                 )
-                beta = bptG_dense.new_zeros(N, M, dtype=bool)
-                bptG = []
-                bptG_dense = bptG_dense.to(dtype).to(device)
-                for i, B in enumerate(bptG_dense):
+                beta = bipartite_graphs_dense.new_zeros(N, level).to(torch.bool)
+                bipartite_graphs = []
+                bipartite_graphs_dense = bipartite_graphs_dense.to(dtype).to(device)
+                for i, B in enumerate(bipartite_graphs_dense):
                     _, vtx_color, _ = is_bipartite_fix(B, fix_flag=True)
                     beta[:, i] = torch.as_tensor(vtx_color)
-                    bptG.append(SparseTensor.from_dense(B))
+                    bipartite_graphs.append(SparseTensor.from_dense(B))
 
             else:
-                bptG, beta, self.partptr, self.perm = admm_lbga_ray(
-                    self.adj, M, **kwargs
+                bipartite_graphs, beta, self.partptr, self.perm = admm_lbga_ray(
+                    self.adj, level, **kwargs
                 )
-                bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
+                bipartite_graphs = [
+                    SparseTensor.from_scipy(B).to(dtype).to(device)
+                    for B in bipartite_graphs
+                ]
 
         elif strategy == "amfs":
-            bptG, beta = amfs(self.adj, level=self.M, **kwargs)
-            bptG = [SparseTensor.from_scipy(B).to(dtype).to(device) for B in bptG]
+            bipartite_graphs, beta = amfs(self.adj, level=self.num_bgraph, **kwargs)
+            bipartite_graphs = [
+                SparseTensor.from_scipy(B).to(dtype).to(device)
+                for B in bipartite_graphs
+            ]
 
         else:
             raise RuntimeError(
@@ -651,6 +682,6 @@ class NumBiorth(BiorthCore):
                 f"algorithm supported at present."
             )
 
-        super(NumBiorth, self).__init__(
-            bptG, beta, k, in_channels, order, lam_max, zeroDC
+        super().__init__(
+            bipartite_graphs, beta, k, in_channels, order, lam_max, zero_dc
         )

@@ -1,7 +1,10 @@
+from typing import Optional
+
 import numpy as np
 from scipy.sparse import eye, lil_matrix
+from torch_sparse import SparseTensor
 
-from thgsp.typing import Optional, SparseTensor, VertexColor
+from thgsp.typing import VertexColor
 
 from ._utils import bipartite_mask
 

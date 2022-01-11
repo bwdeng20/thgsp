@@ -3,10 +3,10 @@
  <img src="./docs/source/_static/img/logo.png" width="30%"  alt="drawing"/>
 </p>
 
-[![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/building.yml/badge.svg)](http://16.162.201.90/whl/)
+[![Github Build Status](https://github.com/bwdeng20/thgsp/actions/workflows/building.yml/badge.svg)](https://wheel.torchgsp.xyz/)
 [![Github Doc Status](https://github.com/bwdeng20/thgsp/actions/workflows/doc.yml/badge.svg)](https://bwdeng20.github.io/thgsp)
-[![Linting](https://github.com/bwdeng20/thgsp/actions/workflows/linting.yml/badge.svg)]()
-[![Testing](https://github.com/bwdeng20/thgsp/actions/workflows/testing.yml/badge.svg)]()
+[![Linting](https://github.com/bwdeng20/thgsp/actions/workflows/linting.yml/badge.svg?branch=main)](https://github.com/bwdeng20/thgsp/actions/workflows/linting.yml)
+[![Testing](https://github.com/bwdeng20/thgsp/actions/workflows/testing.yml/badge.svg)](https://github.com/bwdeng20/thgsp/actions/workflows/testing.yml)
 [![codecov](https://codecov.io/gh/bwdeng20/thgsp/branch/main/graph/badge.svg?token=H45AEGPM0P)](https://codecov.io/gh/bwdeng20/thgsp)
 [![License](https://img.shields.io/static/v1?label=license&message=BSD&color=orange)](https://github.com/bwdeng20/thgsp/blob/main/LICENSE) 
 ![](https://img.shields.io/badge/OS-Linux%7CWin-blue)

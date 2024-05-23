@@ -2,7 +2,7 @@ import numpy as np
 from scipy.sparse import lil_matrix
 
 from thgsp.datasets import Toy
-from thgsp.sampling import ess_sampling
+from thgsp.sampling import ess
 from thgsp.visual import show_transform
 
 g = Toy(download=True)[0]
@@ -15,7 +15,7 @@ bands2 = np.hstack(
 N, M = U.shape
 print(bands)
 print(bands2)
-sampled_nodes = ess_sampling(g.L(lap_type), g.n_node, k=2)
+sampled_nodes = ess(g.L(lap_type), g.n_node, k=2)
 highlights = lil_matrix((M, N))
 highlights[range(M), sampled_nodes] = 1
 cluster = np.concatenate([np.ones(12), np.ones(8) * 2, np.ones(7) * 3])

@@ -92,7 +92,7 @@ install_requires = [
     "torch>=1.7.0",
     "torchvision",
     "ray",
-    "sklearn",
+    "scikit-learn",
     "scipy",
     "networkx",
     "numba",

@@ -1,7 +1,7 @@
 import torch
 
 from thgsp import Graph, loadmat
-from thgsp.sampling import ess_sampling, recon_ess
+from thgsp.sampling import ess, recon_ess
 from thgsp.utils import mse, snr
 
 
@@ -28,7 +28,7 @@ L = graph.L("comb")
 U = graph.U("comb")
 
 M = len(S)
-S1 = ess_sampling(L, M, k=order // 2)
+S1 = ess(L, M, k=order // 2)
 print(S)
 print(S1)
 

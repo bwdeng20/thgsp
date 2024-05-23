@@ -238,7 +238,7 @@ def show_transform(
     vecs = None
     vals = None
     # Clusters
-    if cluster in (None, 1):
+    if cluster is None or np.all(cluster == 1):
         num_clusters = 1  # all nodes belong to one cluster
         cluster = np.ones(N)
     elif isinstance(cluster, int):

@@ -3,7 +3,7 @@ from typing import Optional
 import networkx as nx
 import torch
 
-from thgsp.convert import SparseTensor, to_torch_sparse
+from thgsp.convert import SparseTensor, to_torch_sparse, to_scipy
 
 from .degree import degree_matrix, in_degree, out_degree
 from .is_bipartite import is_bipartite
@@ -203,7 +203,7 @@ class GraphBase(SparseTensor):
             graph_type = nx.Graph
 
         sci_spm = self.to_scipy(layout="csr")
-        nxg = nx.from_scipy_sparse_matrix(sci_spm, create_using=graph_type)
+        nxg = nx.from_scipy_sparse_array(sci_spm, create_using=graph_type)
         return nxg
 
 

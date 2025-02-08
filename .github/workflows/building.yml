@@ -14,14 +14,14 @@ jobs:
       max-parallel: 20 # max for free user
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        python-version: [ 3.7, 3.8, 3.9 ]
-        torch-version: [ 1.9.0, 1.10.0, 1.10.1 ]
-        cuda-version: [ 'cu111', 'cu113', 'cpu' ]
+        python-version: ['3.11']
+        torch-version: [2.5.0]  # [2.3.0, 2.4.0, 2.5.0]
+        cuda-version: ['cu121', 'cpu' ]
         exclude:
-          - torch-version: 1.9.0
-            cuda-version: 'cu113'
-          - torch-version: 1.10.1
-            cuda-version: 'cu111'
+          - torch-version: 2.5.0
+            python-version: '3.8'
+          - torch-version: 2.3.0
+            cuda-version: 'cu124'
 
     steps:
       - uses: actions/checkout@v2
@@ -44,15 +44,14 @@ jobs:
 
       - name: Install CUDA ${{ matrix.cuda-version }}
         if: ${{ matrix.cuda-version != 'cpu' }}
-        uses: Jimver/cuda-toolkit@v0.2.5
+        uses: Jimver/cuda-toolkit@master
         id: cuda-toolkit
         with:
           cuda: ${{steps.translator.outputs.full_version}}
 
       - name: Install PyTorch ${{ matrix.torch-version }}+${{ matrix.cuda-version }}
         run: |
-          pip install numpy typing-extensions dataclasses
-          pip install --no-index --no-cache-dir torch==${{ matrix.torch-version}} torchvision -f https://download.pytorch.org/whl/${{ matrix.cuda-version }}/torch_stable.html
+          pip install --no-index --no-cache-dir torch==${{ matrix.torch-version }} --extra-index-url https://download.pytorch.org/whl/${{ matrix.cuda-version }}
           python -c "import torch; print('PyTorch:', torch.__version__)"
           python -c "import torch; print('CUDA:', torch.version.cuda)"
 

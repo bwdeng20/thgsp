@@ -28,6 +28,8 @@ As this package is built on [PyTorch](https://pytorch.org)  and
 **thgsp** into a PyTorch pipeline. Check the [document](https://bwdeng20.github.io/thgsp/)
 for **installation** and introduction.
 
+Thanks for the [Matlab code](https://biron.usc.edu/wiki/index.php/Graph_Filterbanks) provided by Dr. Narang and Prof. Ortega!
+
 ## Table of Contents
 
 - [Example](#example)

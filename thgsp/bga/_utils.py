@@ -60,7 +60,7 @@ def distribute_color_(n_color, M):
         beta1 = distribute_color_(N1, M - 1)
         beta2 = distribute_color_(N2, M - 1)
         beta_dist = beta1 + 2 ** (M - 1)
-        beta_dist = np.concatenate([beta_dist, beta2])
+        beta_dist = np.concatenate([beta_dist, beta2]).astype(np.uint8)
     return beta_dist
 
 

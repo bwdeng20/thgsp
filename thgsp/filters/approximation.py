@@ -2,7 +2,8 @@ import numpy as np
 import torch
 from torch_sparse import SparseTensor
 
-from thgsp.convert import from_cpx, get_array_module, get_ddd, spmatrix, to_xcipy
+from scipy.sparse import issparse as is_scipy_sparse
+from thgsp.convert import from_cpx, get_array_module, get_ddd, to_xcipy
 
 
 def normalize_laplace(L: SparseTensor, lam_max: float = 2.0):
@@ -16,7 +17,7 @@ def normalize_laplace(L: SparseTensor, lam_max: float = 2.0):
 
 
 def cheby_op(
-    x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.0
+        x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.0
 ):
     r"""Chebyshev approximation of graph filtering
 
@@ -77,7 +78,7 @@ def cheby_op_basis(L, coeff, lam_max=2.0, return_ts=False):
     if isinstance(L, SparseTensor):
         dt, dv, density, on_gpu = get_ddd(L)
         xp, xcipy, _ = get_array_module(on_gpu)
-    elif isinstance(L, spmatrix):
+    elif is_scipy_sparse(L):
         import scipy
 
         xcipy = scipy
@@ -120,9 +121,9 @@ def cheby_coeff(kernels, K=10, lam_max=2.0, num_points=None, dtype=None, device=
         M = Co = Ci = 1
 
     points = (
-        np.pi
-        * (torch.arange(num_points, dtype=dtype, device=device) + 0.5)
-        / num_points
+            np.pi
+            * (torch.arange(num_points, dtype=dtype, device=device) + 0.5)
+            / num_points
     )
 
     gs = torch.zeros(M, Co, Ci, 1, num_points, dtype=dtype, device=device)

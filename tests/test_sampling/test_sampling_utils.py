@@ -27,19 +27,19 @@ def test_construct_sampling_matrix(dtype, dv, layout):
     HtHD0 = H.T @ D @ H
     HtH0 = H.T @ H
 
-    print("\n", H.A)
-    print(HtH0.A)
-    print(HtHD0.A)
+    print("\n", H.toarray())
+    print(HtH0.toarray())
+    print(HtHD0.toarray())
     HtH1 = construct_hth(N, S, dtype=dtype, device=dv, layout=layout)
     HtHD1 = construct_hth(
         N, S, xp.arange(1, N + 1)[S], dtype=dtype, device=dv, layout=layout
     )
-    # print(HtH1.A)
-    # print(HtHD1.A)
+    # print(HtH1.toarray())
+    # print(HtHD1.toarray())
     print(type(HtH1), HtH1.shape, "on_gpu: ", on_gpu)
     print(type(HtHD1), HtHD1.shape, "on_gpu: ", on_gpu)
-    assert np.allclose(HtH0.A, HtH1.A)
-    assert np.allclose(HtHD0.A, HtHD1.A)
+    assert np.allclose(HtH0.toarray(), HtH1.toarray())
+    assert np.allclose(HtHD0.toarray(), HtHD1.toarray())
 
 
 @pytest.mark.parametrize("dt", float_dtypes)

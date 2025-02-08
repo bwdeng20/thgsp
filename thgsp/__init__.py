@@ -39,32 +39,33 @@ __version__ = "0.1.0"
 suffix = "cuda" if torch.cuda.is_available() else "cpu"
 
 cpp_tools = ["_version", "_dsatur", "_bsgda"]
-for tool in cpp_tools:
-    torch.ops.load_library(
-        importlib.machinery.PathFinder()
-        .find_spec(f"{tool}_{suffix}", [osp.dirname(__file__)])
-        .origin
-    )
+for library in cpp_tools:
+    cuda_spec = importlib.machinery.PathFinder().find_spec(
+        f'{library}_cuda', [osp.dirname(__file__)])
+    cpu_spec = importlib.machinery.PathFinder().find_spec(
+        f'{library}_cpu', [osp.dirname(__file__)])
+    spec = cuda_spec or cpu_spec
+    if spec is not None:
+        torch.ops.load_library(spec.origin)
+    else:  # pragma: no cover
+        raise ImportError(f"Could not find module '{library}_cpu' in "
+                          f"{osp.dirname(__file__)}")
 
-if torch.cuda.is_available():  # pragma: no cover
-    cuda_version = torch.ops.thgsp.cuda_version()
-
-    if cuda_version == -1:
-        major = minor = 0
-    elif cuda_version < 10000:
+cuda_version = torch.ops.torch_sparse.cuda_version()
+if torch.version.cuda is not None and cuda_version != -1:  # pragma: no cover
+    if cuda_version < 10000:
         major, minor = int(str(cuda_version)[0]), int(str(cuda_version)[2])
     else:
         major, minor = int(str(cuda_version)[0:2]), int(str(cuda_version)[3])
-    t_major, t_minor = [int(x) for x in torch.version.cuda.split(".")]
+    t_major, t_minor = [int(x) for x in torch.version.cuda.split('.')]
 
     if t_major != major:
         raise RuntimeError(
-            f"Detected that PyTorch and thgsp were compiled with "
-            f"different CUDA versions. PyTorch has CUDA version "
-            f"{t_major}.{t_minor} and thgsp has CUDA version "
-            f"{major}.{minor}. Please reinstall the thgsp that "
-            f"matches your PyTorch install."
-        )
+            f'Detected that PyTorch and torch_sparse were compiled with '
+            f'different CUDA versions. PyTorch has CUDA version '
+            f'{t_major}.{t_minor} and torch_sparse has CUDA version '
+            f'{major}.{minor}. Please reinstall the torch_sparse that '
+            f'matches your PyTorch install.')
 
 __all__ = [
     "to_torch_sparse",

@@ -11,16 +11,16 @@ minne = data[0]
 print(minne)
 
 colors = dsatur(minne)
-fig, axes = plt.subplots(1, 2, figsize=(2 * 7, 6))
-draw(minne, minne.coords, ax=axes[0], node_size=30, with_labels=False)
-axes[0].set_title("the traffic network", fontsize="large", fontweight="bold")
-draw_cn(minne, minne.coords, colors, ax=axes[1], node_size=30, with_labels=False)
-axes[1].set_title(
-    "coloring of Minnesota(chromatic={})".format(str(colors.max() + 1)),
-    fontsize="large",
-    fontweight="bold",
-)
-plt.show()
+# fig, axes = plt.subplots(1, 2, figsize=(2 * 7, 6))
+# draw(minne, minne.coords, ax=axes[0], node_size=30, with_labels=False)
+# axes[0].set_title("the traffic network", fontsize="large", fontweight="bold")
+# draw_cn(minne, minne.coords, colors, ax=axes[1], node_size=30, with_labels=False)
+# axes[1].set_title(
+#     "coloring of Minnesota(chromatic={})".format(str(colors.max() + 1)),
+#     fontsize="large",
+#     fontweight="bold",
+# )
+# plt.show()
 
 # ===> continue the last code block
 K = 30  # the order of Chebyshev approximation

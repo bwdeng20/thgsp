@@ -2,7 +2,9 @@ import warnings
 
 import numpy as np
 import torch
-from scipy.sparse import coo_matrix, csc_matrix, csr_matrix, spmatrix
+from scipy.sparse import coo_matrix, csc_matrix, csr_matrix
+
+from scipy.sparse import issparse as is_scipy_sparse
 from torch.utils.dlpack import from_dlpack
 from torch_sparse import SparseTensor
 
@@ -43,7 +45,7 @@ def to_torch_sparse(mat):
     elif isinstance(mat, np.ndarray):
         stm = SparseTensor.from_dense(torch.as_tensor(mat))
 
-    elif isinstance(mat, spmatrix):
+    elif is_scipy_sparse(mat):
         stm = SparseTensor.from_scipy(mat)
 
     elif isinstance(mat, SparseTensor):
@@ -64,7 +66,7 @@ def to_np(mat):
     elif isinstance(mat, SparseTensor):
         dense = mat.to_dense().cpu().numpy()
 
-    elif isinstance(mat, spmatrix):
+    elif iis_scipy_sparse(mat):
         dense = mat.toarray()
     else:
         raise TypeError(f"{type(mat)} is not supported now or invalid")
@@ -103,7 +105,7 @@ def to_scipy(mat, layout="csr", dtype=None):
             smt = SparseTensor.from_torch_sparse_coo_tensor(mat).to_scipy(layout, dtype)
     elif isinstance(mat, SparseTensor):
         smt = mat.to_scipy(layout, dtype)
-    elif isinstance(mat, (spmatrix, np.ndarray)):
+    elif isinstance(mat, np.ndarray) or is_scipy_sparse(mat):
         cls = {"csr": csr_matrix, "csc": csc_matrix, "coo": coo_matrix}[layout]
         smt = cls(mat)
     else:
@@ -118,7 +120,7 @@ def to_xcipy(mat, layout: str = "csr", dtype=None):
         if device.type != "cpu":
             return to_cpx(mat, layout, dtype)
         return to_scipy(mat, layout, dtype)
-    elif isinstance(mat, spmatrix):
+    elif is_scipy_sparse(mat):
         return to_scipy(mat, layout, dtype)
     else:
         raise TypeError(f"{type(mat)} is not supported now or invalid")

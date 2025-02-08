@@ -44,7 +44,7 @@ def cohere_color_idx(colors, color_group):
 
 def new_order(n_color):
     M = math.ceil(math.log2(n_color))
-    order = np.arange(0, 2 ** M, dtype=np.uint8)  # 0,1,...,2^M-1
+    order = np.arange(0, 2**M, dtype=np.uint8)  # 0,1,...,2^M-1
     no = np.unpackbits(order.reshape(-1, 1), axis=1)[:, -M:]
     # no need to flip before pack since bitorder='little'
     no = np.packbits(no, axis=1, bitorder="little")
@@ -116,7 +116,7 @@ def beta2color_group(beta, th=True):
         An array, see the doc of :class:`thgsp.filters.QmfCore` for the details.
     """
     N, M = beta.shape
-    n_channel = 2 ** M  # pseudo channel number
+    n_channel = 2**M  # pseudo channel number
     beta = beta.numpy().astype("uint8")
     beta_dist = distribute_color(n_channel, M, th=False)  # n_channel x M np.array
     # n_channel x 1 --> n_channel
@@ -160,7 +160,7 @@ def beta2channel_mask(beta):
         An array, see the doc of :class:`thgsp.filters.QmfCore` for the details.
     """
     N, M = beta.shape
-    n_channel = 2 ** M  # pseudo channel number
+    n_channel = 2**M  # pseudo channel number
     mask = torch.zeros(n_channel, N, dtype=torch.bool)
     if isinstance(beta, Tensor):
         beta = np.asarray(beta.cpu())

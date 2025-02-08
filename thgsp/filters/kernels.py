@@ -9,9 +9,9 @@ from scipy.special import comb
 # Utils
 def get_kernel_name(kernel_array, identation=False):
     get_name = np.vectorize(
-        lambda f: "_".join(f.__name__.split("_")[:-1])
-        if "_" in f.__name__
-        else f.__name__
+        lambda f: (
+            "_".join(f.__name__.split("_")[:-1]) if "_" in f.__name__ else f.__name__
+        )
     )
     info = get_name(kernel_array)
     return "\t" + str(info).replace("\n", "\n\t") if identation else str(info)

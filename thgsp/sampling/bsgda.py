@@ -128,7 +128,7 @@ def recon_bsgda(y, S, L: SparseTensor, mu: float = 0.01, reg_order: int = 1, **k
     L = to_xcipy(L)
     Ht = construct_sampling_matrix(N, S, dtype=dt, device=dv, layout="csr").T
     HtH = construct_hth(N, S, dtype=dt, device=dv, layout="csr")
-    B = HtH + mu * L ** reg_order
+    B = HtH + mu * L**reg_order
     Hty = Ht @ xp.asarray(y)
 
     if xp == np:

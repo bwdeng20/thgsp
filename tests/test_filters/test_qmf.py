@@ -65,7 +65,7 @@ class TestQmfCore:
         beta_np = np.random.rand(N, M) > 0.5
 
         qmf = QmfCore(bipartite_graphs=Bs, beta=beta_np, order=K)
-        assert qmf.coefficient_a.shape == (M, 2 ** M, 1, K + 1)
+        assert qmf.coefficient_a.shape == (M, 2**M, 1, K + 1)
         assert qmf.coefficient_a.shape == qmf.coefficient_s.shape
 
         QmfCore(
@@ -76,7 +76,7 @@ class TestQmfCore:
 
         qmf = QmfCore(Bs, beta_np, in_channels=3)
         # 20 is the default order of approximation
-        assert qmf.coefficient_a.shape == (M, 2 ** M, 3, qmf.order + 1)
+        assert qmf.coefficient_a.shape == (M, 2**M, 3, qmf.order + 1)
 
     def test_transform(self, device, dtype):
         M, N = 2, 32
@@ -115,10 +115,10 @@ class TestQmfCore:
         qmf = QmfCore(bipartite_graphs=Bs, beta=beta, order=K)
         x = torch.rand(N, dtype=dtype, device=device)
         y = qmf.analyze(x)
-        assert y.shape == (2 ** M, N, 1)
+        assert y.shape == (2**M, N, 1)
 
         z = qmf.synthesize(y)
-        assert z.shape == (2 ** M, N, 1)
+        assert z.shape == (2**M, N, 1)
         assert (z.sum(0).squeeze() - x).abs().sum() != 0
 
         z.squeeze_()
@@ -212,12 +212,12 @@ class TestBiorthCore:
         beta_np = np.random.rand(N, M) > 0.3
 
         bio = BiorthCore(Bs, beta_np, k=k, order=K)
-        assert bio.coefficient_a.shape == (M, 2 ** M, 1, K + 1)
+        assert bio.coefficient_a.shape == (M, 2**M, 1, K + 1)
         assert bio.coefficient_a.shape == bio.coefficient_s.shape
 
         bio = BiorthCore(Bs, torch.as_tensor(beta_np), in_channels=3, zero_dc=True)
         # 16 is the default order of approximation
-        assert bio.coefficient_a.shape == (M, 2 ** M, 3, 16 + 1)
+        assert bio.coefficient_a.shape == (M, 2**M, 3, 16 + 1)
 
     def test_transform(self, device, dtype):
         M, N = 2, 7
@@ -227,10 +227,10 @@ class TestBiorthCore:
         bio = BiorthCore(Bs, beta)
         x = torch.rand(N, dtype=bio.dtype, device=bio.device)
         y = bio.analyze(x)
-        assert y.shape == (2 ** M, N, 1)
+        assert y.shape == (2**M, N, 1)
 
         z = bio.synthesize(y)
-        assert z.shape == (2 ** M, N, 1)
+        assert z.shape == (2**M, N, 1)
         # since beta and Bs are all randomly generated, the transform won't be
         # numerically valid
         assert (z.sum(0).squeeze() - x).abs().sum() != 0

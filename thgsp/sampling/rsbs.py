@@ -124,7 +124,7 @@ def estimate_lk(
                 cheby_coeff4ideal_band_pass(0.0, lambda_mid, 0.0, lmax, order)
             )
             x = cheby_op(sig, L, coeff, lmax).squeeze_()
-            counts = torch.round_(torch.sum(x ** 2))
+            counts = torch.round_(torch.sum(x**2))
             if counts >= k:
                 lambda_max = lambda_mid
             else:
@@ -142,7 +142,7 @@ def estimate_lk(
             )
 
         if return_coherence:
-            norm_UK[i] = (x ** 2).sum(1)
+            norm_UK[i] = (x**2).sum(1)
 
     lambda_k = np.mean(estimated_lam_k)
     if verbose:
@@ -245,7 +245,7 @@ def recon_rsbs(
     )
 
     Bl = H.T * Psinv
-    B = Bl * H + mu * L ** reg_order
+    B = Bl * H + mu * L**reg_order
 
     HPy = Bl @ yp
 

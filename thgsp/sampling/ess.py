@@ -37,7 +37,7 @@ def ess(operator, M, k=2):
 
     L = to_scipy(operator)
     N = L.shape[-1]
-    LtL = L.T ** k * L ** k
+    LtL = L.T**k * L**k
     V = np.arange(N)
     S = list()
     while len(S) < M:

@@ -76,8 +76,10 @@ def construct_dia(
     col = row.clone()
     shape = (M, M) if ps else (N, N)
     data = torch.as_tensor(diag_data, dtype=dtype, device=device)
-    data = data ** -1 if inverse else data
+    data = data**-1 if inverse else data
     data = data[S] if ps else data
-    spa = SparseTensor(row=row.to(data.device), col=col.to(data.device), value=data, sparse_sizes=shape)
+    spa = SparseTensor(
+        row=row.to(data.device), col=col.to(data.device), value=data, sparse_sizes=shape
+    )
     P = spa if return_ts else to_xcipy(spa, layout)
     return P

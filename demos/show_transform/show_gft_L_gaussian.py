@@ -12,7 +12,7 @@ lap_type = "comb"
 
 # load data
 g0 = Toy(download=True)[0]
-exponent = -g0.extra["distances"] ** 2 / (2 * sigma ** 2)
+exponent = -g0.extra["distances"] ** 2 / (2 * sigma**2)
 W = np.exp(exponent)
 edge_idx, _ = g0.edge_info()
 tmp = W[edge_idx[0], edge_idx[1]]

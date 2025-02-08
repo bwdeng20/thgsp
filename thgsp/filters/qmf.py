@@ -365,7 +365,7 @@ class QmfOperator:
             t2 = H1 - H0
             Ta_sub = t1 + diags(beta[:, i]) * t2
             Ta = Ta_sub * Ta
-        Ta *= 0.5 ** M
+        Ta *= 0.5**M
         return Ta
 
     def __call__(self, x):

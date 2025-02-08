@@ -17,7 +17,7 @@ def normalize_laplace(L: SparseTensor, lam_max: float = 2.0):
 
 
 def cheby_op(
-        x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.0
+    x: torch.Tensor, L: SparseTensor, coeff: torch.Tensor, lam_max: float = 2.0
 ):
     r"""Chebyshev approximation of graph filtering
 
@@ -121,9 +121,9 @@ def cheby_coeff(kernels, K=10, lam_max=2.0, num_points=None, dtype=None, device=
         M = Co = Ci = 1
 
     points = (
-            np.pi
-            * (torch.arange(num_points, dtype=dtype, device=device) + 0.5)
-            / num_points
+        np.pi
+        * (torch.arange(num_points, dtype=dtype, device=device) + 0.5)
+        / num_points
     )
 
     gs = torch.zeros(M, Co, Ci, 1, num_points, dtype=dtype, device=device)

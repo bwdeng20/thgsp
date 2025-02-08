@@ -39,6 +39,7 @@ class Minnesota:
     .. [4] http://biron.usc.edu/wiki/index.php/Graph_Filterbanks)
 
     """
+
     filename = "Graph_Wavelets_Demo.zip"
     zip_md5 = "83bf2aef1ad7e75badfc6296ca336d44"
     url = "http://sipi.usc.edu/~ortega/Software/Graph_Wavelets_Demo.zip"

@@ -12,12 +12,12 @@ from .laplace import laplace
 
 class GraphBase(SparseTensor):
     def __init__(
-            self,
-            adjacency,
-            coords: Optional[torch.Tensor] = None,
-            cache: bool = True,
-            requires_grad: bool = False,
-            **kwargs
+        self,
+        adjacency,
+        coords: Optional[torch.Tensor] = None,
+        cache: bool = True,
+        requires_grad: bool = False,
+        **kwargs
     ):
 
         try:  # torch.Tensor, np.ndarray, scipy.spmatrix
@@ -209,13 +209,13 @@ class GraphBase(SparseTensor):
 
 class Graph(GraphBase):
     def __init__(
-            self,
-            adjacency,
-            coords: Optional[torch.Tensor] = None,
-            cache: bool = False,
-            requires_grad: bool = False,
-            copy: bool = True,
-            **kwargs
+        self,
+        adjacency,
+        coords: Optional[torch.Tensor] = None,
+        cache: bool = False,
+        requires_grad: bool = False,
+        copy: bool = True,
+        **kwargs
     ):
         if isinstance(adjacency, Graph):
             adj = adjacency.clone().detach_() if copy else adjacency
@@ -240,13 +240,13 @@ class Graph(GraphBase):
 
 class DiGraph(GraphBase):
     def __init__(
-            self,
-            adjacency,
-            coords: Optional[torch.Tensor] = None,
-            cache: bool = False,
-            requires_grad: bool = False,
-            copy: bool = True,
-            **kwargs
+        self,
+        adjacency,
+        coords: Optional[torch.Tensor] = None,
+        cache: bool = False,
+        requires_grad: bool = False,
+        copy: bool = True,
+        **kwargs
     ):
         adj = adjacency.clone().detach_() if copy else adjacency
         super(DiGraph, self).__init__(adj, coords, cache, requires_grad, **kwargs)

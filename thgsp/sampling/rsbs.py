@@ -29,17 +29,17 @@ def cheby_coeff4ideal_band_pass(a, b, lmin, lmax, order):
 
 
 def estimate_lk(
-        G,
-        k,
-        num_estimation=1,
-        num_rv=None,
-        epsilon=1e-2,
-        lmin=None,
-        lmax=None,
-        return_coherence=True,
-        order=30,
-        lap_type="comb",
-        verbose=False,
+    G,
+    k,
+    num_estimation=1,
+    num_rv=None,
+    epsilon=1e-2,
+    lmin=None,
+    lmax=None,
+    return_coherence=True,
+    order=30,
+    lap_type="comb",
+    verbose=False,
 ):
     r"""
     Estimate the optimal distribution according to which the bandlimited graph signals
@@ -124,7 +124,7 @@ def estimate_lk(
                 cheby_coeff4ideal_band_pass(0.0, lambda_mid, 0.0, lmax, order)
             )
             x = cheby_op(sig, L, coeff, lmax).squeeze_()
-            counts = torch.round_(torch.sum(x ** 2))
+            counts = torch.round_(torch.sum(x**2))
             if counts >= k:
                 lambda_max = lambda_mid
             else:
@@ -142,7 +142,7 @@ def estimate_lk(
             )
 
         if return_coherence:
-            norm_UK[i] = (x ** 2).sum(1)
+            norm_UK[i] = (x**2).sum(1)
 
     lambda_k = np.mean(estimated_lam_k)
     if verbose:
@@ -152,18 +152,18 @@ def estimate_lk(
 
 
 def rsbs(
-        G: GraphBase,
-        M: int,
-        k: int = None,
-        num_estimation: int = 1,
-        num_rv: int = None,
-        epsilon: float = 1e-2,
-        lmin: float = None,
-        lmax: float = None,
-        order: int = 30,
-        lap_type: str = "comb",
-        return_list: bool = False,
-        verbose: bool = False,
+    G: GraphBase,
+    M: int,
+    k: int = None,
+    num_estimation: int = 1,
+    num_rv: int = None,
+    epsilon: float = 1e-2,
+    lmin: float = None,
+    lmax: float = None,
+    order: int = 30,
+    lap_type: str = "comb",
+    return_list: bool = False,
+    verbose: bool = False,
 ):
     r"""
     Random sampling algorithm for bandlimited signals [3]_ .
@@ -223,7 +223,7 @@ def rsbs(
 
 
 def recon_rsbs(
-        y, S, L: SparseTensor, cum_coh, mu: float = 0.01, reg_order: int = 1, **kwargs
+    y, S, L: SparseTensor, cum_coh, mu: float = 0.01, reg_order: int = 1, **kwargs
 ):
     N = L.size(-1)
     M = len(S)
@@ -245,7 +245,7 @@ def recon_rsbs(
     )
 
     Bl = H.T * Psinv
-    B = Bl * H + mu * L ** reg_order
+    B = Bl * H + mu * L**reg_order
 
     HPy = Bl @ yp
 

@@ -1,4 +1,3 @@
-
 from thgsp.datasets import Toy
 
 from ..utils4t import remove_downloaded_dataset

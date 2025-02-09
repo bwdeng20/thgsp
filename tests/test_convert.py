@@ -9,7 +9,7 @@ from thgsp.convert import (
     from_cpx,
     get_array_module,
     get_ddd,
-    spmatrix,
+    is_scipy_sparse,
     to_cpx,
     to_np,
     to_scipy,
@@ -66,7 +66,7 @@ def test_to_torch_sparse(mats):
 def test_to_scipy(mats):
     for mat in mats[:-1]:
         tmp = to_scipy(mat)
-        assert isinstance(tmp, spmatrix)
+        assert is_scipy_sparse(tmp)
 
     with pytest.raises(TypeError):
         to_scipy(mats[-1])

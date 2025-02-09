@@ -36,7 +36,7 @@ def ess(operator, M, k=2, block_size=2):
 
     L = to_xcipy(operator)
     N = L.shape[-1]
-    LtL = L.T ** k * L ** k
+    LtL = L.T**k * L**k
     V = xp.arange(N)
     S = list()
     while len(S) < M:

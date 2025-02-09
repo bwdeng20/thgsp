@@ -41,7 +41,7 @@ jobs:
 
       - name: Install main package for CPU
         run: |
-          FORCE_ONLY_CPU=1 pip install -e .
+          FORCE_ONLY_CPU=1 python setup.py develop
         shell:
           bash
 

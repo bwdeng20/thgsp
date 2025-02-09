@@ -54,15 +54,19 @@ jobs:
           pip install torch==${{ matrix.torch-version }} --extra-index-url https://download.pytorch.org/whl/${{ matrix.cuda-version }}
           python -c "import torch; print('PyTorch:', torch.__version__)"
           python -c "import torch; print('CUDA:', torch.version.cuda)"
+        shell:
+          bash
 
       - name: Install torch-scatter, sparse, and cluster
         run: |
           pip install torch-scatter torch-sparse torch-cluster  -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
+        shell:
+          bash
 
       - name: Install main package for CPU
         if: ${{ matrix.cuda-version == 'cpu' }}
         run: |
-          FORCE_ONLY_CPU=1 pip install -e .
+          python setup.py develop
         shell:
           bash
 
@@ -71,7 +75,7 @@ jobs:
         run: |
           python -c "import os;print(f'\033[1;35m CURRENT WORKING DIR: {os.getcwd()}\033[0m')"
           source .github/workflows/cuda/${{ matrix.cuda-version }}-${{ runner.os }}-env.sh
-          pip install -e .
+          python setup.py develop
         shell:
           bash
 

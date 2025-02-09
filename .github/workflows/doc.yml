@@ -16,8 +16,8 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         python-version: [ 3.11 ]
-        torch-version: [ 2.5.1 ]
-        tv-version: [ 0.20.1 ]
+        torch-version: [ 2.5.0 ]
+        tv-version: [ 0.20.0 ]
         cuda-version: [ 'cpu' ]
 
     steps:

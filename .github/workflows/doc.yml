@@ -14,10 +14,10 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-18.04 ]
-        python-version: [ 3.8 ]
-        torch-version: [ 1.10.1 ]
-        tv-version: [ 0.11.2 ]
+        os: [ ubuntu-latest ]
+        python-version: [ 3.11 ]
+        torch-version: [ 2.5.1 ]
+        tv-version: [ 0.20.1 ]
         cuda-version: [ 'cpu' ]
 
     steps:
@@ -30,7 +30,6 @@ jobs:
 
       - name: Install PyTorch ${{ matrix.torch-version }}+${{ matrix.cuda-version }}
         run: |
-          pip install numpy typing-extensions dataclasses pillow
           pip install --no-index --no-cache-dir torch==${{ matrix.torch-version }} -f https://download.pytorch.org/whl/${{ matrix.cuda-version }}/torch_stable.html
           pip install --no-index --no-cache-dir torchvision==${{ matrix.tv-version }} -f https://download.pytorch.org/whl/${{ matrix.cuda-version }}/torch_stable.html
           python -c "import torch; print('PyTorch:', torch.__version__)"

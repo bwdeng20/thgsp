@@ -3,7 +3,7 @@ from typing import Optional
 import networkx as nx
 import torch
 
-from thgsp.convert import SparseTensor, to_torch_sparse, to_scipy
+from thgsp.convert import SparseTensor, to_torch_sparse
 
 from .degree import degree_matrix, in_degree, out_degree
 from .is_bipartite import is_bipartite
@@ -12,12 +12,12 @@ from .laplace import laplace
 
 class GraphBase(SparseTensor):
     def __init__(
-        self,
-        adjacency,
-        coords: Optional[torch.Tensor] = None,
-        cache: bool = True,
-        requires_grad: bool = False,
-        **kwargs
+            self,
+            adjacency,
+            coords: Optional[torch.Tensor] = None,
+            cache: bool = True,
+            requires_grad: bool = False,
+            **kwargs
     ):
 
         try:  # torch.Tensor, np.ndarray, scipy.spmatrix
@@ -184,9 +184,9 @@ class GraphBase(SparseTensor):
 
     @classmethod
     def from_networkx(cls, nxg):
-        if type(nxg) == nx.DiGraph:
+        if isinstance(nxg, nx.DiGraph):
             tor_type = DiGraph
-        elif type(nxg) == nx.Graph:
+        elif isinstance(nxg, nx.Graph):
             tor_type = Graph
         else:
             raise TypeError("{} not supported in thgsp at present".format(type(nxg)))
@@ -209,13 +209,13 @@ class GraphBase(SparseTensor):
 
 class Graph(GraphBase):
     def __init__(
-        self,
-        adjacency,
-        coords: Optional[torch.Tensor] = None,
-        cache: bool = False,
-        requires_grad: bool = False,
-        copy: bool = True,
-        **kwargs
+            self,
+            adjacency,
+            coords: Optional[torch.Tensor] = None,
+            cache: bool = False,
+            requires_grad: bool = False,
+            copy: bool = True,
+            **kwargs
     ):
         if isinstance(adjacency, Graph):
             adj = adjacency.clone().detach_() if copy else adjacency
@@ -240,13 +240,13 @@ class Graph(GraphBase):
 
 class DiGraph(GraphBase):
     def __init__(
-        self,
-        adjacency,
-        coords: Optional[torch.Tensor] = None,
-        cache: bool = False,
-        requires_grad: bool = False,
-        copy: bool = True,
-        **kwargs
+            self,
+            adjacency,
+            coords: Optional[torch.Tensor] = None,
+            cache: bool = False,
+            requires_grad: bool = False,
+            copy: bool = True,
+            **kwargs
     ):
         adj = adjacency.clone().detach_() if copy else adjacency
         super(DiGraph, self).__init__(adj, coords, cache, requires_grad, **kwargs)

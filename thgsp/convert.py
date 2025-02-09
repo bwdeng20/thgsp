@@ -66,7 +66,7 @@ def to_np(mat):
     elif isinstance(mat, SparseTensor):
         dense = mat.to_dense().cpu().numpy()
 
-    elif iis_scipy_sparse(mat):
+    elif is_scipy_sparse(mat):
         dense = mat.toarray()
     else:
         raise TypeError(f"{type(mat)} is not supported now or invalid")

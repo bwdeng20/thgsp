@@ -18,10 +18,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        python-version: [ 3.8 ]
-        torch-version: [ 1.10.1 ]
-        tv-version: [ 0.11.2 ]
-        cuda-version: [ 'cpu' ]
+        python-version: ['3.11']
+        torch-version: [2.5.0]  # [2.3.0, 2.4.0, 2.5.0]
+        cuda-version: ['cpu']
+        exclude:
+          - torch-version: 2.5.0
+            python-version: '3.8'
+          - torch-version: 2.3.0
+            cuda-version: 'cu124'
 
 
     steps:

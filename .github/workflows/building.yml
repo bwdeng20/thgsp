@@ -31,10 +31,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Free up disk space
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo rm -rf /usr/share/dotnet
+#      - name: Free up disk space
+#        if: ${{ runner.os == 'Linux' }}
+#        run: |
+#          sudo rm -rf /usr/share/dotnet
 
       - name: Translate cuXXY to XX.Y.Z, e.g., cu113 to 11.3.1
         id: translator

@@ -45,9 +45,9 @@ jobs:
         run: |
           echo "::set-output name=full_version:: $(jq -r .${{ matrix.cuda-version }} .github/workflows/mapping.json)"
 
-      - name: Free Disk Space (Ubuntu)
-        if: ${{ runner.os == 'Linux' }}
-        uses: jlumbroso/free-disk-space@main
+#      - name: Free Disk Space (Ubuntu)
+#        if: ${{ runner.os == 'Linux' }}
+#        uses: jlumbroso/free-disk-space@main
 
       - name: Install CUDA ${{ matrix.cuda-version }}
         if: ${{ matrix.cuda-version != 'cpu' }}
@@ -73,7 +73,7 @@ jobs:
       - name: Install main package for CPU
         if: ${{ matrix.cuda-version == 'cpu' }}
         run: |
-          FORCE_ONLY_CPU=1 pip install -e .
+          FORCE_ONLY_CPU=1 python setup.py develop
         shell:
           bash
 

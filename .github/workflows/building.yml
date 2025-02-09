@@ -51,15 +51,13 @@ jobs:
 
       - name: Install PyTorch ${{ matrix.torch-version }}+${{ matrix.cuda-version }}
         run: |
-          pip install --no-index --no-cache-dir torch==${{ matrix.torch-version }} --extra-index-url https://download.pytorch.org/whl/${{ matrix.cuda-version }}
+          pip install --no-index --no-cache-dir torch==${{ matrix.torch-version }} --extra-index-url https://download.pytorch.org/whl/${{ matrix.cuda-version }}/torch
           python -c "import torch; print('PyTorch:', torch.__version__)"
           python -c "import torch; print('CUDA:', torch.version.cuda)"
 
       - name: Install torch-scatter, sparse, and cluster
         run: |
-          pip install torch-scatter -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
-          pip install torch-sparse -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
-          pip install torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
+          pip install torch-scatter torch-sparse torch-cluster  -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }}.html
 
       - name: Install main package for CPU
         if: ${{ matrix.cuda-version == 'cpu' }}

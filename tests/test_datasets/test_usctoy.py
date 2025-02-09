@@ -1,4 +1,3 @@
-import pytest
 
 from thgsp.datasets import Toy
 

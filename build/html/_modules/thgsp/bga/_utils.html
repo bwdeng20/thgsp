@@ -1,23 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>thgsp.bga._utils &mdash; thgsp 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=0432188f" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,15 +27,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html">
-            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.1.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -71,9 +71,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>thgsp.bga._utils</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">thgsp.bga._utils</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -83,29 +83,31 @@
            <div itemprop="articleBody">
              
   <h1>Source code for thgsp.bga._utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span><span class="p">,</span> <span class="n">lil_matrix</span><span class="p">,</span> <span class="n">spmatrix</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch_cluster</span> <span class="kn">import</span> <span class="n">graclus_cluster</span>
-<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">coo_matrix</span><span class="p">,</span> <span class="n">lil_matrix</span><span class="p">,</span> <span class="n">spmatrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">graclus_cluster</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseTensor</span>
 
-<span class="kn">from</span> <span class="nn">thgsp.utils.sparse_utils</span> <span class="kn">import</span> <span class="n">pool_edge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">thgsp.utils.sparse_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">pool_edge</span>
 
 
-<span class="k">def</span> <span class="nf">kernel_array_from_beta_dist</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">kernel1</span><span class="p">,</span> <span class="n">kernel2</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">kernel_array_from_beta_dist</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">kernel1</span><span class="p">,</span> <span class="n">kernel2</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">f1c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">kernel1</span><span class="p">,</span> <span class="n">kernel2</span><span class="p">)</span>
     <span class="n">f1c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">f1c</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">f1c</span><span class="p">]</span> <span class="o">*</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="cohere_color_idx"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.cohere_color_idx">[docs]</a><span class="k">def</span> <span class="nf">cohere_color_idx</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">color_group</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="cohere_color_idx">
+<a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.cohere_color_idx">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cohere_color_idx</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">color_group</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -127,16 +129,17 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">new_order</span><span class="p">(</span><span class="n">n_color</span><span class="p">):</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">new_order</span><span class="p">(</span><span class="n">n_color</span><span class="p">):</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">n_color</span><span class="p">))</span>
-    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">M</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>  <span class="c1"># 0,1,...,2^M-1</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">M</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>  <span class="c1"># 0,1,...,2^M-1</span>
     <span class="n">no</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unpackbits</span><span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="o">-</span><span class="n">M</span><span class="p">:]</span>
     <span class="c1"># no need to flip before pack since bitorder=&#39;little&#39;</span>
     <span class="n">no</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">packbits</span><span class="p">(</span><span class="n">no</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bitorder</span><span class="o">=</span><span class="s2">&quot;little&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">no</span><span class="p">[</span><span class="n">no</span> <span class="o">&lt;</span> <span class="n">n_color</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">distribute_color_</span><span class="p">(</span><span class="n">n_color</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">distribute_color_</span><span class="p">(</span><span class="n">n_color</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">M</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_color</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -145,18 +148,20 @@
         <span class="n">beta1</span> <span class="o">=</span> <span class="n">distribute_color_</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">M</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">beta2</span> <span class="o">=</span> <span class="n">distribute_color_</span><span class="p">(</span><span class="n">N2</span><span class="p">,</span> <span class="n">M</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">beta1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">beta2</span><span class="p">])</span>
+        <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">beta2</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">beta_dist</span>
 
 
-<span class="k">def</span> <span class="nf">distribute_color</span><span class="p">(</span><span class="n">n_color</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">th</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">distribute_color</span><span class="p">(</span><span class="n">n_color</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">th</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">distribute_color_</span><span class="p">(</span><span class="n">n_color</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
     <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unpackbits</span><span class="p">(</span><span class="n">beta_dist</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="o">-</span><span class="n">M</span><span class="p">:]</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">)</span> <span class="k">if</span> <span class="n">th</span> <span class="k">else</span> <span class="n">beta_dist</span>
 
 
-<div class="viewcode-block" id="beta_dist2channel_name"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.beta_dist2channel_name">[docs]</a><span class="k">def</span> <span class="nf">beta_dist2channel_name</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="beta_dist2channel_name">
+<a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.beta_dist2channel_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beta_dist2channel_name</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the channel names(:math:`L` or :obj:`H`) for each channel according to</span>
 <span class="sd">    :obj:`beta_dist`. By default, :obj:`0` and :obj:`1` means :obj:`H` and :obj:`L`,</span>
 <span class="sd">    respectively.</span>
@@ -179,8 +184,11 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beta_dist</span><span class="p">,</span> <span class="o">*</span><span class="n">channel_name410</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="beta2color_group"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.beta2color_group">[docs]</a><span class="k">def</span> <span class="nf">beta2color_group</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">th</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Actually, beta2channel_group is more exact since &quot;color&quot; here is not</span>
+
+<div class="viewcode-block" id="beta2color_group">
+<a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.beta2color_group">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beta2color_group</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">th</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Actually, beta2channel_group is more exact since &quot;color&quot; here is not</span>
 <span class="sd">    exact graph coloring. However we can take it as an approximation of graph</span>
 <span class="sd">    coloring.</span>
 
@@ -201,7 +209,7 @@
 <span class="sd">        An array, see the doc of :class:`thgsp.filters.QmfCore` for the details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">n_channel</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">M</span>  <span class="c1"># pseudo channel number</span>
+    <span class="n">n_channel</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">M</span>  <span class="c1"># pseudo channel number</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
     <span class="n">beta_dist</span> <span class="o">=</span> <span class="n">distribute_color</span><span class="p">(</span><span class="n">n_channel</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">th</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># n_channel x M np.array</span>
     <span class="c1"># n_channel x 1 --&gt; n_channel</span>
@@ -219,8 +227,11 @@
     <span class="k">return</span> <span class="n">color_group</span><span class="p">,</span> <span class="n">beta_dist</span></div>
 
 
-<div class="viewcode-block" id="beta2channel_mask"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.beta2channel_mask">[docs]</a><span class="k">def</span> <span class="nf">beta2channel_mask</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Generate a :obj:`(2^M, N)` bool mask tensor to indicate which</span>
+
+<div class="viewcode-block" id="beta2channel_mask">
+<a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.beta2channel_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beta2channel_mask</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a :obj:`(2^M, N)` bool mask tensor to indicate which</span>
 <span class="sd">    channel(color group) one node belongs to. All channels have disjoint node</span>
 <span class="sd">    sets and hence the sum along the channel dimension returns a all-one(True)</span>
 <span class="sd">    :obj:`(N,)` tensor.</span>
@@ -245,7 +256,7 @@
 <span class="sd">        An array, see the doc of :class:`thgsp.filters.QmfCore` for the details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">n_channel</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">M</span>  <span class="c1"># pseudo channel number</span>
+    <span class="n">n_channel</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">M</span>  <span class="c1"># pseudo channel number</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_channel</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
         <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">beta</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
@@ -262,7 +273,8 @@
     <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="n">beta_dist</span></div>
 
 
-<span class="k">def</span> <span class="nf">laplace</span><span class="p">(</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">laplace</span><span class="p">(</span>
     <span class="n">adj</span><span class="p">:</span> <span class="n">spmatrix</span><span class="p">,</span> <span class="n">lap_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">add_loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">coo_matrix</span><span class="p">:</span>
     <span class="n">M</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span class="n">shape</span>
@@ -303,8 +315,10 @@
     <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="bipartite_mask"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.bipartite_mask">[docs]</a><span class="k">def</span> <span class="nf">bipartite_mask</span><span class="p">(</span><span class="n">bt</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="bipartite_mask">
+<a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.bipartite_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bipartite_mask</span><span class="p">(</span><span class="n">bt</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a bool mask matrix which can extract a bipartite subgraph from any graph</span>
 <span class="sd">    (represented by a matrix) .</span>
 
@@ -327,7 +341,8 @@
     <span class="k">return</span> <span class="n">lil_matrix</span><span class="p">(</span><span class="n">b1</span> <span class="o">^</span> <span class="n">b2</span><span class="p">)</span> <span class="k">if</span> <span class="n">sparse</span> <span class="k">else</span> <span class="n">b1</span> <span class="o">^</span> <span class="n">b2</span></div>
 
 
-<span class="k">def</span> <span class="nf">is_bipartite_fix</span><span class="p">(</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_bipartite_fix</span><span class="p">(</span>
     <span class="n">A</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">spmatrix</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">fix_flag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">spmatrix</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]]:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">spmatrix</span><span class="p">):</span>
@@ -338,7 +353,7 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="si">}</span><span class="s2"> not supported!&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_bipartite_fix_scipy</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_bipartite_fix_scipy</span><span class="p">(</span>
     <span class="n">A</span><span class="p">:</span> <span class="n">spmatrix</span><span class="p">,</span> <span class="n">fix_flag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">spmatrix</span><span class="p">]:</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span>
@@ -369,10 +384,12 @@
     <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">vtx_color</span><span class="p">,</span> <span class="n">A</span>
 
 
-<div class="viewcode-block" id="is_bipartite_fix_th"><a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.is_bipartite_fix_th">[docs]</a><span class="k">def</span> <span class="nf">is_bipartite_fix_th</span><span class="p">(</span>
+<div class="viewcode-block" id="is_bipartite_fix_th">
+<a class="viewcode-back" href="../../../modules/bga.html#thgsp.bga._utils.is_bipartite_fix_th">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_bipartite_fix_th</span><span class="p">(</span>
     <span class="n">A</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">fix_flag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Check if a graph is bipartite using BFS-based 2-color coloring and</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a graph is bipartite using BFS-based 2-color coloring and</span>
 <span class="sd">    furthermore can fix a graph to a bipartite one by deleting edges bridging</span>
 <span class="sd">    two nodes colored with a same color.</span>
 
@@ -421,14 +438,15 @@
     <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">vtx_color</span><span class="p">,</span> <span class="n">A</span></div>
 
 
-<span class="k">def</span> <span class="nf">dict2perm</span><span class="p">(</span><span class="n">cluster_dict</span><span class="p">):</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">dict2perm</span><span class="p">(</span><span class="n">cluster_dict</span><span class="p">):</span>
     <span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cluster_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
     <span class="n">part</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">cluster_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
     <span class="n">part</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">perm</span><span class="p">,</span> <span class="n">part</span>
 
 
-<span class="k">def</span> <span class="nf">graclus_coarsen</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">graclus_coarsen</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">wgt</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">coo</span><span class="p">()</span>
     <span class="n">coarsen_cluster</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
@@ -439,7 +457,7 @@
     <span class="k">return</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">wgt</span><span class="p">,</span> <span class="n">coarsen_cluster</span>
 
 
-<span class="k">def</span> <span class="nf">graclus_refine_raw</span><span class="p">(</span><span class="n">assignments</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">graclus_refine_raw</span><span class="p">(</span><span class="n">assignments</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">level</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="n">max_level</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">assignments</span><span class="p">)</span>
     <span class="n">coarest</span> <span class="o">=</span> <span class="n">assignments</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># max_level-1</span>
@@ -466,7 +484,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Bowen Deng.</p>
+    <p>&#169; Copyright 2025, Bowen Deng.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -8,8 +8,8 @@ following in the terminal to check if PyTorch is installed successfully.
 
 ```
 python -c "import torch; print(torch.__version__);print(torch.version.cuda)"
->>> 1.10.1  # pytorch version is 1.10.1
->>> 11.3    # my cuda version is 11.3
+>>> 2.5.1  # pytorch version is 2.5.1
+>>> 12.1  # my cuda version is 12.1
 ```
 
 ## 2. Install PyTorch Extensions
@@ -18,40 +18,35 @@ Matthias Fey provides excellent PyTorch extensions for graph-related computation
 [pytorch_scatter](https://github.com/rusty1s/pytorch_scatter),
 [pytorch_sparse](https://github.com/rusty1s/pytorch_sparse) and
 [pytorch_cluster](https://github.com/rusty1s/pytorch_cluster) following the
-[official guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html). Given `PyTorch1.10.1`
-built with `cuda11.3`, the following commands suffice on Linux.
+[official guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html). 
+Briefly speaking, given `PyTorch2.5.1` built with `cuda12.1`, the following commands finish the 
+PyTorch extension installation on Linux.
 
 ``` shell
 # Linux Bash
-export CUDA=cu113
-export TORCH=1.10.1
-pip install torch-scatter -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
-pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
+export CUDA=cu121
+export TORCH=2.5.1
+pip install torch-scatter torch-sparse   torch-cluster -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 ``` 
 
 For Windows `CMD`, try:
 
 ``` shell
 # Windows CMD
-set CUDA=cu113
-set TORCH=1.10.1
-pip install torch-scatter -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
-pip install torch-cluster -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
+set CUDA=cu121
+set TORCH=2.5.1
+pip install torch-scatter  torch-sparse  torch-cluster  -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
 ```
 ---
 **NOTE**
 `${CUDA}` (or `%CUDA%` on Windows) and `${TORCH}` (or `%TORCH%` on Windows) should be replaced by a specific CUDA 
-version (`cpu`, `cu111`, `cu113`) and PyTorch version (`1.8.1`, `1.9.0`, `1.9.1`, `1.10.0`, `1.10.1`), respectively. 
-For example, for PyTorch 1.10.1 and CUDA 11.3, type: 
+version (`cpu`, `cu121`) and PyTorch version (`1.8.1`, `2.5.1`), respectively. 
+For example, for PyTorch 2.5.1 and CUDA 12.1, type: 
 ```
-pip install torch-scatter -f https://data.pyg.org/whl/torch-1.10.1+cu113.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-1.10.1+cu113.html
-pip install torch-cluster -f https://data.pyg.org/whl/torch-1.10.1+cu113.html
+pip install torch-scatter torch-sparse   torch-cluster  -f https://data.pyg.org/whl/torch-2.5.1+cu121.html
 ```
 ---
-## 3. Install thgsp
+## 3. Install thgsp ⭐ 
 
 ### Installation via Prebuilt Pip Wheels
 We provide prebuilt pip wheels for your convenience. Please check them on [my website](https://wheel.torchgsp.xyz/whl).
@@ -59,15 +54,15 @@ You can install thgsp wheels on Linux via the block below.
 
 ``` shell
 # Linux Bash
-export CUDA=cu113
-export TORCH=1.10.1
+export CUDA=cu121
+export TORCH=2.5.1
 pip install thgsp -f https://wheel.torchgsp.xyz/whl/torch-${TORCH}+${CUDA}
 ```
 For Windows `CMD`, use:
 ```
 # Windows CMD
-set CUDA=cu113
-set TORCH=1.10.1
+set CUDA=cu121
+set TORCH=2.5.1
 pip install thgsp  -f https://wheel.torchgsp.xyz/whl/torch-%TORCH%+%CUDA%
 ```
 
@@ -91,8 +86,8 @@ pip install .
 If you do NOT have an Nvidia GPU, please skip this section.
 
 Follow the [official instruction](https://docs.cupy.dev/en/stable/install.html) to install
-`CuPy`, a GPU-based `NumPy` and `SciPy`, via either `pip` or `conda`. Given `CUDA v11.3`, 
+`CuPy`, cuda-based  `NumPy` and `SciPy`, via either `pip` or `conda`. Given `CUDA 12.1`, 
 the following command works.
 ```
-pip install cupy-cuda113
+pip install cupy-cuda12x
 ```

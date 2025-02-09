@@ -1,23 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>thgsp.filters.approximation &mdash; thgsp 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=0432188f" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,15 +27,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html">
-            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.1.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -71,9 +71,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>thgsp.filters.approximation</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">thgsp.filters.approximation</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -83,14 +83,15 @@
            <div itemprop="articleBody">
              
   <h1>Source code for thgsp.filters.approximation</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseTensor</span>
 
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">from_cpx</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">spmatrix</span><span class="p">,</span> <span class="n">to_xcipy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">issparse</span> <span class="k">as</span> <span class="n">is_scipy_sparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">thgsp.convert</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_cpx</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">to_xcipy</span>
 
 
-<span class="k">def</span> <span class="nf">normalize_laplace</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">lam_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_laplace</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">lam_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">):</span>
     <span class="n">Ln</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
     <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">Ln</span><span class="o">.</span><span class="n">coo</span><span class="p">()</span>
     <span class="n">diag_mask</span> <span class="o">=</span> <span class="n">row</span> <span class="o">==</span> <span class="n">col</span>
@@ -100,10 +101,12 @@
     <span class="k">return</span> <span class="n">Ln</span>
 
 
-<div class="viewcode-block" id="cheby_op"><a class="viewcode-back" href="../../../modules/filters.html#thgsp.filters.approximation.cheby_op">[docs]</a><span class="k">def</span> <span class="nf">cheby_op</span><span class="p">(</span>
+<div class="viewcode-block" id="cheby_op">
+<a class="viewcode-back" href="../../../modules/filters.html#thgsp.filters.approximation.cheby_op">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cheby_op</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">coeff</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lam_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Chebyshev approximation of graph filtering</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Chebyshev approximation of graph filtering</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -156,14 +159,15 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<span class="k">def</span> <span class="nf">cheby_op_basis</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cheby_op_basis</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">coeff</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
     <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">SparseTensor</span><span class="p">):</span>
         <span class="n">dt</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">on_gpu</span> <span class="o">=</span> <span class="n">get_ddd</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
         <span class="n">xp</span><span class="p">,</span> <span class="n">xcipy</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_array_module</span><span class="p">(</span><span class="n">on_gpu</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">spmatrix</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">scipy</span>
+    <span class="k">elif</span> <span class="n">is_scipy_sparse</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
 
         <span class="n">xcipy</span> <span class="o">=</span> <span class="n">scipy</span>
         <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
@@ -193,7 +197,7 @@
     <span class="k">return</span> <span class="n">result</span>
 
 
-<span class="k">def</span> <span class="nf">cheby_coeff</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cheby_coeff</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lam_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">num_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">num_points</span> <span class="o">=</span> <span class="n">K</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="k">assert</span> <span class="n">lam_max</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -230,8 +234,10 @@
     <span class="k">return</span> <span class="n">coeff</span><span class="o">.</span><span class="n">squeeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># M x Co x Ci x K+1</span>
 
 
-<div class="viewcode-block" id="polyval"><a class="viewcode-back" href="../../../modules/filters.html#thgsp.filters.approximation.polyval">[docs]</a><span class="k">def</span> <span class="nf">polyval</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Evaluate `N`-order polynomial at the points `x` with the given `N+1`</span>
+<div class="viewcode-block" id="polyval">
+<a class="viewcode-back" href="../../../modules/filters.html#thgsp.filters.approximation.polyval">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">polyval</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate `N`-order polynomial at the points `x` with the given `N+1`</span>
 <span class="sd">    coefficients in descending order.</span>
 
 <span class="sd">    Parameters</span>
@@ -255,7 +261,8 @@
     <span class="k">return</span> <span class="n">f</span></div>
 
 
-<span class="k">def</span> <span class="nf">nla</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;abs&quot;</span><span class="p">):</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">nla</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;abs&quot;</span><span class="p">):</span>
     <span class="n">Co</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Ci</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -287,7 +294,7 @@
     <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Co</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Ci</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">hard_threshold</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">lowest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hard_threshold</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">lowest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">lowest</span><span class="p">:</span>
         <span class="n">x</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
@@ -303,7 +310,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Bowen Deng.</p>
+    <p>&#169; Copyright 2025, Bowen Deng.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

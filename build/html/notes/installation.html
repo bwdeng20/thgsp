@@ -1,24 +1,23 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installation &mdash; thgsp 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=0432188f" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,15 +30,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html">
-            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.1.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -50,7 +50,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-pytorch">1. Install PyTorch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-pytorch-extensions">2. Install PyTorch Extensions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#install-thgsp">3. Install thgsp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-thgsp">3. Install thgsp ⭐</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#installation-via-prebuilt-pip-wheels">Installation via Prebuilt Pip Wheels</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#installation-from-source">Installation from Source</a></li>
 </ul>
@@ -84,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/notes/installation.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -95,78 +95,73 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section class="tex2jax_ignore mathjax_ignore" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
 <section id="install-pytorch">
-<h2>1. Install PyTorch<a class="headerlink" href="#install-pytorch" title="Permalink to this headline">¶</a></h2>
+<h2>1. Install PyTorch<a class="headerlink" href="#install-pytorch" title="Link to this heading">¶</a></h2>
 <p>We recommend users to install thgsp in an <a class="reference external" href="https://conda.io/docs/user-guide/install/index.html/">conda</a>
 virtual environment. Install PyTorch1.5 or later following <a class="reference external" href="https://pytorch.org/">the official instructions</a>. Type the
 following in the terminal to check if PyTorch is installed successfully.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;import torch; print(torch.__version__);print(torch.version.cuda)&quot;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="mf">1.10.1</span>  <span class="c1"># pytorch version is 1.10.1</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="mf">11.3</span>    <span class="c1"># my cuda version is 11.3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="mf">2.5.1</span>  <span class="c1"># pytorch version is 2.5.1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="mf">12.1</span>  <span class="c1"># my cuda version is 12.1</span>
 </pre></div>
 </div>
 </section>
 <section id="install-pytorch-extensions">
-<h2>2. Install PyTorch Extensions<a class="headerlink" href="#install-pytorch-extensions" title="Permalink to this headline">¶</a></h2>
+<h2>2. Install PyTorch Extensions<a class="headerlink" href="#install-pytorch-extensions" title="Link to this heading">¶</a></h2>
 <p>Matthias Fey provides excellent PyTorch extensions for graph-related computations. You can install
 <a class="reference external" href="https://github.com/rusty1s/pytorch_scatter">pytorch_scatter</a>,
 <a class="reference external" href="https://github.com/rusty1s/pytorch_sparse">pytorch_sparse</a> and
 <a class="reference external" href="https://github.com/rusty1s/pytorch_cluster">pytorch_cluster</a> following the
-<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html">official guide</a>. Given <code class="docutils literal notranslate"><span class="pre">PyTorch1.10.1</span></code>
-built with <code class="docutils literal notranslate"><span class="pre">cuda11.3</span></code>, the following commands suffice on Linux.</p>
+<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html">official guide</a>.
+Briefly speaking, given <code class="docutils literal notranslate"><span class="pre">PyTorch2.5.1</span></code> built with <code class="docutils literal notranslate"><span class="pre">cuda12.1</span></code>, the following commands finish the
+PyTorch extension installation on Linux.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linux Bash</span>
-<span class="nb">export</span> <span class="nv">CUDA</span><span class="o">=</span>cu113
-<span class="nb">export</span> <span class="nv">TORCH</span><span class="o">=</span><span class="m">1</span>.10.1
-pip install torch-scatter -f https://data.pyg.org/whl/torch-<span class="si">${</span><span class="nv">TORCH</span><span class="si">}</span>+<span class="si">${</span><span class="nv">CUDA</span><span class="si">}</span>.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-<span class="si">${</span><span class="nv">TORCH</span><span class="si">}</span>+<span class="si">${</span><span class="nv">CUDA</span><span class="si">}</span>.html
-pip install torch-cluster -f https://data.pyg.org/whl/torch-<span class="si">${</span><span class="nv">TORCH</span><span class="si">}</span>+<span class="si">${</span><span class="nv">CUDA</span><span class="si">}</span>.html
+<span class="nb">export</span><span class="w"> </span><span class="nv">CUDA</span><span class="o">=</span>cu121
+<span class="nb">export</span><span class="w"> </span><span class="nv">TORCH</span><span class="o">=</span><span class="m">2</span>.5.1
+pip<span class="w"> </span>install<span class="w"> </span>torch-scatter<span class="w"> </span>torch-sparse<span class="w">   </span>torch-cluster<span class="w"> </span>-f<span class="w"> </span>https://data.pyg.org/whl/torch-<span class="si">${</span><span class="nv">TORCH</span><span class="si">}</span>+<span class="si">${</span><span class="nv">CUDA</span><span class="si">}</span>.html
 </pre></div>
 </div>
 <p>For Windows <code class="docutils literal notranslate"><span class="pre">CMD</span></code>, try:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Windows CMD</span>
-<span class="nb">set</span> <span class="nv">CUDA</span><span class="o">=</span>cu113
-<span class="nb">set</span> <span class="nv">TORCH</span><span class="o">=</span><span class="m">1</span>.10.1
-pip install torch-scatter -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
-pip install torch-cluster -f https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
+<span class="nb">set</span><span class="w"> </span><span class="nv">CUDA</span><span class="o">=</span>cu121
+<span class="nb">set</span><span class="w"> </span><span class="nv">TORCH</span><span class="o">=</span><span class="m">2</span>.5.1
+pip<span class="w"> </span>install<span class="w"> </span>torch-scatter<span class="w">  </span>torch-sparse<span class="w">  </span>torch-cluster<span class="w">  </span>-f<span class="w"> </span>https://data.pyg.org/whl/torch-%TORCH%+%CUDA%.html
 </pre></div>
 </div>
 <hr class="docutils" />
 <p><strong>NOTE</strong>
 <code class="docutils literal notranslate"><span class="pre">${CUDA}</span></code> (or <code class="docutils literal notranslate"><span class="pre">%CUDA%</span></code> on Windows) and <code class="docutils literal notranslate"><span class="pre">${TORCH}</span></code> (or <code class="docutils literal notranslate"><span class="pre">%TORCH%</span></code> on Windows) should be replaced by a specific CUDA
-version (<code class="docutils literal notranslate"><span class="pre">cpu</span></code>, <code class="docutils literal notranslate"><span class="pre">cu111</span></code>, <code class="docutils literal notranslate"><span class="pre">cu113</span></code>) and PyTorch version (<code class="docutils literal notranslate"><span class="pre">1.8.1</span></code>, <code class="docutils literal notranslate"><span class="pre">1.9.0</span></code>, <code class="docutils literal notranslate"><span class="pre">1.9.1</span></code>, <code class="docutils literal notranslate"><span class="pre">1.10.0</span></code>, <code class="docutils literal notranslate"><span class="pre">1.10.1</span></code>), respectively.
-For example, for PyTorch 1.10.1 and CUDA 11.3, type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">scatter</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">pyg</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.10.1</span><span class="o">+</span><span class="n">cu113</span><span class="o">.</span><span class="n">html</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">sparse</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">pyg</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.10.1</span><span class="o">+</span><span class="n">cu113</span><span class="o">.</span><span class="n">html</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">cluster</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">pyg</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">1.10.1</span><span class="o">+</span><span class="n">cu113</span><span class="o">.</span><span class="n">html</span>
+version (<code class="docutils literal notranslate"><span class="pre">cpu</span></code>, <code class="docutils literal notranslate"><span class="pre">cu121</span></code>) and PyTorch version (<code class="docutils literal notranslate"><span class="pre">1.8.1</span></code>, <code class="docutils literal notranslate"><span class="pre">2.5.1</span></code>), respectively.
+For example, for PyTorch 2.5.1 and CUDA 12.1, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">-</span><span class="n">scatter</span> <span class="n">torch</span><span class="o">-</span><span class="n">sparse</span>   <span class="n">torch</span><span class="o">-</span><span class="n">cluster</span>  <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">pyg</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-</span><span class="mf">2.5.1</span><span class="o">+</span><span class="n">cu121</span><span class="o">.</span><span class="n">html</span>
 </pre></div>
 </div>
 </section>
 <hr class="docutils" />
 <section id="install-thgsp">
-<h2>3. Install thgsp<a class="headerlink" href="#install-thgsp" title="Permalink to this headline">¶</a></h2>
+<h2>3. Install thgsp ⭐<a class="headerlink" href="#install-thgsp" title="Link to this heading">¶</a></h2>
 <section id="installation-via-prebuilt-pip-wheels">
-<h3>Installation via Prebuilt Pip Wheels<a class="headerlink" href="#installation-via-prebuilt-pip-wheels" title="Permalink to this headline">¶</a></h3>
+<h3>Installation via Prebuilt Pip Wheels<a class="headerlink" href="#installation-via-prebuilt-pip-wheels" title="Link to this heading">¶</a></h3>
 <p>We provide prebuilt pip wheels for your convenience. Please check them on <a class="reference external" href="https://wheel.torchgsp.xyz/whl">my website</a>.
 You can install thgsp wheels on Linux via the block below.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linux Bash</span>
-<span class="nb">export</span> <span class="nv">CUDA</span><span class="o">=</span>cu113
-<span class="nb">export</span> <span class="nv">TORCH</span><span class="o">=</span><span class="m">1</span>.10.1
-pip install thgsp -f https://wheel.torchgsp.xyz/whl/torch-<span class="si">${</span><span class="nv">TORCH</span><span class="si">}</span>+<span class="si">${</span><span class="nv">CUDA</span><span class="si">}</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CUDA</span><span class="o">=</span>cu121
+<span class="nb">export</span><span class="w"> </span><span class="nv">TORCH</span><span class="o">=</span><span class="m">2</span>.5.1
+pip<span class="w"> </span>install<span class="w"> </span>thgsp<span class="w"> </span>-f<span class="w"> </span>https://wheel.torchgsp.xyz/whl/torch-<span class="si">${</span><span class="nv">TORCH</span><span class="si">}</span>+<span class="si">${</span><span class="nv">CUDA</span><span class="si">}</span>
 </pre></div>
 </div>
 <p>For Windows <code class="docutils literal notranslate"><span class="pre">CMD</span></code>, use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Windows CMD</span>
-<span class="nb">set</span> <span class="n">CUDA</span><span class="o">=</span><span class="n">cu113</span>
-<span class="nb">set</span> <span class="n">TORCH</span><span class="o">=</span><span class="mf">1.10.1</span>
+<span class="nb">set</span> <span class="n">CUDA</span><span class="o">=</span><span class="n">cu121</span>
+<span class="nb">set</span> <span class="n">TORCH</span><span class="o">=</span><span class="mf">2.5.1</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="n">thgsp</span>  <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">wheel</span><span class="o">.</span><span class="n">torchgsp</span><span class="o">.</span><span class="n">xyz</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">torch</span><span class="o">-%</span><span class="n">TORCH</span><span class="o">%+%</span><span class="n">CUDA</span><span class="o">%</span>
 </pre></div>
 </div>
 </section>
 <section id="installation-from-source">
-<h3>Installation from Source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h3>
+<h3>Installation from Source<a class="headerlink" href="#installation-from-source" title="Link to this heading">¶</a></h3>
 <p>You can install it from source. Clone the thgsp repository from  <code class="docutils literal notranslate"><span class="pre">github</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">bwdeng20</span><span class="o">/</span><span class="n">thgsp</span><span class="o">.</span><span class="n">git</span> <span class="c1"># from github</span>
 </pre></div>
@@ -179,12 +174,12 @@ pip install thgsp -f https://wheel.torchgsp.xyz/whl/torch-<span class="si">${</s
 </section>
 </section>
 <section id="install-cupy-for-linear-algebra-on-gpu-optional">
-<h2>4. Install cupy for linear algebra on GPU (Optional)<a class="headerlink" href="#install-cupy-for-linear-algebra-on-gpu-optional" title="Permalink to this headline">¶</a></h2>
+<h2>4. Install cupy for linear algebra on GPU (Optional)<a class="headerlink" href="#install-cupy-for-linear-algebra-on-gpu-optional" title="Link to this heading">¶</a></h2>
 <p>If you do NOT have an Nvidia GPU, please skip this section.</p>
 <p>Follow the <a class="reference external" href="https://docs.cupy.dev/en/stable/install.html">official instruction</a> to install
-<code class="docutils literal notranslate"><span class="pre">CuPy</span></code>, a GPU-based <code class="docutils literal notranslate"><span class="pre">NumPy</span></code> and <code class="docutils literal notranslate"><span class="pre">SciPy</span></code>, via either <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code>. Given <code class="docutils literal notranslate"><span class="pre">CUDA</span> <span class="pre">v11.3</span></code>,
+<code class="docutils literal notranslate"><span class="pre">CuPy</span></code>, cuda-based  <code class="docutils literal notranslate"><span class="pre">NumPy</span></code> and <code class="docutils literal notranslate"><span class="pre">SciPy</span></code>, via either <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code>. Given <code class="docutils literal notranslate"><span class="pre">CUDA</span> <span class="pre">12.1</span></code>,
 the following command works.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">cupy</span><span class="o">-</span><span class="n">cuda113</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">cupy</span><span class="o">-</span><span class="n">cuda12x</span>
 </pre></div>
 </div>
 </section>
@@ -201,7 +196,7 @@ the following command works.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Bowen Deng.</p>
+    <p>&#169; Copyright 2025, Bowen Deng.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

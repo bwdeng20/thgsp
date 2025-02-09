@@ -1,23 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>thgsp.sampling.bsgda &mdash; thgsp 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=0432188f" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -28,15 +27,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html">
-            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.1.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -71,9 +71,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>thgsp.sampling.bsgda</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">thgsp.sampling.bsgda</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -83,18 +83,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for thgsp.sampling.bsgda</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">thgsp.convert</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">to_xcipy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">thgsp.convert</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">get_array_module</span><span class="p">,</span> <span class="n">get_ddd</span><span class="p">,</span> <span class="n">to_xcipy</span>
 
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">construct_hth</span><span class="p">,</span> <span class="n">construct_sampling_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">construct_hth</span><span class="p">,</span> <span class="n">construct_sampling_matrix</span>
 
 
-<span class="k">def</span> <span class="nf">computing_sets</span><span class="p">(</span><span class="n">spm</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">p_hops</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">computing_sets</span><span class="p">(</span><span class="n">spm</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">p_hops</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
     <span class="n">rowptr</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">wgt</span> <span class="o">=</span> <span class="n">spm</span><span class="o">.</span><span class="n">csr</span><span class="p">()</span>
     <span class="n">wgt</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">new_ones</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">spm</span><span class="o">.</span><span class="n">dtype</span><span class="p">())</span> <span class="k">if</span> <span class="n">wgt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">wgt</span>
     <span class="n">ripples</span><span class="p">,</span> <span class="n">ripple_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">thgsp</span><span class="o">.</span><span class="n">computing_sets</span><span class="p">(</span>
@@ -103,18 +103,18 @@
     <span class="k">return</span> <span class="n">ripples</span><span class="p">,</span> <span class="n">ripple_size</span>
 
 
-<span class="k">def</span> <span class="nf">solving_set_covering</span><span class="p">(</span><span class="n">sets</span><span class="p">,</span> <span class="n">set_size</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solving_set_covering</span><span class="p">(</span><span class="n">sets</span><span class="p">,</span> <span class="n">set_size</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
     <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">thgsp</span><span class="o">.</span><span class="n">solving_set_covering</span><span class="p">(</span><span class="n">sets</span><span class="p">,</span> <span class="n">set_size</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span>
 
 
-<span class="k">def</span> <span class="nf">greedy_sampling</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">p_hops</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greedy_sampling</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">p_hops</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
     <span class="n">ripples</span><span class="p">,</span> <span class="n">ripple_size</span> <span class="o">=</span> <span class="n">computing_sets</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">p_hops</span><span class="p">)</span>
     <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span> <span class="o">=</span> <span class="n">solving_set_covering</span><span class="p">(</span><span class="n">ripples</span><span class="p">,</span> <span class="n">ripple_size</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span>
 
 
-<span class="k">def</span> <span class="nf">greedy_gda_sampling</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">p_hops</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greedy_gda_sampling</span><span class="p">(</span><span class="n">spm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">p_hops</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
     <span class="n">rowptr</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">wgt</span> <span class="o">=</span> <span class="n">spm</span><span class="o">.</span><span class="n">csr</span><span class="p">()</span>
     <span class="n">wgt</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">new_ones</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">spm</span><span class="o">.</span><span class="n">dtype</span><span class="p">())</span> <span class="k">if</span> <span class="n">wgt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">wgt</span>
     <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">thgsp</span><span class="o">.</span><span class="n">greedy_gda_sampling</span><span class="p">(</span>
@@ -123,7 +123,9 @@
     <span class="k">return</span> <span class="n">selected_pebbles</span><span class="p">,</span> <span class="n">vf</span>
 
 
-<div class="viewcode-block" id="bsgda"><a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.bsgda.bsgda">[docs]</a><span class="k">def</span> <span class="nf">bsgda</span><span class="p">(</span>
+<div class="viewcode-block" id="bsgda">
+<a class="viewcode-back" href="../../../modules/sampling.html#thgsp.sampling.bsgda.bsgda">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bsgda</span><span class="p">(</span>
     <span class="n">spm</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span>
     <span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
@@ -131,7 +133,7 @@
     <span class="n">p_hops</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
     <span class="n">boost</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A fast deterministic vertex sampling algorithm on Gershgorin disc alignment and for</span>
 <span class="sd">    smooth graph signals [2]_.</span>
 
@@ -196,7 +198,8 @@
     <span class="k">return</span> <span class="n">sampled_nodes</span><span class="p">,</span> <span class="n">left</span></div>
 
 
-<span class="k">def</span> <span class="nf">recon_bsgda</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">reg_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">recon_bsgda</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">SparseTensor</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">reg_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">N</span> <span class="o">&gt;=</span> <span class="n">M</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -213,7 +216,7 @@
     <span class="n">L</span> <span class="o">=</span> <span class="n">to_xcipy</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
     <span class="n">Ht</span> <span class="o">=</span> <span class="n">construct_sampling_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
     <span class="n">HtH</span> <span class="o">=</span> <span class="n">construct_hth</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">HtH</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">L</span> <span class="o">**</span> <span class="n">reg_order</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">HtH</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">L</span><span class="o">**</span><span class="n">reg_order</span>
     <span class="n">Hty</span> <span class="o">=</span> <span class="n">Ht</span> <span class="o">@</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">xp</span> <span class="o">==</span> <span class="n">np</span><span class="p">:</span>
@@ -233,7 +236,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Bowen Deng.</p>
+    <p>&#169; Copyright 2025, Bowen Deng.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

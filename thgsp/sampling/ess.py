@@ -48,8 +48,6 @@ def ess(operator, M, k=2, block_size=2):
         reduced = LtL[xp.ix_(Sc, Sc)]
 
         guess = xp.random.rand(length, block_size)
-        guess = xcipy.linalg.orth(guess)
-
         sigma, psi = xsplin.lobpcg(reduced, X=guess, largest=False, maxiter=100)
 
         psi = psi[:, 0].ravel()

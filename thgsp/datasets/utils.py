@@ -1,6 +1,7 @@
 """
 This file is substantially copied from `torchvision.datasets.utils`
 """
+
 import shutil
 import bz2
 import gzip
@@ -16,7 +17,18 @@ import urllib
 import urllib.error
 import urllib.request
 import zipfile
-from typing import Any, Callable, Dict, IO, Iterable, List, Optional, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    IO,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
 from urllib.parse import urlparse
 
 import numpy as np
@@ -34,15 +46,23 @@ def _is_remote_location_available() -> bool:
     return False
 
 
-def _urlretrieve(url: str, filename: Union[str, pathlib.Path], chunk_size: int = 1024 * 32) -> None:
-    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": USER_AGENT})) as response:
-        with open(filename, "wb") as fh, tqdm(total=response.length, unit="B", unit_scale=True) as pbar:
+def _urlretrieve(
+    url: str, filename: Union[str, pathlib.Path], chunk_size: int = 1024 * 32
+) -> None:
+    with urllib.request.urlopen(
+        urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    ) as response:
+        with open(filename, "wb") as fh, tqdm(
+            total=response.length, unit="B", unit_scale=True
+        ) as pbar:
             while chunk := response.read(chunk_size):
                 fh.write(chunk)
                 pbar.update(len(chunk))
 
 
-def calculate_md5(fpath: Union[str, pathlib.Path], chunk_size: int = 1024 * 1024) -> str:
+def calculate_md5(
+    fpath: Union[str, pathlib.Path], chunk_size: int = 1024 * 1024
+) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but indicates that we are
     # not using the MD5 checksum for cryptography. This enables its usage in restricted environments like FIPS. Without
     # it torchvision.datasets is unusable in these environments since we perform a MD5 check everywhere.
@@ -73,7 +93,9 @@ def _get_redirect_url(url: str, max_hops: int = 3) -> str:
     headers = {"Method": "HEAD", "User-Agent": USER_AGENT}
 
     for _ in range(max_hops + 1):
-        with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:
+        with urllib.request.urlopen(
+            urllib.request.Request(url, headers=headers)
+        ) as response:
             if response.url == url or response.url is None:
                 return url
 
@@ -98,11 +120,11 @@ def _get_google_drive_file_id(url: str) -> Optional[str]:
 
 
 def download_url(
-        url: str,
-        root: Union[str, pathlib.Path],
-        filename: Optional[Union[str, pathlib.Path]] = None,
-        md5: Optional[str] = None,
-        max_redirect_hops: int = 3,
+    url: str,
+    root: Union[str, pathlib.Path],
+    filename: Optional[Union[str, pathlib.Path]] = None,
+    md5: Optional[str] = None,
+    max_redirect_hops: int = 3,
 ) -> None:
     """Download a file from a url and place it in root.
 
@@ -143,7 +165,12 @@ def download_url(
         except (urllib.error.URLError, OSError) as e:  # type: ignore[attr-defined]
             if url[:5] == "https":
                 url = url.replace("https:", "http:")
-                print("Failed download. Trying https -> http instead. Downloading " + url + " to " + fpath)
+                print(
+                    "Failed download. Trying https -> http instead. Downloading "
+                    + url
+                    + " to "
+                    + fpath
+                )
                 _urlretrieve(url, fpath)
             else:
                 raise e
@@ -168,7 +195,9 @@ def list_dir(root: Union[str, pathlib.Path], prefix: bool = False) -> List[str]:
     return directories
 
 
-def list_files(root: Union[str, pathlib.Path], suffix: str, prefix: bool = False) -> List[str]:
+def list_files(
+    root: Union[str, pathlib.Path], suffix: str, prefix: bool = False
+) -> List[str]:
     """List all files ending with a suffix at a given root
 
     Args:
@@ -179,17 +208,21 @@ def list_files(root: Union[str, pathlib.Path], suffix: str, prefix: bool = False
             only returns the name of the files found
     """
     root = os.path.expanduser(root)
-    files = [p for p in os.listdir(root) if os.path.isfile(os.path.join(root, p)) and p.endswith(suffix)]
+    files = [
+        p
+        for p in os.listdir(root)
+        if os.path.isfile(os.path.join(root, p)) and p.endswith(suffix)
+    ]
     if prefix is True:
         files = [os.path.join(root, d) for d in files]
     return files
 
 
 def download_file_from_google_drive(
-        file_id: str,
-        root: Union[str, pathlib.Path],
-        filename: Optional[Union[str, pathlib.Path]] = None,
-        md5: Optional[str] = None,
+    file_id: str,
+    root: Union[str, pathlib.Path],
+    filename: Optional[Union[str, pathlib.Path]] = None,
+    md5: Optional[str] = None,
 ):
     """Download a Google Drive file from  and place it in root.
 
@@ -224,7 +257,9 @@ def download_file_from_google_drive(
 
 
 def _extract_tar(
-        from_path: Union[str, pathlib.Path], to_path: Union[str, pathlib.Path], compression: Optional[str]
+    from_path: Union[str, pathlib.Path],
+    to_path: Union[str, pathlib.Path],
+    compression: Optional[str],
 ) -> None:
     with tarfile.open(from_path, f"r:{compression[1:]}" if compression else "r") as tar:
         tar.extractall(to_path)
@@ -237,15 +272,24 @@ _ZIP_COMPRESSION_MAP: Dict[str, int] = {
 
 
 def _extract_zip(
-        from_path: Union[str, pathlib.Path], to_path: Union[str, pathlib.Path], compression: Optional[str]
+    from_path: Union[str, pathlib.Path],
+    to_path: Union[str, pathlib.Path],
+    compression: Optional[str],
 ) -> None:
     with zipfile.ZipFile(
-            from_path, "r", compression=_ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
+        from_path,
+        "r",
+        compression=(
+            _ZIP_COMPRESSION_MAP[compression] if compression else zipfile.ZIP_STORED
+        ),
     ) as zip:
         zip.extractall(to_path)
 
 
-_ARCHIVE_EXTRACTORS: Dict[str, Callable[[Union[str, pathlib.Path], Union[str, pathlib.Path], Optional[str]], None]] = {
+_ARCHIVE_EXTRACTORS: Dict[
+    str,
+    Callable[[Union[str, pathlib.Path], Union[str, pathlib.Path], Optional[str]], None],
+] = {
     ".tar": _extract_tar,
     ".zip": _extract_zip,
 }
@@ -261,7 +305,9 @@ _FILE_TYPE_ALIASES: Dict[str, Tuple[Optional[str], Optional[str]]] = {
 }
 
 
-def _detect_file_type(file: Union[str, pathlib.Path]) -> Tuple[str, Optional[str], Optional[str]]:
+def _detect_file_type(
+    file: Union[str, pathlib.Path],
+) -> Tuple[str, Optional[str], Optional[str]]:
     """Detect the archive type and/or compression of a file.
 
     Args:
@@ -300,14 +346,20 @@ def _detect_file_type(file: Union[str, pathlib.Path]) -> Tuple[str, Optional[str
 
         return suffix, None, suffix
 
-    valid_suffixes = sorted(set(_FILE_TYPE_ALIASES) | set(_ARCHIVE_EXTRACTORS) | set(_COMPRESSED_FILE_OPENERS))
-    raise RuntimeError(f"Unknown compression or archive type: '{suffix}'.\nKnown suffixes are: '{valid_suffixes}'.")
+    valid_suffixes = sorted(
+        set(_FILE_TYPE_ALIASES)
+        | set(_ARCHIVE_EXTRACTORS)
+        | set(_COMPRESSED_FILE_OPENERS)
+    )
+    raise RuntimeError(
+        f"Unknown compression or archive type: '{suffix}'.\nKnown suffixes are: '{valid_suffixes}'."
+    )
 
 
 def _decompress(
-        from_path: Union[str, pathlib.Path],
-        to_path: Optional[Union[str, pathlib.Path]] = None,
-        remove_finished: bool = False,
+    from_path: Union[str, pathlib.Path],
+    to_path: Optional[Union[str, pathlib.Path]] = None,
+    remove_finished: bool = False,
 ) -> pathlib.Path:
     r"""Decompress a file.
 
@@ -326,7 +378,11 @@ def _decompress(
         raise RuntimeError(f"Couldn't detect a compression from suffix {suffix}.")
 
     if to_path is None:
-        to_path = pathlib.Path(os.fspath(from_path).replace(suffix, archive_type if archive_type is not None else ""))
+        to_path = pathlib.Path(
+            os.fspath(from_path).replace(
+                suffix, archive_type if archive_type is not None else ""
+            )
+        )
 
     # We don't need to check for a missing key here, since this was already done in _detect_file_type()
     compressed_file_opener = _COMPRESSED_FILE_OPENERS[compression]
@@ -341,9 +397,9 @@ def _decompress(
 
 
 def extract_archive(
-        from_path: Union[str, pathlib.Path],
-        to_path: Optional[Union[str, pathlib.Path]] = None,
-        remove_finished: bool = False,
+    from_path: Union[str, pathlib.Path],
+    to_path: Optional[Union[str, pathlib.Path]] = None,
+    remove_finished: bool = False,
 ) -> Union[str, pathlib.Path]:
     """Extract an archive.
 
@@ -389,12 +445,12 @@ def extract_archive(
 
 
 def download_and_extract_archive(
-        url: str,
-        download_root: Union[str, pathlib.Path],
-        extract_root: Optional[Union[str, pathlib.Path]] = None,
-        filename: Optional[Union[str, pathlib.Path]] = None,
-        md5: Optional[str] = None,
-        remove_finished: bool = False,
+    url: str,
+    download_root: Union[str, pathlib.Path],
+    extract_root: Optional[Union[str, pathlib.Path]] = None,
+    filename: Optional[Union[str, pathlib.Path]] = None,
+    md5: Optional[str] = None,
+    remove_finished: bool = False,
 ) -> None:
     download_root = os.path.expanduser(download_root)
     if extract_root is None:
@@ -417,10 +473,10 @@ T = TypeVar("T", str, bytes)
 
 
 def verify_str_arg(
-        value: T,
-        arg: Optional[str] = None,
-        valid_values: Optional[Iterable[T]] = None,
-        custom_msg: Optional[str] = None,
+    value: T,
+    arg: Optional[str] = None,
+    valid_values: Optional[Iterable[T]] = None,
+    custom_msg: Optional[str] = None,
 ) -> T:
     if not isinstance(value, str):
         if arg is None:
@@ -438,13 +494,17 @@ def verify_str_arg(
             msg = custom_msg
         else:
             msg = "Unknown value '{value}' for argument {arg}. Valid values are {{{valid_values}}}."
-            msg = msg.format(value=value, arg=arg, valid_values=iterable_to_str(valid_values))
+            msg = msg.format(
+                value=value, arg=arg, valid_values=iterable_to_str(valid_values)
+            )
         raise ValueError(msg)
 
     return value
 
 
-def _read_pfm(file_name: Union[str, pathlib.Path], slice_channels: int = 2) -> np.ndarray:
+def _read_pfm(
+    file_name: Union[str, pathlib.Path], slice_channels: int = 2
+) -> np.ndarray:
     """Read file in .pfm format. Might contain either 1 or 3 channels of data.
 
     Args:
@@ -482,7 +542,12 @@ def _read_pfm(file_name: Union[str, pathlib.Path], slice_channels: int = 2) -> n
 
 def _flip_byte_order(t: torch.Tensor) -> torch.Tensor:
     return (
-        t.contiguous().view(torch.uint8).view(*t.shape, t.element_size()).flip(-1).view(*t.shape[:-1], -1).view(t.dtype)
+        t.contiguous()
+        .view(torch.uint8)
+        .view(*t.shape, t.element_size())
+        .flip(-1)
+        .view(*t.shape[:-1], -1)
+        .view(t.dtype)
     )
 
 

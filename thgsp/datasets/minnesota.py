@@ -9,7 +9,12 @@ from scipy.sparse import coo_matrix
 from thgsp.graphs import Graph
 from thgsp.io import loadmat
 
-from .utils import get_data_dir_of_thgsp, remove_file_or_dir,check_integrity, download_and_extract_archive
+from .utils import (
+    get_data_dir_of_thgsp,
+    remove_file_or_dir,
+    check_integrity,
+    download_and_extract_archive,
+)
 
 
 class Minnesota:

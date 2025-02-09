@@ -38,6 +38,8 @@ jobs:
       - name: Upgrade pip
         run: |
           pip install --upgrade setuptools
+        shell:
+          bash
 
       - name: Translate cuXXY to XX.Y.Z, e.g., cu113 to 11.3.1
         if: ${{ matrix.cuda-version != 'cpu' }}

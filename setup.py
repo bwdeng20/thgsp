@@ -90,7 +90,6 @@ def get_extensions():
 
 install_requires = [
     "torch>=1.7.0",
-    "torchvision",
     "ray",
     "scikit-learn",
     "scipy",

@@ -1,10 +1,11 @@
-import numpy as np
 import torch
+from thgsp.convert import get_array_module, get_ddd, to_xcipy
+import warnings
 
-from thgsp.convert import get_array_module, to_scipy
+warnings.filterwarnings("ignore", message="Exited at iteration", category=UserWarning)
 
 
-def ess(operator, M, k=2):
+def ess(operator, M, k=2, block_size=2):
     r"""
     An efficient sampling set selection method for bandlimited graph signals [1]_.
 
@@ -16,7 +17,8 @@ def ess(operator, M, k=2):
         The number of desired sampled nodes.
     k:  int
         The proxy order. Refer to the literature for details.
-
+    block_size:  int
+        The block size of lobpcg.
     Returns
     -------
     S:  list
@@ -29,28 +31,29 @@ def ess(operator, M, k=2):
 
 
     """
-    import scipy.sparse.linalg as splin
+    dt, dv, density, on_gpu = get_ddd(operator)
+    xp, xcipy, xsplin = get_array_module(on_gpu)
 
-    # add GPU support after cp.setdiff1d is implemented
-    # dt, dv, density, on_gpu = get_ddd(operator)
-    # xp, xcipy, xsplin = get_array_module(on_gpu)
-
-    L = to_scipy(operator)
+    L = to_xcipy(operator)
     N = L.shape[-1]
-    LtL = L.T**k * L**k
-    V = np.arange(N)
+    LtL = L.T ** k * L ** k
+    V = xp.arange(N)
     S = list()
     while len(S) < M:
-        Sc = np.setdiff1d(V, S)
-        length = len(Sc)
+        Sc = xp.setdiff1d(V, S)
+        length = Sc.shape[0]
         if length == 1:
-            S.append(Sc[0])
+            S.append(Sc[0].item())
             break
-        reduced = LtL[np.ix_(Sc, Sc)]
+        reduced = LtL[xp.ix_(Sc, Sc)]
 
-        sigma, psi = splin.lobpcg(reduced, X=np.random.rand(length, 1), largest=False)
-        psi = psi.ravel()
-        v = Sc[np.argmax(np.abs(psi)).item()]
+        guess = xp.random.rand(length, block_size)
+        guess = xcipy.linalg.orth(guess)
+
+        sigma, psi = xsplin.lobpcg(reduced, X=guess, largest=False, maxiter=100)
+
+        psi = psi[:, 0].ravel()
+        v = Sc[xp.argmax(psi**2).item()].item()
         S.append(v)
     return S
 

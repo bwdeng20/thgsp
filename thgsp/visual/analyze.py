@@ -312,7 +312,8 @@ def show_transform(
         cluster_ordered = cluster[emd_order]
         jump_nodes = (cluster_ordered[1:] - cluster_ordered[:-1]).nonzero()[0]
         if len(jump_nodes) != num_clusters - 1:
-            raise RuntimeError("Vertex embedding and clusters are inconsistent")
+            raise RuntimeError(f"Vertex embedding and clusters are inconsistent. "
+                               f"num_clusters: {num_clusters}, jump_nodes: {jump_nodes}")
 
         #  Vertical lines to separate the clusters
         cluster_boundaries = np.zeros(num_clusters + 1)

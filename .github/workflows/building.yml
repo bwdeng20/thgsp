@@ -14,7 +14,7 @@ jobs:
       max-parallel: 20 # max for free user
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        python-version: [ '3.11' ]
+        python-version: [ '3.10', '3.11' ]
         torch-version: [ 2.5.0 ]  # [2.3.0, 2.4.0, 2.5.0]
         cuda-version: [ 'cu121', 'cpu' ]
         exclude:

@@ -7,7 +7,6 @@ from .utils import (
     check_integrity,
     download_and_extract_archive,
     get_data_dir_of_thgsp,
-    remove_file_or_dir,
 )
 
 

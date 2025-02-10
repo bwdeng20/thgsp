@@ -35,7 +35,7 @@ from .convert import (
 )
 from .io import loadmat  # noqa
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 suffix = "cuda" if torch.cuda.is_available() else "cpu"
 
 cpp_tools = ["_version", "_dsatur", "_bsgda"]

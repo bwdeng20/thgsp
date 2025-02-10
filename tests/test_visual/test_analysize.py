@@ -21,7 +21,7 @@ def test_on_usc_toy(embd):
     highlights = lil_matrix((M, N))
     highlights[range(M), sampled_nodes] = 1
     fig, _, _ = show_transform(
-        g, U.t(), fs, highlights, cluster=2, bands=bands, embedding=embd
+        g, U.t(), fs, highlights, cluster=1, bands=bands, embedding=embd
     )
     plot(fig)
     remove_downloaded_dataset("GraphStructures-master")

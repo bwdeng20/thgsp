@@ -3,7 +3,6 @@ import warnings
 import numpy as np
 import torch
 from scipy.sparse import coo_matrix, csc_matrix, csr_matrix
-
 from scipy.sparse import issparse as is_scipy_sparse
 from torch.utils.dlpack import from_dlpack
 from torch_sparse import SparseTensor

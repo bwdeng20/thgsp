@@ -66,7 +66,7 @@ def harary(
     beta = np.zeros((N, M), dtype=bool)
     for i in range(M):
         colors_L = (beta_dist[:, i] == 1).nonzero()[0]
-        bt = np.in1d(new_vtx_color, colors_L)
+        bt = np.isin(new_vtx_color, colors_L)
 
         beta[:, i] = bt
         mask = bipartite_mask(bt)

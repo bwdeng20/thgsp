@@ -262,7 +262,7 @@ def show_transform(
     # Vertex embedding
     if embedding is None:
         if verbose:
-            print("Computing 1-D embedding based on the 2nd random walk Laplacian ...")
+            print("Computing 1-D embedding based on the 2nd Laplacian vector ...")
         if vecs is None:
             vals, vecs = compute_eigen_of_rw(G, 2)
         idx2nd = vals.argsort()[1]  # the second smallest

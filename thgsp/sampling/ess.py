@@ -1,6 +1,8 @@
-import torch
-from thgsp.convert import get_array_module, get_ddd, to_xcipy
 import warnings
+
+import torch
+
+from thgsp.convert import get_array_module, get_ddd, to_xcipy
 
 warnings.filterwarnings("ignore", message="Exited at iteration", category=UserWarning)
 

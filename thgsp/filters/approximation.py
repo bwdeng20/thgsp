@@ -1,8 +1,8 @@
 import numpy as np
 import torch
+from scipy.sparse import issparse as is_scipy_sparse
 from torch_sparse import SparseTensor
 
-from scipy.sparse import issparse as is_scipy_sparse
 from thgsp.convert import from_cpx, get_array_module, get_ddd, to_xcipy
 
 

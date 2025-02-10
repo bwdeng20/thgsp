@@ -2,7 +2,6 @@
 This file is substantially copied from `torchvision.datasets.utils`
 """
 
-import shutil
 import bz2
 import gzip
 import hashlib
@@ -11,6 +10,7 @@ import os
 import os.path
 import pathlib
 import re
+import shutil
 import sys
 import tarfile
 import urllib
@@ -18,10 +18,10 @@ import urllib.error
 import urllib.request
 import zipfile
 from typing import (
+    IO,
     Any,
     Callable,
     Dict,
-    IO,
     Iterable,
     List,
     Optional,

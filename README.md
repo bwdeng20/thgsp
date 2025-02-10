@@ -38,7 +38,7 @@ Thanks for the [Matlab code](https://biron.usc.edu/wiki/index.php/Graph_Filterba
 
 ## Example
 
-### GraphQMF four channel wavelet filter bank on Minnesota
+### GraphQMF (a four channel wavelet filter bank) on Minnesota road graph
 
 <img src="./demos/minnesota/TheWaveletCoefficientsFourChannels.png" width="50%" height="40%">
 <img src="./demos/minnesota/ReconstructedFourChannels.png" width="50%" height="40%">
@@ -53,9 +53,9 @@ The comparision between the eventual reconstructed signal and the input one.
 
 <img src="./demos/minnesota/Signals.png " width="50%" height="40%">
 
-### GraphBiorth four channel wavelet filter bank for camera man.
+### GraphBiorth (a four channel wavelet filter bank) on CameraMan image graph.
 
-See the full program [here](./demos/images/bio_cmn.py).
+See the full program [here](./demos/images/bio_cmn.ipynb).
 
 ## Reference
 
@@ -70,6 +70,7 @@ See the full program [here](./demos/images/bio_cmn.py).
 [G. Puy, et al.] Random sampling of bandlimited signals on graphs,  ACHA, 2018. \
 [A. Sakiyama, et al.] Eigendecomposition-free sampling set selection for graph signals，IEEE TSP, 2020. \
 [Aamir Anis et al.] Efficient sampling set selection for bandlimited graph signals using graph spectral proxies, IEEE TSP, 2016.
+...
 
 ## Citation
 ```

@@ -86,16 +86,3 @@ jobs:
           python setup.py bdist_wheel --dist-dir=dist
         shell:
           bash
-
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-east-1
-
-
-      - name: Upload wheel
-        run: |
-          aws s3 sync dist s3://thgsp/whl/torch-${{ matrix.torch-version }}+${{ matrix.cuda-version }} --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
-

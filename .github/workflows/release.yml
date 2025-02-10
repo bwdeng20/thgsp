@@ -9,18 +9,16 @@ on:
       - completed
 
 jobs:
-  on-success:
+  release:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Update the website of wheels
-        uses: appleboy/ssh-action@master
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Release and Upload Wheel
+        uses: softprops/action-gh-release@v1
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          script: ${{secrets.SCRIPT}}
-
-
+          files: "dist/*.whl"
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
